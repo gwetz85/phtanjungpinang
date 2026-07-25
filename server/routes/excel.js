@@ -269,7 +269,10 @@ router.get('/export', authorize('admin', 'superadmin'), (req, res) => {
   `);
 
   if (!rows.length) {
-    return res.status(404).json({ success: false, message: 'Tidak ada data untuk diexport.' });
+    return res.status(404).json({
+      success: false,
+      message: 'Belum ada data tamu di database. Silakan upload/import file Excel Anda terlebih dahulu melalui menu "Upload Excel" (Superadmin).'
+    });
   }
 
   const wb = XLSX.utils.book_new();
