@@ -1,14 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const { getDB, persist } = require('../db');
+const { getDB, persist, syncFromFirebase } = require('../db');
 const { authenticate, authorize } = require('../middleware/auth');
 
 // Apply authentication to all settings routes
 router.use(authenticate);
 
 // GET /api/settings/running-text
-router.get('/running-text', (req, res) => {
+router.get('/running-text', async (req, res) => {
   try {
+    await syncFromFirebase();
     const db = getDB();
     res.json({
       success: true,

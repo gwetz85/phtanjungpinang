@@ -450,4 +450,4 @@ function getDB() {
   return dbData;
 }
 
-module.exports = { initDB, getDB, queryAll, queryOne, run, transaction, detectIdentityType, persist };
+module.exports = { initDB, getDB, queryAll, queryOne, run, transaction, detectIdentityType, persist, syncFromFirebase };

@@ -15,6 +15,8 @@ const dashboard = {
     this.renderNav();
     this.setupLogout();
     this.loadRunningText();
+    // Poll for running text updates every 30 seconds
+    setInterval(() => this.loadRunningText(), 30000);
     this.startClock();
 
     // Navigate to default panel
