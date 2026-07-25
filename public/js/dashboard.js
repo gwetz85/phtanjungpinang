@@ -324,13 +324,24 @@ const dashboard = {
   startClock() {
     const clockEl = document.getElementById('clock-time');
     if (!clockEl) return;
-    
+
+    const DAYS_ID = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const MONTHS_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
     const updateTime = () => {
       const now = new Date();
-      const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/\./g, ':');
-      clockEl.textContent = timeStr;
+      const dayName = DAYS_ID[now.getDay()];
+      const date = now.getDate();
+      const monthName = MONTHS_ID[now.getMonth()];
+      const year = now.getFullYear();
+      
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      
+      clockEl.textContent = `${dayName}, ${date} ${monthName} ${year} - ${hours}:${minutes}:${seconds}`;
     };
-    
+
     updateTime();
     setInterval(updateTime, 1000);
   }
