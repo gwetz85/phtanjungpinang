@@ -154,10 +154,53 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
         const { rows } = parseSheetData(sheet);
         if (!rows.length) continue;
 
+const MAPPING_ALIASES = {
+  no_identitas:    ['IDENTITAS', 'NIK / PSP NO', 'NIK', 'PSP NO', 'PASSPORT', 'NO IDENTITAS', 'ID'],
+  nama_tamu:       ['NAMA TAMU', 'NAMA', 'NAME', 'GUEST NAME'],
+  umur:            ['TANGGAL LAHIR', 'TGL LAHIR', 'UMUR', 'AGE', 'USIA'],
+  expiry_identitas:['EXPIRY', 'EXPIRY DATE', 'EXPIRED', 'EXP'],
+  kewarganegaraan: ['NATIONALITY', 'KEWARGANEGARAAN', 'WN', 'NEGARA'],
+  datang_dari:     ['DATANG DARI', 'DATANG', 'ASAL', 'FROM', 'ORIGIN'],
+  nomor_kamar:     ['NOMOR ROOM', 'ROOM NO', 'KAMAR', 'ROOM', 'NO KAMAR', 'NO ROOM'],
+  tanggal_masuk:   ['TANGGAL MASUK', 'TANGGAL', 'TGL MASUK', 'CHECK IN', 'DATE IN'],
+  keterangan:      ['KETERANGAN', 'KET', 'NOTES', 'REMARKS'],
+};
+
+function getRowValue(row, field, mappedHeader) {
+  if (!row) return '';
+
+  if (mappedHeader && row[mappedHeader] !== undefined && String(row[mappedHeader]).trim() !== '') {
+    return row[mappedHeader];
+  }
+
+  const rowKeys = Object.keys(row);
+  if (mappedHeader) {
+    const targetKeyLower = String(mappedHeader).replace(/\s+/g, ' ').trim().toLowerCase();
+    const foundKey = rowKeys.find(k => k.replace(/\s+/g, ' ').trim().toLowerCase() === targetKeyLower);
+    if (foundKey && row[foundKey] !== undefined && String(row[foundKey]).trim() !== '') {
+      return row[foundKey];
+    }
+  }
+
+  const aliases = MAPPING_ALIASES[field] || [];
+  for (const alias of aliases) {
+    const aliasLower = alias.toLowerCase();
+    const foundKey = rowKeys.find(k => {
+      const kLower = k.replace(/\s+/g, ' ').trim().toLowerCase();
+      return kLower === aliasLower || kLower.includes(aliasLower) || aliasLower.includes(kLower);
+    });
+    if (foundKey && row[foundKey] !== undefined && String(row[foundKey]).trim() !== '') {
+      return row[foundKey];
+    }
+  }
+
+  return '';
+}
+
 function formatBirthdate(val) {
   if (!val || val === '"') return '';
   if (typeof val === 'number') {
-    if (val > 0 && val < 150) return String(val); // raw age number e.g. 28, 45
+    if (val > 0 && val < 150) return String(val);
     try {
       const d = XLSX.SSF.parse_date_code(val);
       if (d && d.y > 1900 && d.y < 2100) {
@@ -219,7 +262,7 @@ function formatCheckinDate(val, importMonth) {
           const row = rows[i];
           try {
             const map = columnMapping;
-            const namaTamu = String(row[map.nama_tamu] || '').trim();
+            const namaTamu = String(getRowValue(row, 'nama_tamu', map.nama_tamu) || '').trim();
 
             const nameUpper = namaTamu.toUpperCase();
             if (!namaTamu || nameUpper.includes('NAMA TAMU') || nameUpper === 'NAMA' || nameUpper === 'NAME' || nameUpper === 'GUEST NAME' || nameUpper === 'IDENTITAS' || nameUpper === 'KEWARGANEGARAAN') {
@@ -227,18 +270,18 @@ function formatCheckinDate(val, importMonth) {
               continue;
             }
 
-            let rawNoId = String(row[map.no_identitas] || '').trim();
+            let rawNoId = String(getRowValue(row, 'no_identitas', map.no_identitas) || '').trim();
             if (['IDENTITAS', 'NIK', 'PASSPORT', 'NO IDENTITAS', 'ID'].includes(rawNoId.toUpperCase())) {
               skipped++;
               continue;
             }
 
             // Carry-forward / ditto mark (") handling for group guests
-            let room = String(row[map.nomor_kamar] || '').trim();
-            let nationality = String(row[map.kewarganegaraan] || '').trim();
-            let datang = String(row[map.datang_dari] || '').trim();
-            let tglRaw = String(row[map.tanggal_masuk] || '').trim();
-            let ket = String(row[map.keterangan] || '').trim();
+            let room = String(getRowValue(row, 'nomor_kamar', map.nomor_kamar) || '').trim();
+            let nationality = String(getRowValue(row, 'kewarganegaraan', map.kewarganegaraan) || '').trim();
+            let datang = String(getRowValue(row, 'datang_dari', map.datang_dari) || '').trim();
+            let tglRaw = String(getRowValue(row, 'tanggal_masuk', map.tanggal_masuk) || '').trim();
+            let ket = String(getRowValue(row, 'keterangan', map.keterangan) || '').trim();
 
             if (room === '"' || !room) room = lastRoom; else lastRoom = room;
             if (nationality === '"' || !nationality) nationality = lastNationality; else lastNationality = nationality;
@@ -283,8 +326,10 @@ function formatCheckinDate(val, importMonth) {
             };
 
             const tglMasuk = formatCheckinDate(tglRaw, importMonth);
-            const expiry   = parseDate(row[map.expiry_identitas]);
-            const birthdateFormatted = formatBirthdate(row[map.umur]);
+            const expiryVal = getRowValue(row, 'expiry_identitas', map.expiry_identitas);
+            const umurVal   = getRowValue(row, 'umur', map.umur);
+            const expiry   = parseDate(expiryVal);
+            const birthdateFormatted = formatBirthdate(umurVal);
 
             // Smart Upsert: match by ID first (if non-AUTO), then match by exact Name
             let existing = null;
