@@ -52,18 +52,9 @@ const guestsPanel = (() => {
       }
 
       listEl.innerHTML = data.map((g, i) => `
-        <div class="guest-name-card" id="gc-${g.id}" data-guest-id="${g.id}" style="
-          border-radius:12px;border:1px solid var(--border);
-          margin-bottom:0.75rem;overflow:hidden;
-          transition:border-color 0.2s,box-shadow 0.2s;
-          background:var(--surface);
-        ">
+        <div class="guest-name-card" id="gc-${g.id}" data-guest-id="${g.id}">
           <!-- ── Header Row (clickable) ── -->
-          <div class="guest-card-header" onclick="guestsPanel.toggleExpand(${g.id})" style="
-            display:flex;align-items:center;gap:1rem;padding:0.9rem 1.25rem;
-            cursor:pointer;user-select:none;
-            transition:background 0.15s;
-          ">
+          <div class="guest-card-header" onclick="guestsPanel.toggleExpand(${g.id})">
             <div class="user-avatar" style="width:44px;height:44px;font-size:1rem;flex-shrink:0;background:var(--primary-gradient);">
               ${getInitials(g.nama_tamu)}
             </div>

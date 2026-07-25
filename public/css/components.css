@@ -532,3 +532,35 @@
   font-weight: 600;
   margin-bottom: 1rem;
 }
+
+/* ═══════════════════════════════════════
+   GUEST NAME CARDS (Semua Data Tamu List)
+   ═══════════════════════════════════════ */
+.guest-name-card {
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  background: var(--surface);
+}
+
+.guest-name-card:hover {
+  border-color: rgba(79, 142, 247, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.guest-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.25rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.guest-card-header:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
