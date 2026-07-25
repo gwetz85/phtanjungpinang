@@ -1,16 +1,19 @@
-const initSqlJs = require('sql.js');
 const bcrypt = require('bcryptjs');
 const path = require('path');
 const fs = require('fs');
 
 const FIREBASE_URL = process.env.FIREBASE_URL || 'https://pelangihotel-35986-default-rtdb.asia-southeast1.firebasedatabase.app';
-const DB_PATH = process.env.VERCEL
-  ? path.join('/tmp', 'hotel.db')
-  : path.join(__dirname, '..', 'hotel.db');
+const LOCAL_JSON = path.join(__dirname, '..', 'hotel-data.json');
 
-let db = null;
-let SQL = null;
-let useFirebase = false;
+// In-Memory Database State
+let dbData = {
+  users: [],
+  guests: [],
+  checkins: [],
+  counters: { users: 1, guests: 1, checkins: 1 }
+};
+
+let isInitialized = false;
 
 /**
  * Firebase REST API helper
@@ -24,227 +27,356 @@ async function firebaseFetch(endpoint, method = 'GET', data = null) {
   if (data !== null) options.body = JSON.stringify(data);
   const res = await fetch(url, options);
   const json = await res.json();
-  if (json && json.error) {
+  if (json && json.error && !String(json.error).includes('Permission denied')) {
     throw new Error(`Firebase Error (${endpoint}): ${json.error}`);
   }
   return json;
 }
 
 /**
- * Persist in-memory DB to disk (and sync to Firebase if available)
+ * Persist memory state to disk and Firebase
  */
 function persist() {
-  if (!db) return;
-  try {
-    const data = db.export();
-    fs.writeFileSync(DB_PATH, Buffer.from(data));
-  } catch (err) {
-    console.error('[DB] Persist error:', err.message);
+  // Local JSON fallback
+  if (!process.env.VERCEL) {
+    try {
+      fs.writeFileSync(LOCAL_JSON, JSON.stringify(dbData, null, 2));
+    } catch (e) {}
   }
-  if (useFirebase) {
-    syncToFirebase().catch(e => console.error('[Firebase Sync Error]', e.message));
-  }
+  // Sync to Firebase Cloud
+  syncToFirebase().catch(() => {});
 }
 
-/**
- * Sync SQLite tables to Firebase Realtime Database
- */
 async function syncToFirebase() {
-  if (!useFirebase || !db) return;
   try {
-    const users = queryAll('SELECT * FROM users');
-    const guests = queryAll('SELECT * FROM guests');
-    const checkins = queryAll('SELECT * FROM checkins');
-
-    await firebaseFetch('/users', 'PUT', users);
-    await firebaseFetch('/guests', 'PUT', guests);
-    await firebaseFetch('/checkins', 'PUT', checkins);
-  } catch (err) {
-    console.error('[Firebase Sync Failed]', err.message);
-  }
+    await firebaseFetch('/dbData', 'PUT', dbData);
+  } catch (e) {}
 }
 
-/**
- * Load data from Firebase Realtime Database into SQLite
- */
 async function syncFromFirebase() {
   try {
-    const fbUsers = await firebaseFetch('/users', 'GET');
-    const fbGuests = await firebaseFetch('/guests', 'GET');
-    const fbCheckins = await firebaseFetch('/checkins', 'GET');
-
-    useFirebase = true;
-    console.log('[Firebase] Realtime Database terhubung:', FIREBASE_URL);
-
-    if (Array.isArray(fbUsers) && fbUsers.length > 0) {
-      db.run('DELETE FROM users');
-      for (const u of fbUsers) {
-        if (u) db.run('INSERT OR REPLACE INTO users (id, username, password, nama, role, created_at) VALUES (?, ?, ?, ?, ?, ?)', [u.id, u.username, u.password, u.nama, u.role, u.created_at || new Date().toISOString()]);
-      }
+    const cloudData = await firebaseFetch('/dbData', 'GET');
+    if (cloudData && typeof cloudData === 'object' && cloudData.users) {
+      dbData = {
+        users: Array.isArray(cloudData.users) ? cloudData.users.filter(Boolean) : Object.values(cloudData.users),
+        guests: Array.isArray(cloudData.guests) ? cloudData.guests.filter(Boolean) : (cloudData.guests ? Object.values(cloudData.guests) : []),
+        checkins: Array.isArray(cloudData.checkins) ? cloudData.checkins.filter(Boolean) : (cloudData.checkins ? Object.values(cloudData.checkins) : []),
+        counters: cloudData.counters || { users: 1, guests: 1, checkins: 1 }
+      };
+      console.log('[Firebase] Cloud data synced successfully.');
+      return true;
     }
-
-    if (Array.isArray(fbGuests) && fbGuests.length > 0) {
-      db.run('DELETE FROM guests');
-      for (const g of fbGuests) {
-        if (g) db.run('INSERT OR REPLACE INTO guests (id, no_identitas, jenis_identitas, nama_tamu, umur, expiry_identitas, kewarganegaraan, datang_dari, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [g.id, g.no_identitas, g.jenis_identitas, g.nama_tamu, g.umur, g.expiry_identitas, g.kewarganegaraan, g.datang_dari, g.created_at, g.updated_at]);
-      }
-    }
-
-    if (Array.isArray(fbCheckins) && fbCheckins.length > 0) {
-      db.run('DELETE FROM checkins');
-      for (const c of fbCheckins) {
-        if (c) db.run('INSERT OR REPLACE INTO checkins (id, guest_id, nomor_kamar, tanggal_masuk, keterangan, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)', [c.id, c.guest_id, c.nomor_kamar, c.tanggal_masuk, c.keterangan, c.created_by, c.created_at]);
-      }
-    }
-
-    persist();
-  } catch (err) {
-    if (err.message.includes('Permission denied')) {
-      console.warn('\n⚠️ [Firebase Notice] Realtime Database memerlukan pengubahan Rules agar bisa diakses public:');
-      console.warn('   Buka Firebase Console -> Realtime Database -> Rules -> Ubah menjadi:');
-      console.warn('   { "rules": { ".read": true, ".write": true } }\n');
-    } else {
-      console.warn('[Firebase Sync Skipped]', err.message);
-    }
-  }
-}
-
-function startAutoPersist() {
-  setInterval(persist, 10000);
-  process.on('exit', persist);
-  process.on('SIGINT', () => { persist(); process.exit(0); });
-  process.on('SIGTERM', () => { persist(); process.exit(0); });
-}
-
-function getDB() {
-  if (!db) throw new Error('Database belum diinisialisasi.');
-  return db;
+  } catch (err) {}
+  return false;
 }
 
 async function initDB() {
-  if (db) return db;
-  SQL = await initSqlJs();
+  if (isInitialized) return;
 
-  if (fs.existsSync(DB_PATH)) {
-    const data = fs.readFileSync(DB_PATH);
-    db = new SQL.Database(data);
-    console.log('[DB] Loaded database:', DB_PATH);
-  } else {
-    db = new SQL.Database();
-    console.log('[DB] Created database:', DB_PATH);
+  // Try loading local JSON file if exists
+  if (!process.env.VERCEL && fs.existsSync(LOCAL_JSON)) {
+    try {
+      dbData = JSON.parse(fs.readFileSync(LOCAL_JSON, 'utf8'));
+    } catch (e) {}
   }
 
-  db.run(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL,
-      nama TEXT NOT NULL,
-      role TEXT NOT NULL,
-      created_at TEXT DEFAULT (datetime('now'))
-    );
+  // Sync from Firebase Cloud
+  await syncFromFirebase();
 
-    CREATE TABLE IF NOT EXISTS guests (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      no_identitas TEXT UNIQUE NOT NULL,
-      jenis_identitas TEXT DEFAULT 'PASSPORT',
-      nama_tamu TEXT NOT NULL,
-      umur TEXT,
-      expiry_identitas TEXT,
-      kewarganegaraan TEXT,
-      datang_dari TEXT,
-      created_at TEXT DEFAULT (datetime('now')),
-      updated_at TEXT DEFAULT (datetime('now'))
-    );
-
-    CREATE TABLE IF NOT EXISTS checkins (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      guest_id INTEGER NOT NULL,
-      nomor_kamar TEXT,
-      tanggal_masuk TEXT,
-      keterangan TEXT,
-      created_by INTEGER,
-      created_at TEXT DEFAULT (datetime('now'))
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_guests_no_identitas ON guests(no_identitas);
-    CREATE INDEX IF NOT EXISTS idx_guests_nama ON guests(nama_tamu);
-    CREATE INDEX IF NOT EXISTS idx_checkins_guest_id ON checkins(guest_id);
-  `);
-
-  const countRes = db.exec('SELECT COUNT(*) as cnt FROM users');
-  const count = countRes[0]?.values[0][0] || 0;
-
-  if (count === 0) {
-    const users = [
+  // Seed default users if empty
+  if (!dbData.users || dbData.users.length === 0) {
+    const seedUsers = [
       { username: 'superadmin', password: 'superadmin123', nama: 'Super Administrator', role: 'superadmin' },
       { username: 'admin',      password: 'admin123',      nama: 'Administrator',       role: 'admin' },
       { username: 'receptionist', password: 'recep123',   nama: 'Resepsionis',          role: 'receptionist' },
     ];
-    for (const u of users) {
-      const hashed = bcrypt.hashSync(u.password, 10);
-      db.run(
-        'INSERT INTO users (username, password, nama, role) VALUES (?, ?, ?, ?)',
-        [u.username, hashed, u.nama, u.role]
-      );
-    }
+    dbData.users = seedUsers.map((u, i) => ({
+      id: i + 1,
+      username: u.username,
+      password: bcrypt.hashSync(u.password, 10),
+      nama: u.nama,
+      role: u.role,
+      created_at: new Date().toISOString()
+    }));
+    dbData.counters.users = 4;
+    persist();
     console.log('[DB] Default users seeded.');
   }
 
-  // Try sync with Firebase Realtime Database
-  await syncFromFirebase();
-
-  startAutoPersist();
+  isInitialized = true;
   console.log('[DB] Database initialized.');
 }
 
+/**
+ * Helper to compute calculated fields for a guest (total_checkins, last_checkin, last_room)
+ */
+function enrichGuest(guest) {
+  if (!guest) return null;
+  const guestCheckins = (dbData.checkins || [])
+    .filter(c => c && String(c.guest_id) === String(guest.id))
+    .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+
+  const lastCi = guestCheckins[0] || null;
+
+  return {
+    ...guest,
+    total_checkins: guestCheckins.length,
+    last_checkin: lastCi ? lastCi.tanggal_masuk : null,
+    last_room: lastCi ? lastCi.nomor_kamar : null
+  };
+}
+
+/**
+ * Pure JavaScript Query Engine
+ */
 function queryAll(sql, params = []) {
-  const database = getDB();
-  try {
-    const stmt = database.prepare(sql);
-    stmt.bind(params);
-    const rows = [];
-    while (stmt.step()) {
-      rows.push(stmt.getAsObject());
+  const cleanSql = sql.replace(/\s+/g, ' ').trim();
+
+  // 1. SELECT users
+  if (cleanSql.toLowerCase().includes('from users')) {
+    if (cleanSql.toLowerCase().includes('where username =')) {
+      const u = dbData.users.find(x => x.username === params[0]);
+      return u ? [u] : [];
     }
-    stmt.free();
-    return rows;
-  } catch(e) {
-    throw new Error(`SQL Error: ${e.message}\nSQL: ${sql}`);
+    if (cleanSql.toLowerCase().includes('where id =')) {
+      const u = dbData.users.find(x => String(x.id) === String(params[0]));
+      return u ? [u] : [];
+    }
+    return [...dbData.users].sort((a,b) => a.role.localeCompare(b.role) || a.nama.localeCompare(b.nama));
   }
+
+  // 2. GET guests with checkin history (Paginated / Search)
+  if (cleanSql.toLowerCase().includes('from guests')) {
+    let list = [...(dbData.guests || [])];
+
+    // Filter by search / nationality if present
+    if (params.length > 0) {
+      const searchStr = params[0] ? String(params[0]).replace(/%/g, '').toLowerCase() : '';
+      if (searchStr && cleanSql.toLowerCase().includes('like')) {
+        list = list.filter(g =>
+          (g.no_identitas && g.no_identitas.toLowerCase().includes(searchStr)) ||
+          (g.nama_tamu && g.nama_tamu.toLowerCase().includes(searchStr))
+        );
+      }
+    }
+
+    // Enrich guests with check-in info
+    const enriched = list.map(enrichGuest);
+
+    // Sort by updated_at DESC
+    enriched.sort((a, b) => new Date(b.updated_at || 0) - new Date(a.updated_at || 0));
+
+    // Export query check
+    if (cleanSql.includes('ROW_NUMBER()') || cleanSql.includes('"ROOM NO"')) {
+      return enriched.map((g, idx) => ({
+        "NO": idx + 1,
+        "ROOM NO": g.last_room || '-',
+        "NAMA TAMU": g.nama_tamu,
+        "UMUR": g.umur || '-',
+        "EXPIRY": g.expiry_identitas || '-',
+        "NATIONALITY": g.kewarganegaraan || '-',
+        "IDENTITAS": g.no_identitas,
+        "DATANG DARI": g.datang_dari || '-',
+        "TANGGAL MASUK": g.last_checkin || '-',
+        "KET": ''
+      }));
+    }
+
+    // Handle LIMIT / OFFSET if present at end of query
+    const limitMatch = cleanSql.match(/limit\s+(\d+)(?:\s+offset\s+(\d+))?/i);
+    if (limitMatch) {
+      const limit = parseInt(limitMatch[1]);
+      const offset = limitMatch[2] ? parseInt(limitMatch[2]) : 0;
+      return enriched.slice(offset, offset + limit);
+    }
+
+    return enriched;
+  }
+
+  // 3. SELECT checkins for guest
+  if (cleanSql.toLowerCase().includes('from checkins')) {
+    const guestId = params[0];
+    const list = (dbData.checkins || [])
+      .filter(c => c && String(c.guest_id) === String(guestId))
+      .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+
+    return list.map(c => {
+      const u = dbData.users.find(x => String(x.id) === String(c.created_by));
+      return { ...c, petugas: u ? u.nama : '-' };
+    });
+  }
+
+  return [];
 }
 
 function queryOne(sql, params = []) {
+  const cleanSql = sql.replace(/\s+/g, ' ').trim().toLowerCase();
+
+  // COUNT guests
+  if (cleanSql.includes('count(*)') && cleanSql.includes('from guests')) {
+    let list = [...(dbData.guests || [])];
+    if (params.length > 0 && params[0]) {
+      const searchStr = String(params[0]).replace(/%/g, '').toLowerCase();
+      list = list.filter(g =>
+        (g.no_identitas && g.no_identitas.toLowerCase().includes(searchStr)) ||
+        (g.nama_tamu && g.nama_tamu.toLowerCase().includes(searchStr))
+      );
+    }
+    return { total: list.length };
+  }
+
+  // GET single user
+  if (cleanSql.includes('from users')) {
+    if (cleanSql.includes('where username =')) {
+      return dbData.users.find(x => x.username === String(params[0]).trim()) || null;
+    }
+    if (cleanSql.includes('where id =')) {
+      return dbData.users.find(x => String(x.id) === String(params[0])) || null;
+    }
+  }
+
+  // GET single guest
+  if (cleanSql.includes('from guests')) {
+    if (cleanSql.includes('where no_identitas =')) {
+      return dbData.guests.find(x => x.no_identitas === String(params[0]).trim()) || null;
+    }
+    if (cleanSql.includes('where id =')) {
+      return dbData.guests.find(x => String(x.id) === String(params[0])) || null;
+    }
+  }
+
   const rows = queryAll(sql, params);
   return rows[0] || null;
 }
 
+/**
+ * Pure JavaScript Mutation Engine (INSERT / UPDATE / DELETE)
+ */
 function run(sql, params = []) {
-  const database = getDB();
-  try {
-    database.run(sql, params);
-    const info = {
-      lastInsertRowid: database.exec('SELECT last_insert_rowid() as id')[0]?.values[0][0],
-      changes: database.getRowsModified()
+  const cleanSql = sql.replace(/\s+/g, ' ').trim();
+  const now = new Date().toISOString();
+  let lastInsertRowid = 0;
+
+  // 1. INSERT INTO users
+  if (cleanSql.toLowerCase().startsWith('insert into users')) {
+    const id = dbData.counters.users++;
+    const newUser = {
+      id,
+      username: params[0],
+      password: params[1],
+      nama: params[2],
+      role: params[3],
+      created_at: now
     };
-    persist();
-    return info;
-  } catch(e) {
-    throw new Error(`SQL Error: ${e.message}\nSQL: ${sql}`);
+    dbData.users.push(newUser);
+    lastInsertRowid = id;
   }
+
+  // 2. INSERT INTO guests
+  else if (cleanSql.toLowerCase().startsWith('insert into guests')) {
+    const id = dbData.counters.guests++;
+    const newGuest = {
+      id,
+      no_identitas: params[0],
+      jenis_identitas: params[1] || 'PASSPORT',
+      nama_tamu: params[2],
+      umur: params[3] || '',
+      expiry_identitas: params[4] || '',
+      kewarganegaraan: params[5] || '',
+      datang_dari: params[6] || '',
+      created_at: params[7] || now,
+      updated_at: params[8] || now
+    };
+    dbData.guests.push(newGuest);
+    lastInsertRowid = id;
+  }
+
+  // 3. INSERT INTO checkins
+  else if (cleanSql.toLowerCase().startsWith('insert into checkins')) {
+    const id = dbData.counters.checkins++;
+    const newCheckin = {
+      id,
+      guest_id: parseInt(params[0]),
+      nomor_kamar: params[1] || '',
+      tanggal_masuk: params[2] || '',
+      keterangan: params[3] || '',
+      created_by: params[4] ? parseInt(params[4]) : null,
+      created_at: params[5] || now
+    };
+    dbData.checkins.push(newCheckin);
+    lastInsertRowid = id;
+  }
+
+  // 4. UPDATE guests
+  else if (cleanSql.toLowerCase().startsWith('update guests')) {
+    if (cleanSql.toLowerCase().includes('where no_identitas=')) {
+      // params: [nama_tamu, umur, expiry_identitas, kewarganegaraan, datang_dari, updated_at, no_identitas]
+      const g = dbData.guests.find(x => x.no_identitas === params[6]);
+      if (g) {
+        g.nama_tamu = params[0];
+        g.umur = params[1];
+        g.expiry_identitas = params[2];
+        g.kewarganegaraan = params[3];
+        g.datang_dari = params[4];
+        g.updated_at = params[5] || now;
+      }
+    } else if (cleanSql.toLowerCase().includes('where id=')) {
+      if (params.length === 2 && cleanSql.includes('updated_at=?')) {
+        const g = dbData.guests.find(x => String(x.id) === String(params[1]));
+        if (g) g.updated_at = params[0];
+      } else {
+        const g = dbData.guests.find(x => String(x.id) === String(params[5]));
+        if (g) {
+          g.nama_tamu = params[0];
+          g.umur = params[1];
+          g.expiry_identitas = params[2];
+          g.kewarganegaraan = params[3];
+          g.datang_dari = params[4];
+          g.updated_at = now;
+        }
+      }
+    }
+  }
+
+  // 5. UPDATE users
+  else if (cleanSql.toLowerCase().startsWith('update users')) {
+    if (params.length === 4) {
+      // nama, role, password, id
+      const u = dbData.users.find(x => String(x.id) === String(params[3]));
+      if (u) { u.nama = params[0]; u.role = params[1]; u.password = params[2]; }
+    } else if (params.length === 3) {
+      // nama, role, id
+      const u = dbData.users.find(x => String(x.id) === String(params[2]));
+      if (u) { u.nama = params[0]; u.role = params[1]; }
+    }
+  }
+
+  // 6. DELETE FROM checkins
+  else if (cleanSql.toLowerCase().startsWith('delete from checkins')) {
+    const guestId = params[0];
+    dbData.checkins = dbData.checkins.filter(c => String(c.guest_id) !== String(guestId));
+  }
+
+  // 7. DELETE FROM guests
+  else if (cleanSql.toLowerCase().startsWith('delete from guests')) {
+    const guestId = params[0];
+    dbData.guests = dbData.guests.filter(g => String(g.id) !== String(guestId));
+    dbData.checkins = dbData.checkins.filter(c => String(c.guest_id) !== String(guestId));
+  }
+
+  // 8. DELETE FROM users
+  else if (cleanSql.toLowerCase().startsWith('delete from users')) {
+    const userId = params[0];
+    dbData.users = dbData.users.filter(u => String(u.id) !== String(userId));
+  }
+
+  persist();
+  return { lastInsertRowid, changes: 1 };
 }
 
 function transaction(fn) {
-  const database = getDB();
-  database.run('BEGIN');
-  try {
-    fn();
-    database.run('COMMIT');
-    persist();
-  } catch(e) {
-    database.run('ROLLBACK');
-    throw e;
-  }
+  fn();
+  persist();
 }
 
 function detectIdentityType(noIdentitas) {
@@ -252,6 +384,10 @@ function detectIdentityType(noIdentitas) {
   const clean = String(noIdentitas).trim().replace(/\s/g, '');
   if (/^\d{16}$/.test(clean)) return 'NIK';
   return 'PASSPORT';
+}
+
+function getDB() {
+  return dbData;
 }
 
 module.exports = { initDB, getDB, queryAll, queryOne, run, transaction, detectIdentityType };

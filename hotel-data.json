@@ -1,0 +1,35 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "superadmin",
+      "password": "$2a$10$k/Lvm/YnE/.w29CnqB0KaeAtdyZ7PBCu8/pVKFL3S5IR.NKgEM/Tq",
+      "nama": "Super Administrator",
+      "role": "superadmin",
+      "created_at": "2026-07-25T10:16:28.181Z"
+    },
+    {
+      "id": 2,
+      "username": "admin",
+      "password": "$2a$10$KFTVXGFm2edRTkSeBwTwkOwKp1a1njuUc5pDdTCcN5nreTnsy7VYi",
+      "nama": "Administrator",
+      "role": "admin",
+      "created_at": "2026-07-25T10:16:28.241Z"
+    },
+    {
+      "id": 3,
+      "username": "receptionist",
+      "password": "$2a$10$8BmpNtvaj9GGx82DjEqvgumf..S2yinDZbRdq04XzmY9uPCVGXro6",
+      "nama": "Resepsionis",
+      "role": "receptionist",
+      "created_at": "2026-07-25T10:16:28.305Z"
+    }
+  ],
+  "guests": [],
+  "checkins": [],
+  "counters": {
+    "users": 4,
+    "guests": 1,
+    "checkins": 1
+  }
+}
