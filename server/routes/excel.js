@@ -7,27 +7,10 @@ const fs = require('fs');
 const { queryAll, queryOne, run, transaction, detectIdentityType } = require('../db');
 const { authenticate, authorize } = require('../middleware/auth');
 
-const UPLOAD_DIR = process.env.VERCEL
-  ? path.join('/tmp', 'uploads')
-  : path.join(__dirname, '..', '..', 'uploads');
-if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, UPLOAD_DIR),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, unique + path.extname(file.originalname));
-  }
-});
-
+// Memory storage for stateless serverless functions (Vercel)
 const upload = multer({
-  storage,
-  limits: { fileSize: 50 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (['.xlsx', '.xls'].includes(ext)) cb(null, true);
-    else cb(new Error('Hanya file .xlsx atau .xls yang diizinkan.'));
-  }
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024 }
 });
 
 /**
@@ -94,14 +77,14 @@ function slugify(text) {
 
 router.use(authenticate);
 
-// ─── POST /api/excel/upload ─── (superadmin - preview sheets)
+// ─── POST /api/excel/upload ─── (superadmin - preview sheets in memory)
 router.post('/upload', authorize('superadmin'), upload.single('file'), (req, res) => {
-  if (!req.file) {
+  if (!req.file || !req.file.buffer) {
     return res.status(400).json({ success: false, message: 'File tidak ditemukan.' });
   }
 
   try {
-    const workbook = XLSX.readFile(req.file.path);
+    const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
     const sheets = workbook.SheetNames.map(name => {
       const sheet = workbook.Sheets[name];
       const { headers, rows } = parseSheetData(sheet);
@@ -111,32 +94,39 @@ router.post('/upload', authorize('superadmin'), upload.single('file'), (req, res
     res.json({
       success: true,
       message: 'File berhasil diupload.',
-      filePath: req.file.filename,
       originalName: req.file.originalname,
       sheets
     });
   } catch (err) {
-    try { fs.unlinkSync(req.file.path); } catch(e) {}
     res.status(500).json({ success: false, message: 'Gagal membaca file Excel: ' + err.message });
   }
 });
 
-// ─── POST /api/excel/import ─── (superadmin - do import)
-router.post('/import', authorize('superadmin'), (req, res) => {
-  const { filePath, sheetNames, columnMapping } = req.body;
+// ─── POST /api/excel/import ─── (superadmin - do import directly from memory)
+router.post('/import', authorize('superadmin'), upload.single('file'), (req, res) => {
+  if (!req.file || !req.file.buffer) {
+    return res.status(400).json({ success: false, message: 'File tidak ditemukan di request.' });
+  }
 
-  if (!filePath || !sheetNames || !columnMapping) {
+  const sheetNamesRaw = req.body.sheetNames;
+  const columnMappingRaw = req.body.columnMapping;
+
+  if (!sheetNamesRaw || !columnMappingRaw) {
     return res.status(400).json({ success: false, message: 'Parameter import tidak lengkap.' });
   }
 
-  const sheets = Array.isArray(sheetNames) ? sheetNames : [sheetNames];
-  const fullPath = path.join(UPLOAD_DIR, filePath);
-  if (!fs.existsSync(fullPath)) {
-    return res.status(404).json({ success: false, message: 'File tidak ditemukan di server.' });
+  let sheets = [];
+  let columnMapping = {};
+
+  try {
+    sheets = typeof sheetNamesRaw === 'string' ? JSON.parse(sheetNamesRaw) : sheetNamesRaw;
+    columnMapping = typeof columnMappingRaw === 'string' ? JSON.parse(columnMappingRaw) : columnMappingRaw;
+  } catch (e) {
+    return res.status(400).json({ success: false, message: 'Format parameter JSON tidak valid.' });
   }
 
   try {
-    const workbook = XLSX.readFile(fullPath);
+    const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
 
     let totalImported = 0, totalUpdated = 0, totalSkipped = 0;
     const allErrors = [];
@@ -161,15 +151,11 @@ router.post('/import', authorize('superadmin'), (req, res) => {
             const map = columnMapping;
             const namaTamu = String(row[map.nama_tamu] || '').trim();
 
-            // Skip row if guest name is missing
             if (!namaTamu) { skipped++; continue; }
 
             let rawNoId = String(row[map.no_identitas] || '').trim();
-
-            // Clean prefixes like "Nik.", "Psp no.", "Sim no."
             let cleanNoId = rawNoId.replace(/^(nik|psp|psp\s*no|sim|sim\s*no|ktp|id)\.?:?\s*/i, '').trim();
 
-            // Fallback auto ID if identity column was blank
             if (!cleanNoId) {
               const room = String(row[map.nomor_kamar] || '').trim();
               cleanNoId = `AUTO-${slugify(namaTamu)}-${room || autoIdCounter++}`;
@@ -229,8 +215,6 @@ router.post('/import', authorize('superadmin'), (req, res) => {
         totalSkipped  += skipped;
       }
     });
-
-    try { fs.unlinkSync(fullPath); } catch(e) {}
 
     const sheetWord = sheets.length > 1 ? `${sheets.length} sheet` : `sheet "${sheets[0]}"`;
     res.json({

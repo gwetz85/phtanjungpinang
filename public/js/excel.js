@@ -4,20 +4,22 @@
 
 const excelPanel = (() => {
   let uploadedFile   = null;
+  let rawFile        = null; // Store actual HTML5 File object for Vercel stateless upload
   let selectedSheets = [];   // array — bisa 1 sheet atau semua
   let sheetHeaders   = [];   // headers dari sheet pertama yang dipilih (untuk mapping)
 
-  // Default column mapping based on our Excel columns
-  const DEFAULT_MAPPING = {
-    no_identitas:    'IDENTITAS',
-    nama_tamu:       'NAMA TAMU',
-    umur:            'UMUR',
-    expiry_identitas:'EXPIRY',
-    kewarganegaraan: 'NATIONALITY',
-    datang_dari:     'DATANG DARI',
-    nomor_kamar:     'ROOM NO',
-    tanggal_masuk:   'TANGGAL MASUK',
-    keterangan:      'KET',
+  // Default column mapping — keywords to match against Excel headers (case-insensitive)
+  // Multiple aliases supported per field
+  const MAPPING_ALIASES = {
+    no_identitas:    ['IDENTITAS', 'NIK', 'PASSPORT', 'NO IDENTITAS', 'NO_IDENTITAS', 'ID'],
+    nama_tamu:       ['NAMA TAMU', 'NAMA', 'NAME', 'GUEST NAME', 'NAMA_TAMU'],
+    umur:            ['UMUR', 'AGE', 'USIA'],
+    expiry_identitas:['EXPIRY', 'EXPIRED', 'MASA BERLAKU', 'EXP'],
+    kewarganegaraan: ['NATIONALITY', 'KEWARGANEGARAAN', 'WN', 'NEGARA'],
+    datang_dari:     ['DATANG DARI', 'DATANG_DARI', 'ASAL', 'FROM', 'ORIGIN'],
+    nomor_kamar:     ['ROOM NO', 'ROOM', 'KAMAR', 'NO KAMAR', 'ROOM NUMBER', 'NO ROOM'],
+    tanggal_masuk:   ['TANGGAL MASUK', 'TGL MASUK', 'CHECK IN', 'CHECKIN', 'CHECK-IN', 'DATE IN'],
+    keterangan:      ['KET', 'KETERANGAN', 'NOTES', 'NOTE', 'REMARKS', 'INFO'],
   };
 
   const FIELD_LABELS = {
@@ -80,6 +82,7 @@ const excelPanel = (() => {
       toast('Hanya file .xlsx atau .xls yang diizinkan!', 'error'); return;
     }
 
+    rawFile = file; // Store actual File object
     const formData = new FormData();
     formData.append('file', file);
 
@@ -346,11 +349,12 @@ const excelPanel = (() => {
     }
 
     try {
-      const res = await api.post('/excel/import', {
-        filePath:   uploadedFile.path,
-        sheetNames: selectedSheets,
-        columnMapping
-      });
+      const formData = new FormData();
+      formData.append('file', rawFile);
+      formData.append('sheetNames', JSON.stringify(selectedSheets));
+      formData.append('columnMapping', JSON.stringify(columnMapping));
+
+      const res = await api.upload('/excel/import', formData);
 
       if (progressEl) progressEl.innerHTML = '';
 
