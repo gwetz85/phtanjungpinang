@@ -33,9 +33,13 @@ const usersPanel = (() => {
               <div style="margin-top:0.35rem;">${roleBadge(u.role)}</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:0.4rem;flex-shrink:0;">
-              <button class="btn btn-secondary btn-sm" onclick="usersPanel.resetDevice(${u.id}, '${escHtml(u.nama)}')">📱 Reset Perangkat</button>
-              <button class="btn btn-warning btn-sm" onclick="usersPanel.editUser(${u.id})">✏️ Edit</button>
-              ${u.id !== currentUser?.id ? `<button class="btn btn-danger btn-sm" onclick="usersPanel.deleteUser(${u.id}, '${escHtml(u.nama)}')">🗑️ Hapus</button>` : `<span style="font-size:0.72rem;color:var(--text-muted);text-align:center;">Akun Anda</span>`}
+              ${(currentUser?.role === 'admin' && u.role === 'superadmin') ? 
+                `<span style="font-size:0.72rem;color:var(--text-muted);text-align:center;">Hanya Super Admin</span>` 
+              : `
+                <button class="btn btn-secondary btn-sm" onclick="usersPanel.resetDevice(${u.id}, '${escHtml(u.nama)}')">📱 Reset Perangkat</button>
+                <button class="btn btn-warning btn-sm" onclick="usersPanel.editUser(${u.id})">✏️ Edit</button>
+                ${u.id !== currentUser?.id ? `<button class="btn btn-danger btn-sm" onclick="usersPanel.deleteUser(${u.id}, '${escHtml(u.nama)}')">🗑️ Hapus</button>` : `<span style="font-size:0.72rem;color:var(--text-muted);text-align:center;">Akun Anda</span>`}
+              `}
             </div>
           </div>
         </div>

@@ -10,10 +10,7 @@ router.use(authorize('admin', 'superadmin'));
 // GET /api/users
 router.get('/', (req, res) => {
   let users = queryAll('SELECT id, username, nama, role, created_at FROM users ORDER BY role, nama');
-  // Admin cannot see superadmin accounts
-  if (req.user.role === 'admin') {
-    users = users.filter(u => u.role !== 'superadmin');
-  }
+  // Removed: Admin cannot see superadmin accounts (Admin is now allowed to see them, but not edit/delete them)
   res.json({ success: true, data: users });
 });
 
