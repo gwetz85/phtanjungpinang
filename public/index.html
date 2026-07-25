@@ -11,27 +11,72 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="shortcut icon" href="logo.png" type="image/png">
   <style>
-    .login-page { background: transparent; }
-    .grid-bg {
-      position: fixed; inset: 0; z-index: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 40px 40px;
+    /* ── Hotel Photo Background ── */
+    body {
+      background: #000;
     }
-    .glow-orb {
-      position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
-      filter: blur(80px);
+    .hotel-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image: url('hotel-bg.jpg');
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      /* slight dark overlay so text stays readable */
+      filter: brightness(0.55);
+      transition: filter 0.5s ease;
     }
-    .glow-1 { width: 500px; height: 500px; background: rgba(79,142,247,0.12); top: -100px; left: -100px; }
-    .glow-2 { width: 400px; height: 400px; background: rgba(124,58,237,0.1); bottom: -80px; right: -80px; }
+    /* Dark gradient overlay on top of photo */
+    .hotel-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(
+        135deg,
+        rgba(5, 10, 25, 0.55) 0%,
+        rgba(10, 20, 50, 0.40) 50%,
+        rgba(5, 10, 25, 0.65) 100%
+      );
+    }
+    /* ── Login page centering ── */
+    .login-page {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* ── Glassmorphism login card ── */
+    .login-box {
+      background: rgba(10, 14, 26, 0.72) !important;
+      backdrop-filter: blur(20px) saturate(160%) !important;
+      -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      box-shadow:
+        0 8px 48px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+    }
+    /* Subtle glow under the card */
+    .login-box::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      background: linear-gradient(135deg, rgba(79,142,247,0.15), rgba(124,58,237,0.08));
+      z-index: -1;
+      pointer-events: none;
+    }
+    /* Mobile: make bg stay sharp on small screens */
+    @media (max-width: 480px) {
+      .hotel-bg { background-position: 60% center; }
+    }
   </style>
 </head>
 <body>
-  <div class="bg-animated"></div>
-  <div class="grid-bg"></div>
-  <div class="glow-orb glow-1"></div>
-  <div class="glow-orb glow-2"></div>
+  <div class="hotel-bg"></div>
+  <div class="hotel-overlay"></div>
 
   <div class="login-page">
     <div class="login-box" style="position:relative;z-index:1;">
