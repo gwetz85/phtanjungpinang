@@ -13,10 +13,27 @@ const settingsRoutes = require('./server/routes/settings');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// ── Ensure DB is initialized for serverless invocations ──
+// ── Ensure DB is initialized and Firebase is synced ──
 app.use(async (req, res, next) => {
   try {
     await initDB();
+    
+    // Intercept res.json to ensure Firebase is updated BEFORE Vercel suspends the function
+    const originalJson = res.json;
+    res.json = function (body) {
+      if (req.method !== 'GET') {
+        const { syncToFirebase } = require('./server/db');
+        syncToFirebase().then(() => {
+          originalJson.call(res, body);
+        }).catch(err => {
+          console.error('[Firebase Sync Error]', err);
+          originalJson.call(res, body);
+        });
+      } else {
+        originalJson.call(res, body);
+      }
+    };
+    
     next();
   } catch (err) {
     console.error('[DB Init Error]', err);

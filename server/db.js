@@ -44,8 +44,6 @@ function persist() {
       fs.writeFileSync(LOCAL_JSON, JSON.stringify(dbData, null, 2));
     } catch (e) {}
   }
-  // Sync to Firebase Cloud
-  syncToFirebase().catch(() => {});
 }
 
 async function syncToFirebase() {
@@ -97,8 +95,6 @@ function sanitizeData() {
 }
 
 async function initDB() {
-  if (isInitialized) return;
-
   // Try loading local JSON file if exists
   if (!process.env.VERCEL && fs.existsSync(LOCAL_JSON)) {
     try {
@@ -513,4 +509,4 @@ function getDB() {
   return dbData;
 }
 
-module.exports = { initDB, getDB, queryAll, queryOne, run, transaction, detectIdentityType, persist, syncFromFirebase };
+module.exports = { initDB, getDB, queryAll, queryOne, run, transaction, detectIdentityType, persist, syncFromFirebase, syncToFirebase };
