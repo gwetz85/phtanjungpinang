@@ -15,6 +15,7 @@ const dashboard = {
     this.renderNav();
     this.setupLogout();
     this.loadRunningText();
+    this.startClock();
 
     // Navigate to default panel
     this.navigate('panel-home');
@@ -323,6 +324,20 @@ const dashboard = {
         newSaveBtn.textContent = '💾 Simpan & Terapkan';
       }
     });
+  },
+
+  startClock() {
+    const clockEl = document.getElementById('clock-time');
+    if (!clockEl) return;
+    
+    const updateTime = () => {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/\./g, ':');
+      clockEl.textContent = timeStr;
+    };
+    
+    updateTime();
+    setInterval(updateTime, 1000);
   }
 };
 

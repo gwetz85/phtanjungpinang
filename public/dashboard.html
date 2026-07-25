@@ -53,11 +53,17 @@
   <div class="main-content">
 
     <!-- HEADER -->
-    <header class="main-header">
+    <header class="main-header" style="position:relative;">
       <div style="display:flex;align-items:center;gap:0.75rem;">
         <button class="btn btn-ghost btn-icon" id="hamburger-btn" style="display:none;" title="Menu">☰</button>
         <h2 id="main-title">Beranda</h2>
       </div>
+
+      <!-- Realtime Clock -->
+      <div id="realtime-clock" style="position: absolute; left: 50%; transform: translateX(-50%); font-size: 1.05rem; font-weight: 700; color: var(--primary); letter-spacing: 0.05em; font-family: monospace; display: flex; align-items: center; gap: 0.4rem; user-select: none;">
+        ⏰ <span id="clock-time">--:--:--</span>
+      </div>
+
       <div class="header-actions">
         <div style="display:flex;align-items:center;gap:0.5rem;">
           <div class="user-avatar" id="header-user-avatar" style="width:32px;height:32px;font-size:0.8rem;">?</div>
