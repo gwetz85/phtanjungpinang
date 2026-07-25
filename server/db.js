@@ -225,6 +225,23 @@ function queryAll(sql, params = []) {
       );
     }
 
+    // Filter by WHERE ... LIKE ? (used by /search route: "WHERE g.no_identitas LIKE ? OR g.nama_tamu LIKE ?")
+    if (!searchMatch && !natMatch && sqlLower.includes('where') && sqlLower.includes('like ?')) {
+      // Extract LIKE params — they come before limit/offset params
+      // For search: params = [term, term] or [term, term, limit]
+      // term looks like "%keyword%"
+      const likeParams = params.filter(p => typeof p === 'string' && p.startsWith('%') && p.endsWith('%'));
+      if (likeParams.length > 0) {
+        const term = likeParams[0].replace(/%/g, '').toLowerCase();
+        if (term) {
+          list = list.filter(g =>
+            (g.no_identitas && String(g.no_identitas).toLowerCase().includes(term)) ||
+            (g.nama_tamu    && String(g.nama_tamu).toLowerCase().includes(term))
+          );
+        }
+      }
+    }
+
     // Enrich guests with check-in info
     const enriched = list.map(enrichGuest).filter(Boolean);
 
@@ -251,9 +268,14 @@ function queryAll(sql, params = []) {
       }));
     }
 
-    // Apply pagination
+    // Apply pagination (handle both "LIMIT ?" and literal "LIMIT N")
     if (limit !== null) {
       return enriched.slice(offset, offset + limit);
+    }
+    const literalLimitMatch = sqlLower.match(/limit\s+(\d+)/);
+    if (literalLimitMatch) {
+      const literalLimit = parseInt(literalLimitMatch[1]);
+      return enriched.slice(0, literalLimit);
     }
 
     return enriched;
