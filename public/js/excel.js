@@ -74,6 +74,13 @@ const excelPanel = (() => {
     document.getElementById('excel-import-btn')?.addEventListener('click', doImport);
     document.getElementById('excel-reset-btn')?.addEventListener('click', resetPanel);
     document.getElementById('excel-clear-db-btn')?.addEventListener('click', clearDatabase);
+
+    // Pre-fill month picker with current month (YYYY-MM)
+    const picker = document.getElementById('import-month-picker');
+    if (picker) {
+      const now = new Date();
+      picker.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    }
   }
 
   async function handleFile(file) {
@@ -354,6 +361,11 @@ const excelPanel = (() => {
       formData.append('file', rawFile);
       formData.append('sheetNames', JSON.stringify(selectedSheets));
       formData.append('columnMapping', JSON.stringify(columnMapping));
+
+      // Include selected import month for per-month cleanup
+      const picker = document.getElementById('import-month-picker');
+      const importMonth = picker?.value?.trim() || '';
+      if (importMonth) formData.append('importMonth', importMonth);
 
       const res = await api.upload('/excel/import', formData);
 

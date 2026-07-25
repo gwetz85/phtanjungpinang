@@ -373,6 +373,27 @@
           </div>
 
           <div>
+            <!-- Pilih Bulan Import -->
+            <div class="card" style="margin-bottom:1rem;">
+              <div class="card-header">
+                <div class="card-title">📅 Pilih Bulan Import</div>
+              </div>
+              <div class="card-body">
+                <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem;line-height:1.6;">
+                  Pilih bulan data yang akan diimport. Data check-in bulan yang dipilih akan <strong style="color:var(--warning);">diganti otomatis</strong> — data bulan lain <strong style="color:var(--success);">tetap aman</strong>.
+                </p>
+                <input
+                  type="month"
+                  id="import-month-picker"
+                  class="form-control"
+                  style="width:100%;padding:0.6rem 0.9rem;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-primary);font-size:0.95rem;"
+                >
+                <div style="margin-top:0.6rem;font-size:0.78rem;color:var(--text-muted);">
+                  💡 Kosongkan jika tidak ingin membersihkan checkin bulan tertentu
+                </div>
+              </div>
+            </div>
+
             <!-- Import button + result -->
             <div class="card" style="margin-bottom:1rem;">
               <div class="card-body">

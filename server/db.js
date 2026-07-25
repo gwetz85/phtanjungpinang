@@ -360,17 +360,29 @@ function run(sql, params = []) {
     }
   }
 
-  // 6. DELETE FROM checkins
+  // 6. DELETE FROM checkins (by guest_id OR by month prefix)
   else if (cleanSql.toLowerCase().startsWith('delete from checkins')) {
-    const guestId = params[0];
-    dbData.checkins = dbData.checkins.filter(c => String(c.guest_id) !== String(guestId));
+    if (cleanSql.toLowerCase().includes('like')) {
+      // DELETE FROM checkins WHERE tanggal_masuk LIKE 'YYYY-MM-%'
+      const prefix = String(params[0] || '').replace(/%/g, '');
+      dbData.checkins = dbData.checkins.filter(c => !String(c.tanggal_masuk || '').startsWith(prefix));
+    } else {
+      const guestId = params[0];
+      dbData.checkins = dbData.checkins.filter(c => String(c.guest_id) !== String(guestId));
+    }
   }
 
-  // 7. DELETE FROM guests
+  // 7. DELETE FROM guests (by id, or ALL if no params)
   else if (cleanSql.toLowerCase().startsWith('delete from guests')) {
-    const guestId = params[0];
-    dbData.guests = dbData.guests.filter(g => String(g.id) !== String(guestId));
-    dbData.checkins = dbData.checkins.filter(c => String(c.guest_id) !== String(guestId));
+    if (params.length === 0) {
+      // Clear ALL guests and checkins
+      dbData.guests   = [];
+      dbData.checkins = [];
+    } else {
+      const guestId = params[0];
+      dbData.guests   = dbData.guests.filter(g => String(g.id) !== String(guestId));
+      dbData.checkins = dbData.checkins.filter(c => String(c.guest_id) !== String(guestId));
+    }
   }
 
   // 8. DELETE FROM users

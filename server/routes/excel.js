@@ -125,14 +125,25 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
     return res.status(400).json({ success: false, message: 'Format parameter JSON tidak valid.' });
   }
 
+  const importMonth = req.body.importMonth || ''; // format: YYYY-MM
+
   try {
     const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
 
     let totalImported = 0, totalUpdated = 0, totalSkipped = 0;
+    let totalCheckinDeleted = 0;
     const allErrors = [];
     let autoIdCounter = 1;
 
     transaction(() => {
+      // ── Hapus semua checkin di bulan yang dipilih (prevent duplikasi) ──
+      if (importMonth) {
+        const before = (require('../db').getDB().checkins || []).length;
+        run(`DELETE FROM checkins WHERE tanggal_masuk LIKE ?`, [`${importMonth}-%`]);
+        const after = (require('../db').getDB().checkins || []).length;
+        totalCheckinDeleted = before - after;
+      }
+
       for (const sheetName of sheets) {
         const sheet = workbook.Sheets[sheetName];
         if (!sheet) {
@@ -187,6 +198,7 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
             const tglMasuk = parseDate(row[map.tanggal_masuk]);
             const expiry   = parseDate(row[map.expiry_identitas]);
 
+            // Upsert guest (insert or update info only — never re-add duplicate)
             const existing = queryOne('SELECT id FROM guests WHERE no_identitas = ?', [cleanNoId]);
             let guestId;
 
@@ -225,16 +237,21 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
       }
     });
 
-    const sheetWord = sheets.length > 1 ? `${sheets.length} sheet` : `sheet "${sheets[0]}"`;
+    const sheetWord  = sheets.length > 1 ? `${sheets.length} sheet` : `sheet "${sheets[0]}"`;
+    const monthLabel = importMonth ? ` (Bulan: ${importMonth})` : '';
+    const clearNote  = totalCheckinDeleted > 0 ? ` Sebelumnya ${totalCheckinDeleted} data check-in bulan ini dibersihkan.` : '';
+
     res.json({
       success: true,
-      message: `Import ${sheetWord} selesai. ${totalImported} tamu baru, ${totalUpdated} diperbarui, ${totalSkipped} dilewati.`,
+      message: `Import ${sheetWord}${monthLabel} selesai. ${totalImported} tamu baru, ${totalUpdated} diperbarui, ${totalSkipped} dilewati.${clearNote}`,
       stats: {
-        imported: totalImported,
-        updated:  totalUpdated,
-        skipped:  totalSkipped,
-        sheets:   sheets.length,
-        errors:   allErrors.slice(0, 20)
+        imported:        totalImported,
+        updated:         totalUpdated,
+        skipped:         totalSkipped,
+        sheets:          sheets.length,
+        checkinCleared:  totalCheckinDeleted,
+        importMonth:     importMonth || null,
+        errors:          allErrors.slice(0, 20)
       }
     });
   } catch (err) {
