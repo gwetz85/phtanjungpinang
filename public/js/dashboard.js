@@ -288,8 +288,8 @@ const dashboard = {
         return;
       }
       primary.textContent = text;
-      // Calculate smooth, slow duration based on text length (minimum 60s)
-      const duration = Math.max(60, Math.round(text.length * 0.45)) + 's';
+      // Balanced animation duration based on text length (minimum 35s)
+      const duration = Math.max(35, Math.round(text.length * 0.22)) + 's';
       primary.style.animationDuration = duration;
       banner.style.display = 'flex';
       try { localStorage.setItem('ph_running_text', text); } catch(_) {}
