@@ -28,7 +28,7 @@ const dashboard = {
     const headerName = document.getElementById('header-user-name');
     const headerAvatar = document.getElementById('header-user-avatar');
     if (headerName) headerName.textContent = u.nama;
-    if (headerAvatar) headerAvatar.textContent = getInitials(u.nama);
+    if (headerAvatar) headerAvatar.innerHTML = '👤';
 
     const sidebarName = document.getElementById('sidebar-user-name');
     const sidebarRole = document.getElementById('sidebar-user-role');
