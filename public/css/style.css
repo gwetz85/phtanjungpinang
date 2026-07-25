@@ -186,6 +186,23 @@ input, select, textarea {
   outline: none;
 }
 
+/* Fix: native browser select dropdown opens on white OS background.
+   Options MUST have dark text so they're readable. */
+select.form-control {
+  color-scheme: dark;        /* hint browser to use dark-themed native picker */
+}
+
+select.form-control option {
+  background: #1e293b;       /* dark slate background */
+  color: #f1f5f9;            /* light text */
+}
+
+select.form-control option:checked,
+select.form-control option:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
+
 .form-control:focus {
   border-color: var(--border-focus);
   box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.15);

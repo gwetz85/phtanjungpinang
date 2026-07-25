@@ -428,6 +428,12 @@
   color: var(--text-primary);
   font-size: 0.85rem;
   outline: none;
+  color-scheme: dark;
+}
+
+.mapping-table select option {
+  background: #1e293b;
+  color: #f1f5f9;
 }
 
 /* Progress bar */
