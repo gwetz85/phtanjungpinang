@@ -274,14 +274,9 @@ const dashboard = {
       const res = await api.get('/settings/running-text');
       const text = res.runningText || '';
       const banner = document.getElementById('running-text-banner');
-      const marquee = document.getElementById('running-text-marquee');
-      
-      if (marquee) {
-        marquee.textContent = text;
-      }
-      
       if (banner) {
         if (text.trim().length > 0) {
+          banner.innerHTML = `<span class="banner-label">INFO</span><marquee scrollamount="4" behavior="scroll" direction="left" id="running-text-marquee">${escHtml(text)}</marquee>`;
           banner.style.display = 'flex';
         } else {
           banner.style.display = 'none';
