@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — PH Hotel Tanjungpinang</title>
+  <meta name="description" content="Sistem manajemen database tamu Hotel PH Tanjungpinang.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+<div class="bg-animated"></div>
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
+<div id="toast-container"></div>
+
+<!-- ═══ DASHBOARD LAYOUT ═══ -->
+<div class="dashboard-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="brand-icon">🏨</div>
+        <div class="brand-text">
+          <div class="hotel-name">PH Hotel</div>
+          <div class="hotel-sub">Tanjungpinang</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Menu</div>
+      <div id="sidebar-nav"><!-- Rendered by dashboard.js --></div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar" id="sidebar-user-avatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">—</div>
+          <div id="sidebar-user-role"></div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-block btn-sm" id="logout-sidebar-btn">
+        🚪 Keluar
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <!-- HEADER -->
+    <header class="main-header">
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <button class="btn btn-ghost btn-icon" id="hamburger-btn" style="display:none;" title="Menu">☰</button>
+        <h2 id="main-title">Beranda</h2>
+      </div>
+      <div class="header-actions">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <div class="user-avatar" id="header-user-avatar" style="width:32px;height:32px;font-size:0.8rem;">?</div>
+          <span id="header-user-name" style="font-size:0.85rem;color:var(--text-secondary);"></span>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="logout-btn">🚪 Keluar</button>
+      </div>
+    </header>
+
+    <!-- CONTENT AREA -->
+    <main class="content-area">
+
+      <!-- ══════════════════════════════════
+           PANEL: BERANDA
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-home">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon blue">👥</div>
+            <div>
+              <div class="stat-value" id="stat-total-tamu">—</div>
+              <div class="stat-label">Total Tamu</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">📅</div>
+            <div>
+              <div class="stat-value" id="stat-today">—</div>
+              <div class="stat-label">Check-in Hari Ini</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple">👤</div>
+            <div>
+              <div class="stat-value" id="stat-users">—</div>
+              <div class="stat-label">Jumlah User</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon cyan">🏨</div>
+            <div>
+              <div class="stat-value">PH</div>
+              <div class="stat-label">Hotel Tanjungpinang</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+          <!-- Recent Guests -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🕐 Tamu Terbaru</div>
+              <button class="btn btn-ghost btn-sm" onclick="dashboard.navigate('panel-guests')">Lihat Semua →</button>
+            </div>
+            <div class="card-body" id="recent-guests" style="padding:0 1.5rem;">
+              <div style="text-align:center;padding:2rem;color:var(--text-muted);"><div class="spinner" style="margin:0 auto;"></div></div>
+            </div>
+          </div>
+
+          <!-- Quick actions -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">⚡ Aksi Cepat</div>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:0.75rem;">
+              <button class="btn btn-primary btn-block" onclick="dashboard.navigate('panel-checkin')">
+                ➕ Check-in Tamu Baru
+              </button>
+              <button class="btn btn-secondary btn-block" onclick="dashboard.navigate('panel-search')">
+                🔍 Cari Data Tamu
+              </button>
+              <button class="btn btn-secondary btn-block" onclick="dashboard.navigate('panel-guests')">
+                📋 Lihat Semua Data
+              </button>
+              <hr class="divider">
+              <button class="btn btn-ghost btn-block btn-sm" onclick="guestsPanel.exportExcel ? guestsPanel.exportExcel() : null" id="home-export-btn">
+                📊 Export ke Excel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════
+           PANEL: CARI TAMU
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-search">
+        <div class="card" style="margin-bottom:1.5rem;">
+          <div class="card-body">
+            <div class="search-hero">
+              <span class="search-icon-lg">🔍</span>
+              <input
+                type="text"
+                id="search-input"
+                placeholder="Cari berdasarkan No. Identitas (NIK/Passport) atau Nama Tamu..."
+                autocomplete="off"
+              >
+              <div id="search-spinner" style="display:none;" class="search-spinner">
+                <div class="spinner"></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+              <button class="btn btn-primary" id="search-btn">🔍 Cari</button>
+              <span style="font-size:0.82rem;color:var(--text-muted);">
+                Ketik minimal 2 karakter atau tekan Enter untuk mencari
+              </span>
+            </div>
+          </div>
+        </div>
+        <div id="search-results"></div>
+      </div>
+
+      <!-- ══════════════════════════════════
+           PANEL: CHECK-IN BARU
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-checkin">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;">
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">🧍 Data Identitas Tamu</div>
+              </div>
+              <div class="card-body">
+                <form id="ci-form">
+                  <!-- Identitas -->
+                  <div class="form-section-title">🪪 Identitas</div>
+                  <div class="form-group">
+                    <label class="form-label" for="ci-identitas">No. Identitas (NIK / Passport) *</label>
+                    <input type="text" id="ci-identitas" class="form-control"
+                      placeholder="Ketik untuk auto-cek database..."
+                      autocomplete="off" required>
+                  </div>
+                  <div id="ci-lookup-indicator" style="margin-bottom:0.75rem;"></div>
+                  <div id="ci-guest-info" style="display:none;margin-bottom:1rem;"></div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="ci-nama">Nama Tamu *</label>
+                    <input type="text" id="ci-nama" class="form-control" placeholder="Nama lengkap" required>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label" for="ci-umur">Umur</label>
+                      <input type="text" id="ci-umur" class="form-control" placeholder="Contoh: 35">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="ci-expiry">Expiry Identitas</label>
+                      <input type="text" id="ci-expiry" class="form-control" placeholder="Contoh: 2028-01-01">
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label" for="ci-nationality">Kewarganegaraan</label>
+                      <input type="text" id="ci-nationality" class="form-control" placeholder="Contoh: INDONESIA">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="ci-dari">Datang Dari</label>
+                      <input type="text" id="ci-dari" class="form-control" placeholder="Kota/Negara asal">
+                    </div>
+                  </div>
+
+                  <!-- Check-in Info -->
+                  <div class="form-section-title" style="margin-top:0.5rem;">🏠 Info Menginap</div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label" for="ci-room">Nomor Kamar</label>
+                      <input type="text" id="ci-room" class="form-control" placeholder="Contoh: 101">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="ci-date">Tanggal Masuk</label>
+                      <input type="date" id="ci-date" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="ci-ket">Keterangan</label>
+                    <textarea id="ci-ket" class="form-control" rows="2" placeholder="Opsional..."></textarea>
+                  </div>
+
+                  <div style="display:flex;gap:0.75rem;margin-top:0.5rem;">
+                    <button type="submit" class="btn btn-primary btn-lg" id="ci-submit-btn" style="flex:1;">
+                      <span id="ci-submit-text">💾 Simpan Check-in</span>
+                    </button>
+                    <button type="button" class="btn btn-ghost" id="ci-clear-btn" title="Bersihkan form">🗑️</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div id="ci-success-result" style="display:none;margin-bottom:1rem;"></div>
+            <div class="card">
+              <div class="card-body">
+                <div style="font-size:0.9rem;color:var(--text-secondary);line-height:1.8;">
+                  <div style="font-weight:700;color:var(--text-primary);margin-bottom:0.75rem;">ℹ️ Petunjuk Penggunaan</div>
+                  <div>1. Ketik No. Identitas — sistem akan <strong style="color:var(--primary);">otomatis</strong> mencari di database</div>
+                  <div style="margin-top:0.4rem;">2. Jika tamu sudah terdaftar → data akan <strong style="color:var(--success);">terisi otomatis</strong></div>
+                  <div style="margin-top:0.4rem;">3. Jika tamu baru → isi semua data identitas</div>
+                  <div style="margin-top:0.4rem;">4. Isi info kamar dan tanggal masuk</div>
+                  <div style="margin-top:0.4rem;">5. Klik <strong>Simpan Check-in</strong></div>
+                  <hr class="divider">
+                  <div><span class="badge badge-nik">NIK</span> = 16 digit angka (WNI)</div>
+                  <div style="margin-top:0.4rem;"><span class="badge badge-passport">PASSPORT</span> = Nomor paspor (WNA)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════
+           PANEL: SEMUA DATA TAMU (Admin+)
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-guests">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">👥 Data Tamu Hotel</div>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+              <span id="guests-info" style="font-size:0.78rem;color:var(--text-muted);"></span>
+              <button class="btn btn-ghost btn-sm" id="guests-refresh" title="Refresh">🔄</button>
+              <button class="btn btn-success btn-sm" id="guests-export">📊 Export Excel</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:1rem 1.5rem;">
+            <div class="table-toolbar">
+              <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="guests-search" placeholder="Cari nama atau identitas...">
+              </div>
+            </div>
+          </div>
+          <div class="table-wrapper" style="border:none;border-top:1px solid var(--border);border-radius:0;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nama Tamu</th>
+                  <th>Identitas</th>
+                  <th>Umur</th>
+                  <th>Kewarganegaraan</th>
+                  <th>Datang Dari</th>
+                  <th>Check-in Terakhir</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="guests-tbody">
+                <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-muted);">Memuat data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="guests-pagination"></div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════
+           PANEL: MANAJEMEN AKUN (Admin+)
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-users">
+        <div class="action-bar">
+          <div>
+            <h3 style="color:var(--text-primary);font-size:1rem;">👥 Daftar User</h3>
+            <p style="font-size:0.82rem;color:var(--text-secondary);">Kelola akun receptionist, admin, dan superadmin</p>
+          </div>
+          <button class="btn btn-primary" id="add-user-btn">➕ Tambah User</button>
+        </div>
+        <div id="users-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem;margin-top:1rem;">
+          <div style="text-align:center;padding:2rem;color:var(--text-muted);grid-column:1/-1;">
+            <div class="spinner" style="margin:0 auto;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════
+           PANEL: UPLOAD EXCEL (Superadmin)
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-excel">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;">
+          <div>
+            <!-- Upload Zone -->
+            <div class="card" style="margin-bottom:1.5rem;">
+              <div class="card-header">
+                <div class="card-title">📁 Upload File Excel</div>
+              </div>
+              <div class="card-body">
+                <div class="dropzone" id="excel-dropzone">
+                  <div class="drop-icon">📂</div>
+                  <div class="drop-title">Drag & Drop file Excel di sini</div>
+                  <div class="drop-sub">atau klik untuk memilih file · .xlsx / .xls · Maks 50MB</div>
+                </div>
+                <input type="file" id="excel-file-input" accept=".xlsx,.xls" style="display:none;">
+                <div id="excel-upload-status" style="margin-top:1rem;"></div>
+              </div>
+            </div>
+
+            <!-- Sheet Selection -->
+            <div class="card" id="excel-sheet-section" style="display:none;margin-bottom:1.5rem;">
+              <div class="card-header">
+                <div class="card-title">📋 Pilih Sheet</div>
+              </div>
+              <div class="card-body">
+                <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem;">
+                  Klik sheet yang ingin diimport datanya:
+                </p>
+                <div class="sheet-list" id="sheet-list"></div>
+              </div>
+            </div>
+
+            <!-- Column Mapping -->
+            <div class="card" id="excel-mapping-section" style="display:none;">
+              <div class="card-header">
+                <div class="card-title">🔗 Mapping Kolom</div>
+              </div>
+              <div class="card-body" id="mapping-container"></div>
+            </div>
+          </div>
+
+          <div>
+            <!-- Import button + result -->
+            <div class="card" style="margin-bottom:1rem;">
+              <div class="card-body">
+                <button class="btn btn-primary btn-block btn-lg" id="excel-import-btn" style="display:none;">
+                  🚀 Import Data
+                </button>
+                <div id="import-progress" style="display:none;margin-top:1rem;"></div>
+                <div id="import-result" style="margin-top:1rem;"></div>
+
+                <div style="margin-top:1rem;">
+                  <button class="btn btn-ghost btn-sm btn-block" id="excel-reset-btn">🔄 Reset / Upload File Lain</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">ℹ️ Panduan Import</div>
+              </div>
+              <div class="card-body" style="font-size:0.85rem;color:var(--text-secondary);line-height:1.9;">
+                <div>📋 File Excel boleh memiliki <strong style="color:var(--primary);">banyak sheet</strong></div>
+                <div style="margin-top:0.3rem;">🔁 Jika No. Identitas sudah ada di database → data akan <strong style="color:var(--success);">diperbarui</strong></div>
+                <div style="margin-top:0.3rem;">➕ Jika belum ada → otomatis <strong style="color:var(--primary);">ditambahkan</strong> sebagai tamu baru</div>
+                <div style="margin-top:0.3rem;">📅 Tanggal masuk dari Excel akan disimpan sebagai riwayat check-in</div>
+                <hr class="divider">
+                <div style="font-weight:700;color:var(--text-primary);margin-bottom:0.5rem;">Kolom yang dikenali otomatis:</div>
+                <div>• IDENTITAS → No. Identitas</div>
+                <div>• NAMA TAMU → Nama</div>
+                <div>• ROOM NO → Nomor Kamar</div>
+                <div>• TANGGAL MASUK → Check-in</div>
+                <div>• NATIONALITY → Kewarganegaraan</div>
+                <div>• DATANG DARI → Asal</div>
+                <div>• EXPIRY → Expiry ID</div>
+                <div>• KET → Keterangan</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div><!-- end main-content -->
+
+</div><!-- end dashboard-layout -->
+
+<style>
+  @media (max-width: 768px) {
+    #hamburger-btn { display: flex !important; }
+    .content-area { padding: 1rem; }
+    #panel-checkin > div, #panel-excel > div { grid-template-columns: 1fr !important; }
+    #panel-home > div:last-child { grid-template-columns: 1fr !important; }
+  }
+</style>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/search.js"></script>
+<script src="js/checkin.js"></script>
+<script src="js/guests.js"></script>
+<script src="js/users.js"></script>
+<script src="js/excel.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
