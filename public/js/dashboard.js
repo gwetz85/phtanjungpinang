@@ -274,7 +274,6 @@ const dashboard = {
   async loadRunningText() {
     const banner  = document.getElementById('running-text-banner');
     const primary = document.getElementById('running-text-marquee');
-    const clone   = document.getElementById('running-text-clone');
     if (!banner || !primary) return;
 
     const applyText = (text) => {
@@ -283,26 +282,14 @@ const dashboard = {
         return;
       }
       primary.textContent = text;
-      if (clone) clone.textContent = text;
-
-      // Duration proportional to text length — lower divisor = slower speed
-      const charPx   = Math.max(text.length * 9, 400);
-      const duration = Math.max(Math.round(charPx / 55), 18) + 's';
-      primary.style.animationDuration = duration;
-      if (clone) {
-        clone.style.animationDuration = duration;
-        // Clone starts exactly half-cycle later for seamless loop
-        clone.style.animationDelay = `calc(${duration} / 2)`;
-      }
       banner.style.display = 'flex';
       try { localStorage.setItem('ph_running_text', text); } catch(_) {}
     };
 
     try {
-      const res  = await api.get('/settings/running-text');
+      const res = await api.get('/settings/running-text');
       applyText((res.runningText || '').trim());
     } catch (err) {
-      // Fallback: use cached text
       try {
         const cached = localStorage.getItem('ph_running_text');
         applyText((cached || '').trim());

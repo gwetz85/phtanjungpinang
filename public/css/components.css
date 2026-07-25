@@ -688,44 +688,32 @@
 .ticker-track {
   flex: 1;
   overflow: hidden;
-  display: flex;
-  align-items: center;
   height: 100%;
-  position: relative;
+  position: relative;   /* single absolute child — no stacking */
 }
 
-/* Each text span scrolls left continuously */
+/* Single scrolling span — position:absolute prevents any overlap */
 .ticker-text {
-  display: inline-block;
+  position: absolute;
+  top: 50%;
+  left: 0;
   white-space: nowrap;
-  padding-right: 80px;          /* gap between end and clone start */
   color: #e2e8f0;
   font-size: 0.83rem;
   font-weight: 500;
   letter-spacing: 0.02em;
-  line-height: 1;
-  animation: ticker-scroll 25s linear infinite;
+  animation: ticker-scroll 30s linear infinite;
   will-change: transform;
 }
 
-.ticker-clone {
-  animation-delay: calc(var(--ticker-duration, 25s) / 2);
-}
-
 @keyframes ticker-scroll {
-  0%   { transform: translateX(100vw); }
-  100% { transform: translateX(-100%); }
+  0%   { transform: translateY(-50%) translateX(100vw); }
+  100% { transform: translateY(-50%) translateX(-100%); }
 }
 
 /* Pause on hover */
 .running-text-banner:hover .ticker-text {
   animation-play-state: paused;
-}
-
-/* Divider pipe between repeated texts */
-.ticker-text::after {
-  content: '\00a0\00a0|\00a0\00a0';
-  opacity: 0.35;
 }
 
 
