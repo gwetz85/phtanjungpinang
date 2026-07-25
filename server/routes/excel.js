@@ -157,11 +157,13 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
 function formatBirthdate(val) {
   if (!val || val === '"') return '';
   if (typeof val === 'number') {
+    if (val > 0 && val < 150) return String(val); // raw age number e.g. 28, 45
     try {
       const d = XLSX.SSF.parse_date_code(val);
-      let year = d.y < 100 ? (d.y > 26 ? 1900 + d.y : 2000 + d.y) : d.y;
-      return `${String(d.d).padStart(2,'0')}/${String(d.m).padStart(2,'0')}/${year}`;
-    } catch { return String(val); }
+      if (d && d.y > 1900 && d.y < 2100) {
+        return `${String(d.d).padStart(2,'0')}/${String(d.m).padStart(2,'0')}/${d.y}`;
+      }
+    } catch {}
   }
   let str = String(val).trim();
   const match = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
@@ -178,13 +180,14 @@ function formatBirthdate(val) {
 }
 
 function formatCheckinDate(val, importMonth) {
-  if (!val || val === '"') return '';
+  if (!val || val === '"') return importMonth ? `${importMonth}-01` : '';
   if (typeof val === 'number') {
     try {
       const d = XLSX.SSF.parse_date_code(val);
-      let year = d.y < 100 ? (d.y > 50 ? 1900 + d.y : 2000 + d.y) : d.y;
-      return `${year}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;
-    } catch { return String(val); }
+      if (d && d.y >= 1970 && d.y <= 2100) {
+        return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;
+      }
+    } catch {}
   }
   let str = String(val).trim();
   const match = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
@@ -201,7 +204,8 @@ function formatCheckinDate(val, importMonth) {
   if (importMonth && /^\d{1,2}$/.test(str)) {
     return `${importMonth}-${String(str).padStart(2,'0')}`;
   }
-  return str;
+  if (importMonth) return `${importMonth}-01`;
+  return new Date().toISOString().split('T')[0];
 }
 
         let imported = 0, updated = 0, skipped = 0;
@@ -297,20 +301,17 @@ function formatCheckinDate(val, importMonth) {
             if (existing) {
               // Update metadata for existing guest
               run(
-                `UPDATE guests SET
-                  nama_tamu = ?,
-                  jenis_identitas = CASE WHEN ? NOT LIKE 'AUTO-%' THEN ? ELSE jenis_identitas END,
-                  no_identitas = CASE WHEN ? NOT LIKE 'AUTO-%' THEN ? ELSE no_identitas END,
-                  umur = COALESCE(NULLIF(?, ''), umur),
-                  expiry_identitas = COALESCE(NULLIF(?, ''), expiry_identitas),
-                  kewarganegaraan = COALESCE(NULLIF(?, ''), kewarganegaraan),
-                  datang_dari = COALESCE(NULLIF(?, ''), datang_dari),
-                  updated_at = ?
-                 WHERE id = ?`,
+                `UPDATE guests SET nama_tamu=?, jenis_identitas=?, no_identitas=?, umur=?, expiry_identitas=?, kewarganegaraan=?, datang_dari=?, updated_at=? WHERE id=?`,
                 [
-                  namaTamu, cleanNoId, jenis, cleanNoId, cleanNoId,
-                  birthdateFormatted, expiry, nationality, datang,
-                  now, existing.id
+                  namaTamu,
+                  jenis,
+                  cleanNoId,
+                  birthdateFormatted,
+                  expiry,
+                  nationality,
+                  datang,
+                  now,
+                  existing.id
                 ]
               );
               guestId = existing.id;

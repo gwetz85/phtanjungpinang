@@ -382,29 +382,21 @@ function run(sql, params = []) {
   // 4. UPDATE guests
   else if (cleanSql.toLowerCase().startsWith('update guests')) {
     try {
-      const setPart = cleanSql.toLowerCase().split('set')[1].split('where')[0];
-      const wherePart = cleanSql.toLowerCase().split('where')[1];
-      const cols = setPart.split(',').map(s => s.split('=')[0].trim());
-
-      let g = null;
       const whereVal = params[params.length - 1];
-
-      if (wherePart.includes('no_identitas')) {
+      let g = dbData.guests.find(x => String(x.id) === String(whereVal));
+      if (!g && cleanSql.includes('no_identitas =')) {
         g = dbData.guests.find(x => String(x.no_identitas).trim() === String(whereVal).trim());
-      } else if (wherePart.includes('id')) {
-        g = dbData.guests.find(x => String(x.id) === String(whereVal));
       }
 
-      if (g) {
-        cols.forEach((col, idx) => {
-          if (col === 'nama_tamu') g.nama_tamu = params[idx];
-          else if (col === 'jenis_identitas') g.jenis_identitas = params[idx];
-          else if (col === 'umur') g.umur = params[idx];
-          else if (col === 'expiry_identitas') g.expiry_identitas = params[idx];
-          else if (col === 'kewarganegaraan') g.kewarganegaraan = params[idx];
-          else if (col === 'datang_dari') g.datang_dari = params[idx];
-          else if (col === 'updated_at') g.updated_at = params[idx] || now;
-        });
+      if (g && params.length >= 8) {
+        g.nama_tamu        = params[0] || g.nama_tamu;
+        g.jenis_identitas  = (params[1] && !String(params[1]).startsWith('AUTO-')) ? params[1] : g.jenis_identitas;
+        g.no_identitas     = (params[2] && !String(params[2]).startsWith('AUTO-')) ? params[2] : g.no_identitas;
+        g.umur             = params[3] !== undefined ? params[3] : g.umur;
+        g.expiry_identitas = params[4] !== undefined ? params[4] : g.expiry_identitas;
+        g.kewarganegaraan  = params[5] !== undefined ? params[5] : g.kewarganegaraan;
+        g.datang_dari      = params[6] !== undefined ? params[6] : g.datang_dari;
+        g.updated_at       = params[7] || now;
       }
     } catch (e) {
       console.error('[DB UPDATE guests] parse error:', e);
