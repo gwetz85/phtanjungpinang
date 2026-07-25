@@ -151,9 +151,18 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
             const map = columnMapping;
             const namaTamu = String(row[map.nama_tamu] || '').trim();
 
-            if (!namaTamu) { skipped++; continue; }
+            // Skip row if guest name is missing, empty, or is a header label
+            if (!namaTamu || ['NAMA TAMU', 'NAMA', 'NAME', 'GUEST NAME'].includes(namaTamu.toUpperCase())) {
+              skipped++;
+              continue;
+            }
 
             let rawNoId = String(row[map.no_identitas] || '').trim();
+            if (['IDENTITAS', 'NIK', 'PASSPORT', 'NO IDENTITAS', 'ID'].includes(rawNoId.toUpperCase())) {
+              skipped++;
+              continue;
+            }
+
             let cleanNoId = rawNoId.replace(/^(nik|psp|psp\s*no|sim|sim\s*no|ktp|id)\.?:?\s*/i, '').trim();
 
             if (!cleanNoId) {

@@ -1,35 +1,1162 @@
 {
   "users": [
     {
+      "created_at": "2026-07-25T10:16:28.181Z",
       "id": 1,
-      "username": "superadmin",
-      "password": "$2a$10$k/Lvm/YnE/.w29CnqB0KaeAtdyZ7PBCu8/pVKFL3S5IR.NKgEM/Tq",
       "nama": "Super Administrator",
+      "password": "$2a$10$k/Lvm/YnE/.w29CnqB0KaeAtdyZ7PBCu8/pVKFL3S5IR.NKgEM/Tq",
       "role": "superadmin",
-      "created_at": "2026-07-25T10:16:28.181Z"
+      "username": "superadmin"
     },
     {
+      "created_at": "2026-07-25T10:16:28.241Z",
       "id": 2,
-      "username": "admin",
-      "password": "$2a$10$KFTVXGFm2edRTkSeBwTwkOwKp1a1njuUc5pDdTCcN5nreTnsy7VYi",
       "nama": "Administrator",
+      "password": "$2a$10$KFTVXGFm2edRTkSeBwTwkOwKp1a1njuUc5pDdTCcN5nreTnsy7VYi",
       "role": "admin",
-      "created_at": "2026-07-25T10:16:28.241Z"
+      "username": "admin"
     },
     {
+      "created_at": "2026-07-25T10:16:28.305Z",
       "id": 3,
-      "username": "receptionist",
-      "password": "$2a$10$8BmpNtvaj9GGx82DjEqvgumf..S2yinDZbRdq04XzmY9uPCVGXro6",
       "nama": "Resepsionis",
+      "password": "$2a$10$8BmpNtvaj9GGx82DjEqvgumf..S2yinDZbRdq04XzmY9uPCVGXro6",
       "role": "receptionist",
-      "created_at": "2026-07-25T10:16:28.305Z"
+      "username": "receptionist"
     }
   ],
-  "guests": [],
-  "checkins": [],
+  "guests": [
+    {
+      "created_at": "2026-07-25T10:30:59.153Z",
+      "datang_dari": "Medan",
+      "expiry_identitas": "",
+      "id": 1,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Md. Adar Nafisah",
+      "no_identitas": "AUTO-mdadarnafisah-104",
+      "umur": "",
+      "updated_at": "2026-07-25T10:30:59.338Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.159Z",
+      "datang_dari": "Aceh",
+      "expiry_identitas": "",
+      "id": 4,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Syahruan",
+      "no_identitas": "AUTO-mrsyahruan-2204",
+      "umur": "",
+      "updated_at": "2026-07-25T10:30:59.212Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.160Z",
+      "datang_dari": "Jakarta",
+      "expiry_identitas": "26/11/35",
+      "id": 5,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Md. Nurliana",
+      "no_identitas": "no. X 7478022",
+      "umur": "05/04/76",
+      "updated_at": "2026-07-25T10:30:59.213Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.162Z",
+      "datang_dari": "Spore",
+      "expiry_identitas": "1933-09-22",
+      "id": 6,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Singaporean",
+      "nama_tamu": "Mr. Yahya Bin Mohamed",
+      "no_identitas": "no. K 4428690 P",
+      "umur": "24118",
+      "updated_at": "2026-07-25T10:30:59.162Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.162Z",
+      "datang_dari": "Natuna",
+      "expiry_identitas": "S Hidup",
+      "id": 7,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Md. Adilla",
+      "no_identitas": "2103065706040001",
+      "umur": "38155",
+      "updated_at": "2026-07-25T10:30:59.162Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.163Z",
+      "datang_dari": "Batam",
+      "expiry_identitas": "S Hidup",
+      "id": 8,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Ragil Apriansyah",
+      "no_identitas": "2171122404990002",
+      "umur": "36274",
+      "updated_at": "2026-07-25T10:30:59.163Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.164Z",
+      "datang_dari": "Batam",
+      "expiry_identitas": "",
+      "id": 9,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Guide",
+      "no_identitas": "AUTO-guide-131",
+      "umur": "",
+      "updated_at": "2026-07-25T10:30:59.164Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.164Z",
+      "datang_dari": "M'Sia",
+      "expiry_identitas": "",
+      "id": 10,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Malaysian",
+      "nama_tamu": "Md. Aishah Binti Ahmad Shahimi",
+      "no_identitas": "AUTO-mdaishahbintiahmadshahimi-2216",
+      "umur": "",
+      "updated_at": "2026-07-25T10:30:59.164Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.165Z",
+      "datang_dari": "\"",
+      "expiry_identitas": "",
+      "id": 11,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "\"",
+      "nama_tamu": "Md. Zarina  Binti Selamat",
+      "no_identitas": "AUTO-mdzarinabintiselamat-1",
+      "umur": "",
+      "updated_at": "2026-07-25T10:30:59.165Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.166Z",
+      "datang_dari": "M'Sia",
+      "expiry_identitas": "",
+      "id": 12,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Malaysian",
+      "nama_tamu": "Mr. Mislani Bin Tumirin",
+      "no_identitas": "AUTO-mrmislanibintumirin-2207",
+      "umur": "",
+      "updated_at": "2026-07-25T10:30:59.166Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.166Z",
+      "datang_dari": "\"",
+      "expiry_identitas": "",
+      "id": 13,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "\"",
+      "nama_tamu": "Md. Jamilah Binti Selamat",
+      "no_identitas": "AUTO-mdjamilahbintiselamat-2",
+      "umur": "",
+      "updated_at": "2026-07-25T10:30:59.166Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.167Z",
+      "datang_dari": "M'Sia",
+      "expiry_identitas": "",
+      "id": 14,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Malaysian",
+      "nama_tamu": "Mr. Zabidi Bin Md Dom",
+      "no_identitas": "AUTO-mrzabidibinmddom-2208",
+      "umur": "",
+      "updated_at": "2026-07-25T10:30:59.167Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.168Z",
+      "datang_dari": "\"",
+      "expiry_identitas": "",
+      "id": 15,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "\"",
+      "nama_tamu": "Md. Noorliyana Binti Abd Rahaman",
+      "no_identitas": "AUTO-mdnoorliyanabintiabdrahaman-3",
+      "umur": "",
+      "updated_at": "2026-07-25T10:30:59.168Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.168Z",
+      "datang_dari": "M'Sia",
+      "expiry_identitas": "",
+      "id": 16,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Malaysian",
+      "nama_tamu": "Md. Juriah Binti Mohamed",
+      "no_identitas": "AUTO-mdjuriahbintimohamed-2209",
+      "umur": "",
+      "updated_at": "2026-07-25T10:30:59.168Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.169Z",
+      "datang_dari": "T P I",
+      "expiry_identitas": "S Hidup",
+      "id": 17,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Dody",
+      "no_identitas": "2101070512850001",
+      "umur": "31386",
+      "updated_at": "2026-07-25T10:30:59.169Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.170Z",
+      "datang_dari": "Bintan",
+      "expiry_identitas": "S Hidup",
+      "id": 18,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Roi Hanafi Aswin",
+      "no_identitas": "2101060606000001",
+      "umur": "36683",
+      "updated_at": "2026-07-25T10:30:59.170Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.171Z",
+      "datang_dari": "Batam",
+      "expiry_identitas": "2026-10-04",
+      "id": 19,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Md. Mutiara Wide",
+      "no_identitas": "09209010000260",
+      "umur": "33156",
+      "updated_at": "2026-07-25T10:30:59.171Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.171Z",
+      "datang_dari": "Bintan",
+      "expiry_identitas": "S Hidup",
+      "id": 20,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Chairun Meiranto",
+      "no_identitas": "2101150805030001",
+      "umur": "37749",
+      "updated_at": "2026-07-25T10:30:59.171Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.172Z",
+      "datang_dari": "Bintan",
+      "expiry_identitas": "S Hidup",
+      "id": 21,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Feril Fathur Rendika",
+      "no_identitas": "2101062301020001",
+      "umur": "37279",
+      "updated_at": "2026-07-25T10:30:59.172Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.173Z",
+      "datang_dari": "Palembang",
+      "expiry_identitas": "S Hidup",
+      "id": 22,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Md. Nur Aisyah",
+      "no_identitas": "1671066110890005",
+      "umur": "21/10/89",
+      "updated_at": "2026-07-25T10:30:59.173Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.173Z",
+      "datang_dari": "Bintan",
+      "expiry_identitas": "S Hidup",
+      "id": 23,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Md. Qamariyah",
+      "no_identitas": "3525174610990001",
+      "umur": "06/10/99",
+      "updated_at": "2026-07-25T10:30:59.173Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.174Z",
+      "datang_dari": "Agam",
+      "expiry_identitas": "S Hidup",
+      "id": 24,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Md. Mici khairunnisa",
+      "no_identitas": "1306065701000002",
+      "umur": "17/01/00",
+      "updated_at": "2026-07-25T10:30:59.174Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.175Z",
+      "datang_dari": "DATANG",
+      "expiry_identitas": "EXPIRY",
+      "id": 25,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "NATIONALITY",
+      "nama_tamu": "NAMA TAMU",
+      "no_identitas": "ENTITAS",
+      "umur": "UMUR",
+      "updated_at": "2026-07-25T10:30:59.309Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.214Z",
+      "datang_dari": "Depok ",
+      "expiry_identitas": "S Hidup",
+      "id": 26,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Rifki Farhan",
+      "no_identitas": "3174062906810004",
+      "umur": "29766",
+      "updated_at": "2026-07-25T10:30:59.214Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.214Z",
+      "datang_dari": "TPI",
+      "expiry_identitas": "S Hidup",
+      "id": 27,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Md. Sofia",
+      "no_identitas": "2172025702940001",
+      "umur": "34382",
+      "updated_at": "2026-07-25T10:30:59.214Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.215Z",
+      "datang_dari": "JKT",
+      "expiry_identitas": "S Hidup",
+      "id": 28,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Sulaiman",
+      "no_identitas": "3172051512730003",
+      "umur": "27013",
+      "updated_at": "2026-07-25T10:30:59.292Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.216Z",
+      "datang_dari": "Jateng",
+      "expiry_identitas": "S Hidup",
+      "id": 29,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Muhammad Abdur Rokhim",
+      "no_identitas": "2171090707969008",
+      "umur": "35253",
+      "updated_at": "2026-07-25T10:30:59.216Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.250Z",
+      "datang_dari": "Aceh",
+      "expiry_identitas": "",
+      "id": 30,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Syahruan",
+      "no_identitas": "AUTO-mrsyahruan-135",
+      "umur": "",
+      "updated_at": "2026-07-25T10:30:59.291Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.252Z",
+      "datang_dari": "Padang",
+      "expiry_identitas": "S Hidup",
+      "id": 31,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Dwi Satria",
+      "no_identitas": "1308052509000001",
+      "umur": "36794",
+      "updated_at": "2026-07-25T10:30:59.252Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.253Z",
+      "datang_dari": "Spore",
+      "expiry_identitas": "1933-04-12",
+      "id": 32,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Singaporean",
+      "nama_tamu": "Mr. Koh Chin Fong",
+      "no_identitas": "no. K 4031554 R",
+      "umur": "21964",
+      "updated_at": "2026-07-25T10:30:59.293Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.253Z",
+      "datang_dari": "Batam",
+      "expiry_identitas": "2029-10-18",
+      "id": 33,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Erwin Ruswandy",
+      "no_identitas": "2171102311739002",
+      "umur": "26991",
+      "updated_at": "2026-07-25T10:30:59.253Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.254Z",
+      "datang_dari": "TPI",
+      "expiry_identitas": "2029-10-18",
+      "id": 34,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Agustin Siregar",
+      "no_identitas": "2172021508000002",
+      "umur": "15/08/00",
+      "updated_at": "2026-07-25T10:30:59.254Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.293Z",
+      "datang_dari": "Yogyakarta",
+      "expiry_identitas": "S Hidup",
+      "id": 35,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Ade Irfan Setiawan",
+      "no_identitas": "3301212611860002",
+      "umur": "31742",
+      "updated_at": "2026-07-25T10:30:59.293Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.294Z",
+      "datang_dari": "Bangka",
+      "expiry_identitas": "S Hidup",
+      "id": 36,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Md. Yelly Febdrianty",
+      "no_identitas": "1971056303820003",
+      "umur": "30033",
+      "updated_at": "2026-07-25T10:30:59.294Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.295Z",
+      "datang_dari": "Batam",
+      "expiry_identitas": "S Hidup",
+      "id": 37,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Md. Nurhayati",
+      "no_identitas": "2171105008940012",
+      "umur": "34556",
+      "updated_at": "2026-07-25T10:30:59.295Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.296Z",
+      "datang_dari": "Spore",
+      "expiry_identitas": "1932-06-17",
+      "id": 38,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Singaporean",
+      "nama_tamu": "Md. Wong Seok Weng Veronica",
+      "no_identitas": "no. K 2842744 G",
+      "umur": "24239",
+      "updated_at": "2026-07-25T10:30:59.296Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.297Z",
+      "datang_dari": "\"",
+      "expiry_identitas": "1931-10-20",
+      "id": 39,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "\"",
+      "nama_tamu": "Md. Mrs Anne Rachel C Wong",
+      "no_identitas": "no. K 2297025 B",
+      "umur": "19085",
+      "updated_at": "2026-07-25T10:30:59.297Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.297Z",
+      "datang_dari": "\"",
+      "expiry_identitas": "1932-09-04",
+      "id": 40,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "\"",
+      "nama_tamu": "Md. Ng Hwee Koon Angela",
+      "no_identitas": "no. K 3392736 R",
+      "umur": "21217",
+      "updated_at": "2026-07-25T10:30:59.297Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.298Z",
+      "datang_dari": "Spore",
+      "expiry_identitas": "1932-03-14",
+      "id": 41,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Singaporean",
+      "nama_tamu": "Mr. Oh seh Chuan",
+      "no_identitas": "no. K 2522152 P",
+      "umur": "20343",
+      "updated_at": "2026-07-25T10:30:59.298Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.299Z",
+      "datang_dari": "\"",
+      "expiry_identitas": "1933-08-10",
+      "id": 42,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "\"",
+      "nama_tamu": "Mr. Koh William",
+      "no_identitas": "no. K 4330276 E",
+      "umur": "16984",
+      "updated_at": "2026-07-25T10:30:59.299Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.300Z",
+      "datang_dari": "\"",
+      "expiry_identitas": "1933-08-02",
+      "id": 43,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "\"",
+      "nama_tamu": "Mr. Tan Chee Kheong, Thomas",
+      "no_identitas": "no. K 4312867 G",
+      "umur": "26240",
+      "updated_at": "2026-07-25T10:30:59.300Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.301Z",
+      "datang_dari": "Spore",
+      "expiry_identitas": "1932-11-23",
+      "id": 44,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Singaporean",
+      "nama_tamu": "Mr. Tan Kim Chew",
+      "no_identitas": "no. K 3645455 N",
+      "umur": "19156",
+      "updated_at": "2026-07-25T10:30:59.301Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.302Z",
+      "datang_dari": "\"",
+      "expiry_identitas": "1934-02-23",
+      "id": 45,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "\"",
+      "nama_tamu": "Mr. Tan Hoon Lian",
+      "no_identitas": "no. K 4775623 N",
+      "umur": "23958",
+      "updated_at": "2026-07-25T10:30:59.302Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.303Z",
+      "datang_dari": "TPI",
+      "expiry_identitas": "",
+      "id": 46,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Zulkarnain",
+      "no_identitas": "AUTO-mrzulkarnain-130",
+      "umur": "",
+      "updated_at": "2026-07-25T10:30:59.303Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.304Z",
+      "datang_dari": "Batam",
+      "expiry_identitas": "S Hidup",
+      "id": 47,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Sukirman",
+      "no_identitas": "2171042703680002",
+      "umur": "24924",
+      "updated_at": "2026-07-25T10:30:59.305Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.306Z",
+      "datang_dari": "TPI",
+      "expiry_identitas": "S Hidup",
+      "id": 48,
+      "jenis_identitas": "NIK",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Dimas Ramadhani",
+      "no_identitas": "2172042504890001",
+      "umur": "32623",
+      "updated_at": "2026-07-25T10:30:59.306Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.307Z",
+      "datang_dari": "Bintan",
+      "expiry_identitas": "",
+      "id": 49,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Mr. Hasanudin",
+      "no_identitas": "AUTO-mrhasanudin-2204",
+      "umur": "",
+      "updated_at": "2026-07-25T10:30:59.307Z"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.308Z",
+      "datang_dari": "TPI",
+      "expiry_identitas": "",
+      "id": 50,
+      "jenis_identitas": "PASSPORT",
+      "kewarganegaraan": "Indonesian",
+      "nama_tamu": "Md. Rini Oktavianti",
+      "no_identitas": "AUTO-mdrinioktavianti-124",
+      "umur": "",
+      "updated_at": "2026-07-25T10:30:59.308Z"
+    }
+  ],
+  "checkins": [
+    {
+      "created_at": "2026-07-25T10:30:59.159Z",
+      "created_by": 1,
+      "guest_id": 4,
+      "id": 4,
+      "keterangan": "Adya              06",
+      "nomor_kamar": "2204",
+      "tanggal_masuk": "2026-01-27"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.160Z",
+      "created_by": 1,
+      "guest_id": 5,
+      "id": 5,
+      "keterangan": "Mg Holiday     04",
+      "nomor_kamar": "135",
+      "tanggal_masuk": "2026-01-29"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.162Z",
+      "created_by": 1,
+      "guest_id": 6,
+      "id": 6,
+      "keterangan": "Hotel              02",
+      "nomor_kamar": "132",
+      "tanggal_masuk": "2026-01-31"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.162Z",
+      "created_by": 1,
+      "guest_id": 7,
+      "id": 7,
+      "keterangan": "Agoda            01",
+      "nomor_kamar": "123",
+      "tanggal_masuk": "2026-02-01"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.163Z",
+      "created_by": 1,
+      "guest_id": 8,
+      "id": 8,
+      "keterangan": "Traveloka       01",
+      "nomor_kamar": "130",
+      "tanggal_masuk": "2026-02-01"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.164Z",
+      "created_by": 1,
+      "guest_id": 9,
+      "id": 9,
+      "keterangan": "Vebi               01",
+      "nomor_kamar": "131",
+      "tanggal_masuk": "2026-02-01"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.164Z",
+      "created_by": 1,
+      "guest_id": 10,
+      "id": 10,
+      "keterangan": "Vebi               01",
+      "nomor_kamar": "2216",
+      "tanggal_masuk": "2026-02-01"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.165Z",
+      "created_by": 1,
+      "guest_id": 11,
+      "id": 11,
+      "keterangan": "\"",
+      "nomor_kamar": "",
+      "tanggal_masuk": "\""
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.166Z",
+      "created_by": 1,
+      "guest_id": 12,
+      "id": 12,
+      "keterangan": "Vebi               01",
+      "nomor_kamar": "2207",
+      "tanggal_masuk": "2026-02-01"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.166Z",
+      "created_by": 1,
+      "guest_id": 13,
+      "id": 13,
+      "keterangan": "\"",
+      "nomor_kamar": "",
+      "tanggal_masuk": "\""
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.167Z",
+      "created_by": 1,
+      "guest_id": 14,
+      "id": 14,
+      "keterangan": "Vebi               01",
+      "nomor_kamar": "2208",
+      "tanggal_masuk": "2026-02-01"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.168Z",
+      "created_by": 1,
+      "guest_id": 15,
+      "id": 15,
+      "keterangan": "\"",
+      "nomor_kamar": "",
+      "tanggal_masuk": "\""
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.168Z",
+      "created_by": 1,
+      "guest_id": 16,
+      "id": 16,
+      "keterangan": "Vebi               01",
+      "nomor_kamar": "2209",
+      "tanggal_masuk": "2026-02-01"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.169Z",
+      "created_by": 1,
+      "guest_id": 17,
+      "id": 17,
+      "keterangan": "Traveloka       01",
+      "nomor_kamar": "129",
+      "tanggal_masuk": "2026-02-01"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.170Z",
+      "created_by": 1,
+      "guest_id": 18,
+      "id": 18,
+      "keterangan": "Agoda            01",
+      "nomor_kamar": "124",
+      "tanggal_masuk": "2026-02-01"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.171Z",
+      "created_by": 1,
+      "guest_id": 19,
+      "id": 19,
+      "keterangan": "Agoda            01",
+      "nomor_kamar": "121",
+      "tanggal_masuk": "2026-02-01"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.171Z",
+      "created_by": 1,
+      "guest_id": 20,
+      "id": 20,
+      "keterangan": "Agoda            01",
+      "nomor_kamar": "122",
+      "tanggal_masuk": "2026-02-01"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.172Z",
+      "created_by": 1,
+      "guest_id": 21,
+      "id": 21,
+      "keterangan": "Traveloka       01",
+      "nomor_kamar": "128",
+      "tanggal_masuk": "2026-02-01"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.173Z",
+      "created_by": 1,
+      "guest_id": 22,
+      "id": 22,
+      "keterangan": "Hotel              01",
+      "nomor_kamar": "2205",
+      "tanggal_masuk": "2026-02-01"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.173Z",
+      "created_by": 1,
+      "guest_id": 23,
+      "id": 23,
+      "keterangan": "Agoda            01",
+      "nomor_kamar": "127",
+      "tanggal_masuk": "2026-02-01"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.174Z",
+      "created_by": 1,
+      "guest_id": 24,
+      "id": 24,
+      "keterangan": "Traveloka       01",
+      "nomor_kamar": "105",
+      "tanggal_masuk": "2026-02-01"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.175Z",
+      "created_by": 1,
+      "guest_id": 25,
+      "id": 25,
+      "keterangan": "KET",
+      "nomor_kamar": "ROOM",
+      "tanggal_masuk": "TANGGAL"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.176Z",
+      "created_by": 1,
+      "guest_id": 25,
+      "id": 26,
+      "keterangan": "KET",
+      "nomor_kamar": "ROOM",
+      "tanggal_masuk": "TANGGAL"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.212Z",
+      "created_by": 1,
+      "guest_id": 4,
+      "id": 30,
+      "keterangan": "Adya              07",
+      "nomor_kamar": "2204",
+      "tanggal_masuk": "2026-01-27"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.213Z",
+      "created_by": 1,
+      "guest_id": 5,
+      "id": 31,
+      "keterangan": "Mg Holiday     05",
+      "nomor_kamar": "135",
+      "tanggal_masuk": "2026-01-29"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.214Z",
+      "created_by": 1,
+      "guest_id": 26,
+      "id": 32,
+      "keterangan": "Traveloka       01",
+      "nomor_kamar": "105",
+      "tanggal_masuk": "2026-02-02"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.214Z",
+      "created_by": 1,
+      "guest_id": 27,
+      "id": 33,
+      "keterangan": "Agoda            01",
+      "nomor_kamar": "132",
+      "tanggal_masuk": "2026-02-02"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.215Z",
+      "created_by": 1,
+      "guest_id": 28,
+      "id": 34,
+      "keterangan": "Hotel              01",
+      "nomor_kamar": "2216",
+      "tanggal_masuk": "2026-02-02"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.216Z",
+      "created_by": 1,
+      "guest_id": 29,
+      "id": 35,
+      "keterangan": "Hotel              01",
+      "nomor_kamar": "131",
+      "tanggal_masuk": "2026-02-02"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.217Z",
+      "created_by": 1,
+      "guest_id": 25,
+      "id": 36,
+      "keterangan": "KET",
+      "nomor_kamar": "ROOM",
+      "tanggal_masuk": "TANGGAL"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.218Z",
+      "created_by": 1,
+      "guest_id": 25,
+      "id": 37,
+      "keterangan": "KET",
+      "nomor_kamar": "ROOM",
+      "tanggal_masuk": "TANGGAL"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.250Z",
+      "created_by": 1,
+      "guest_id": 30,
+      "id": 41,
+      "keterangan": "Mg Holiday     08",
+      "nomor_kamar": "135",
+      "tanggal_masuk": "2026-01-27"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.251Z",
+      "created_by": 1,
+      "guest_id": 28,
+      "id": 42,
+      "keterangan": "KNB              02",
+      "nomor_kamar": "106",
+      "tanggal_masuk": "2026-02-02"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.252Z",
+      "created_by": 1,
+      "guest_id": 31,
+      "id": 43,
+      "keterangan": "KNB              01",
+      "nomor_kamar": "2211",
+      "tanggal_masuk": "2026-02-03"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.253Z",
+      "created_by": 1,
+      "guest_id": 32,
+      "id": 44,
+      "keterangan": "Narto             01",
+      "nomor_kamar": "132",
+      "tanggal_masuk": "2026-02-03"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.253Z",
+      "created_by": 1,
+      "guest_id": 33,
+      "id": 45,
+      "keterangan": "Traveloka       01",
+      "nomor_kamar": "2216",
+      "tanggal_masuk": "2026-02-03"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.254Z",
+      "created_by": 1,
+      "guest_id": 34,
+      "id": 46,
+      "keterangan": "Hotel             01",
+      "nomor_kamar": "131",
+      "tanggal_masuk": "2026-02-03"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.255Z",
+      "created_by": 1,
+      "guest_id": 25,
+      "id": 47,
+      "keterangan": "KET",
+      "nomor_kamar": "ROOM",
+      "tanggal_masuk": "TANGGAL"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.256Z",
+      "created_by": 1,
+      "guest_id": 25,
+      "id": 48,
+      "keterangan": "KET",
+      "nomor_kamar": "ROOM",
+      "tanggal_masuk": "TANGGAL"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.291Z",
+      "created_by": 1,
+      "guest_id": 30,
+      "id": 52,
+      "keterangan": "Mg Holiday     09",
+      "nomor_kamar": "135",
+      "tanggal_masuk": "2026-01-27"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.292Z",
+      "created_by": 1,
+      "guest_id": 28,
+      "id": 53,
+      "keterangan": "KNB              03",
+      "nomor_kamar": "106",
+      "tanggal_masuk": "2026-02-02"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.293Z",
+      "created_by": 1,
+      "guest_id": 32,
+      "id": 54,
+      "keterangan": "Narto             02",
+      "nomor_kamar": "132",
+      "tanggal_masuk": "2026-02-03"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.293Z",
+      "created_by": 1,
+      "guest_id": 35,
+      "id": 55,
+      "keterangan": "Hotel              01",
+      "nomor_kamar": "129",
+      "tanggal_masuk": "2026-02-04"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.294Z",
+      "created_by": 1,
+      "guest_id": 36,
+      "id": 56,
+      "keterangan": "Hotel              01",
+      "nomor_kamar": "2205",
+      "tanggal_masuk": "2026-02-04"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.295Z",
+      "created_by": 1,
+      "guest_id": 37,
+      "id": 57,
+      "keterangan": "Hotel              01",
+      "nomor_kamar": "131",
+      "tanggal_masuk": "2026-02-04"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.296Z",
+      "created_by": 1,
+      "guest_id": 38,
+      "id": 58,
+      "keterangan": "Hotel              01",
+      "nomor_kamar": "2214",
+      "tanggal_masuk": "2026-02-04"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.297Z",
+      "created_by": 1,
+      "guest_id": 39,
+      "id": 59,
+      "keterangan": "\"",
+      "nomor_kamar": "",
+      "tanggal_masuk": "\""
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.297Z",
+      "created_by": 1,
+      "guest_id": 40,
+      "id": 60,
+      "keterangan": "\"",
+      "nomor_kamar": "",
+      "tanggal_masuk": "\""
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.298Z",
+      "created_by": 1,
+      "guest_id": 41,
+      "id": 61,
+      "keterangan": "Hotel              01",
+      "nomor_kamar": "2215",
+      "tanggal_masuk": "2026-02-04"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.299Z",
+      "created_by": 1,
+      "guest_id": 42,
+      "id": 62,
+      "keterangan": "\"",
+      "nomor_kamar": "",
+      "tanggal_masuk": "\""
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.300Z",
+      "created_by": 1,
+      "guest_id": 43,
+      "id": 63,
+      "keterangan": "\"",
+      "nomor_kamar": "",
+      "tanggal_masuk": "\""
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.301Z",
+      "created_by": 1,
+      "guest_id": 44,
+      "id": 64,
+      "keterangan": "Hotel              01",
+      "nomor_kamar": "2216",
+      "tanggal_masuk": "2026-02-04"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.302Z",
+      "created_by": 1,
+      "guest_id": 45,
+      "id": 65,
+      "keterangan": "\"",
+      "nomor_kamar": "",
+      "tanggal_masuk": "\""
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.303Z",
+      "created_by": 1,
+      "guest_id": 46,
+      "id": 66,
+      "keterangan": "Agoda            01",
+      "nomor_kamar": "130",
+      "tanggal_masuk": "2026-02-04"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.304Z",
+      "created_by": 1,
+      "guest_id": 47,
+      "id": 67,
+      "keterangan": "P. Made         01",
+      "nomor_kamar": "107",
+      "tanggal_masuk": "2026-02-04"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.305Z",
+      "created_by": 1,
+      "guest_id": 47,
+      "id": 68,
+      "keterangan": "P. Made         01",
+      "nomor_kamar": "108",
+      "tanggal_masuk": "2026-02-04"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.306Z",
+      "created_by": 1,
+      "guest_id": 48,
+      "id": 69,
+      "keterangan": "Agoda            01",
+      "nomor_kamar": "122",
+      "tanggal_masuk": "2026-02-04"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.307Z",
+      "created_by": 1,
+      "guest_id": 49,
+      "id": 70,
+      "keterangan": "Hotel              01",
+      "nomor_kamar": "2204",
+      "tanggal_masuk": "2026-02-04"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.308Z",
+      "created_by": 1,
+      "guest_id": 50,
+      "id": 71,
+      "keterangan": "Hotel              01",
+      "nomor_kamar": "124",
+      "tanggal_masuk": "2026-02-04"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.308Z",
+      "created_by": 1,
+      "guest_id": 25,
+      "id": 72,
+      "keterangan": "KET",
+      "nomor_kamar": "ROOM",
+      "tanggal_masuk": "TANGGAL"
+    },
+    {
+      "created_at": "2026-07-25T10:30:59.309Z",
+      "created_by": 1,
+      "guest_id": 25,
+      "id": 73,
+      "keterangan": "KET",
+      "nomor_kamar": "ROOM",
+      "tanggal_masuk": "TANGGAL"
+    }
+  ],
   "counters": {
-    "users": 4,
-    "guests": 1,
-    "checkins": 1
+    "checkins": 77,
+    "guests": 51,
+    "users": 4
   }
 }
