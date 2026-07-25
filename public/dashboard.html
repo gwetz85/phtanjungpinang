@@ -7,6 +7,7 @@
   <meta name="description" content="Sistem manajemen database tamu Pelangi Hotel Tanjungpinang.">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/components.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <div class="bg-animated"></div>
@@ -72,72 +73,70 @@
            PANEL: BERANDA
       ══════════════════════════════════ -->
       <div class="panel" id="panel-home">
-        <div class="stats-grid">
-          <div class="stat-card">
+
+        <!-- ── STAT CARDS ── -->
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.5rem;">
+
+          <div class="stat-card" style="background:linear-gradient(135deg,rgba(79,142,247,0.18),rgba(79,142,247,0.05));border:1px solid rgba(79,142,247,0.35);">
             <div class="stat-icon blue">👥</div>
             <div>
-              <div class="stat-value" id="stat-total-tamu">—</div>
-              <div class="stat-label">Total Tamu</div>
+              <div class="stat-value" id="stat-total-tamu" style="font-size:2rem;">—</div>
+              <div class="stat-label">Total Database Tamu</div>
             </div>
           </div>
-          <div class="stat-card">
+
+          <div class="stat-card" style="background:linear-gradient(135deg,rgba(16,185,129,0.18),rgba(16,185,129,0.05));border:1px solid rgba(16,185,129,0.35);">
             <div class="stat-icon green">📅</div>
             <div>
-              <div class="stat-value" id="stat-today">—</div>
+              <div class="stat-value" id="stat-today" style="font-size:2rem;">—</div>
               <div class="stat-label">Check-in Hari Ini</div>
             </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon purple">👤</div>
+
+          <div class="stat-card" style="background:linear-gradient(135deg,rgba(168,85,247,0.18),rgba(168,85,247,0.05));border:1px solid rgba(168,85,247,0.35);">
+            <div class="stat-icon purple">📆</div>
             <div>
-              <div class="stat-value" id="stat-users">—</div>
-              <div class="stat-label">Jumlah User</div>
+              <div class="stat-value" id="stat-this-month" style="font-size:2rem;">—</div>
+              <div class="stat-label" id="stat-month-label">Tamu Check-in Bulan Ini</div>
             </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon cyan">🏨</div>
-            <div>
-              <div class="stat-value">Pelangi</div>
-              <div class="stat-label">Hotel Tanjungpinang</div>
-            </div>
-          </div>
+
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
-          <!-- Recent Guests -->
+        <!-- ── CHART + RECENT TABLE ── -->
+        <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:1.5rem;align-items:start;">
+
+          <!-- Grafik Bulanan -->
           <div class="card">
             <div class="card-header">
-              <div class="card-title">🕐 Tamu Terbaru</div>
-              <button class="btn btn-ghost btn-sm" onclick="dashboard.navigate('panel-guests')">Lihat Semua →</button>
+              <div class="card-title">📊 Grafik Tamu Bulanan</div>
+              <span id="chart-year-label" style="font-size:0.8rem;color:var(--text-muted);"></span>
             </div>
-            <div class="card-body" id="recent-guests" style="padding:0 1.5rem;">
-              <div style="text-align:center;padding:2rem;color:var(--text-muted);"><div class="spinner" style="margin:0 auto;"></div></div>
+            <div class="card-body" style="padding:1rem 1.5rem 1.5rem;">
+              <div id="chart-loading" style="text-align:center;padding:3rem;color:var(--text-muted);">
+                <div class="spinner" style="margin:0 auto 0.5rem;"></div>
+                Memuat grafik...
+              </div>
+              <canvas id="monthly-chart" height="220" style="display:none;width:100%;"></canvas>
             </div>
           </div>
 
-          <!-- Quick actions -->
+          <!-- 5 Tamu Terakhir Check-in -->
           <div class="card">
             <div class="card-header">
-              <div class="card-title">⚡ Aksi Cepat</div>
+              <div class="card-title">🕐 Tamu Terakhir Check-in</div>
+              <button class="btn btn-ghost btn-sm" onclick="dashboard.navigate('panel-guests')">Semua →</button>
             </div>
-            <div class="card-body" style="display:flex;flex-direction:column;gap:0.75rem;">
-              <button class="btn btn-primary btn-block" onclick="dashboard.navigate('panel-checkin')">
-                ➕ Check-in Tamu Baru
-              </button>
-              <button class="btn btn-secondary btn-block" onclick="dashboard.navigate('panel-search')">
-                🔍 Cari Data Tamu
-              </button>
-              <button class="btn btn-secondary btn-block" onclick="dashboard.navigate('panel-guests')">
-                📋 Lihat Semua Data
-              </button>
-              <hr class="divider">
-              <button class="btn btn-ghost btn-block btn-sm" onclick="guestsPanel.exportExcel ? guestsPanel.exportExcel() : null" id="home-export-btn">
-                📊 Export ke Excel
-              </button>
+            <div class="card-body" id="recent-guests" style="padding:0 1.25rem 0.5rem;">
+              <div style="text-align:center;padding:2rem;color:var(--text-muted);">
+                <div class="spinner" style="margin:0 auto;"></div>
+              </div>
             </div>
           </div>
+
         </div>
       </div>
+
 
       <!-- ══════════════════════════════════
            PANEL: CARI TAMU

@@ -76,8 +76,8 @@ const dashboard = {
     };
     document.getElementById('main-title').textContent = titles[panelId] || '';
 
-    // Initialize panel if first time
-    if (this.currentPanel !== panelId) {
+    // Initialize panel (home always refreshes for live stats)
+    if (this.currentPanel !== panelId || panelId === 'panel-home') {
       this.currentPanel = panelId;
       this.initPanel(panelId);
     }
@@ -99,41 +99,147 @@ const dashboard = {
   },
 
   async loadHomeStats() {
+    const now     = new Date();
+    const today   = now.toISOString().split('T')[0];  // YYYY-MM-DD
+    const yr      = now.getFullYear();
+    const mo      = now.getMonth() + 1; // 1-12
+    const moStr   = String(mo).padStart(2, '0');
+    const monthPrefix = `${yr}-${moStr}`; // YYYY-MM
+
+    const MONTHS_ID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+    // Update month label
+    const monthLabel = document.getElementById('stat-month-label');
+    if (monthLabel) monthLabel.textContent = `Check-in ${MONTHS_ID[mo - 1]} ${yr}`;
+    const chartYearLabel = document.getElementById('chart-year-label');
+    if (chartYearLabel) chartYearLabel.textContent = `Tahun ${yr}`;
+
     try {
-      // Guests count
+      // ── 1. Total database tamu ──
       const gRes = await api.get('/guests', { page: 1, limit: 1 });
-      document.getElementById('stat-total-tamu').textContent = gRes.pagination?.total || 0;
+      const totalTamu = gRes.pagination?.total || 0;
+      document.getElementById('stat-total-tamu').textContent = totalTamu.toLocaleString('id-ID');
 
-      // Today checkins
-      const today = new Date().toISOString().split('T')[0];
-      const sRes = await api.get('/guests/search', { q: today });
-      document.getElementById('stat-today').textContent = sRes.data?.length || 0;
+      // ── 2. Ambil semua tamu (untuk hitung checkin hari ini & bulan ini) ──
+      const allRes  = await api.get('/guests', { page: 1, limit: 9999 });
+      const allGuests = allRes.data || [];
 
-      // Users count
-      const uRes = await api.get('/users');
-      document.getElementById('stat-users').textContent = uRes.data?.length || 0;
-    } catch {}
+      let todayCount = 0;
+      let monthCount = 0;
 
-    // Recent guests (last 5)
-    try {
-      const res = await api.get('/guests', { page: 1, limit: 5 });
-      const recentDiv = document.getElementById('recent-guests');
-      const guests = res.data || [];
-      if (!guests.length) {
-        recentDiv.innerHTML = `<div class="empty-state" style="padding:1.5rem;"><div class="empty-icon">👥</div><p>Belum ada data tamu.</p></div>`;
-        return;
+      // Monthly chart data: keyed by month number (1–12)
+      const monthCounts = Array(12).fill(0);
+
+      for (const g of allGuests) {
+        const ci = g.last_checkin || '';
+        if (!ci) continue;
+        const ciDate = ci.substring(0, 10); // YYYY-MM-DD
+        if (ciDate === today) todayCount++;
+        if (ciDate.startsWith(monthPrefix)) monthCount++;
+        // For chart: check year match
+        if (ciDate.startsWith(`${yr}-`)) {
+          const ciMo = parseInt(ciDate.substring(5, 7), 10);
+          if (ciMo >= 1 && ciMo <= 12) monthCounts[ciMo - 1]++;
+        }
       }
-      recentDiv.innerHTML = guests.map(g => `
-        <div style="display:flex;align-items:center;gap:0.85rem;padding:0.75rem 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="guestsPanel.showDetail(${g.id})">
-          <div class="user-avatar" style="width:40px;height:40px;font-size:0.9rem;flex-shrink:0;">${getInitials(g.nama_tamu)}</div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(g.nama_tamu)}</div>
-            <div style="font-size:0.78rem;color:var(--text-muted);">${g.last_checkin ? formatDate(g.last_checkin) : 'Belum check-in'} ${g.last_room ? '— Kamar ' + g.last_room : ''}</div>
+
+      document.getElementById('stat-today').textContent = todayCount;
+      document.getElementById('stat-this-month').textContent = monthCount;
+
+      // ── 3. Render monthly bar chart ──
+      const chartEl = document.getElementById('monthly-chart');
+      const chartLoading = document.getElementById('chart-loading');
+
+      if (chartEl) {
+        if (chartLoading) chartLoading.style.display = 'none';
+        chartEl.style.display = 'block';
+
+        // Destroy old chart if re-navigating
+        if (window._monthlyChartInstance) {
+          window._monthlyChartInstance.destroy();
+        }
+
+        const maxVal = Math.max(...monthCounts, 1);
+        window._monthlyChartInstance = new Chart(chartEl, {
+          type: 'bar',
+          data: {
+            labels: MONTHS_ID,
+            datasets: [{
+              label: 'Tamu Check-in',
+              data: monthCounts,
+              backgroundColor: monthCounts.map((v, i) =>
+                i === mo - 1
+                  ? 'rgba(79,142,247,0.9)'
+                  : 'rgba(79,142,247,0.35)'
+              ),
+              borderRadius: 8,
+              borderSkipped: false,
+              hoverBackgroundColor: 'rgba(79,142,247,0.95)',
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  title: (items) => `${MONTHS_ID[items[0].dataIndex]} ${yr}`,
+                  label: (item) => ` ${item.raw} tamu check-in`
+                },
+                backgroundColor: 'rgba(15,20,40,0.92)',
+                titleColor: '#e2e8f0',
+                bodyColor: '#94a3b8',
+                borderColor: 'rgba(79,142,247,0.4)',
+                borderWidth: 1,
+                padding: 10,
+                cornerRadius: 8,
+              }
+            },
+            scales: {
+              x: {
+                grid: { color: 'rgba(255,255,255,0.05)' },
+                ticks: { color: '#94a3b8', font: { size: 11 } },
+              },
+              y: {
+                grid: { color: 'rgba(255,255,255,0.05)' },
+                ticks: { color: '#94a3b8', font: { size: 11 }, stepSize: 1 },
+                min: 0,
+                suggestedMax: maxVal + 1,
+              }
+            }
+          }
+        });
+      }
+
+      // ── 4. 5 tamu terakhir check-in ──
+      const recentDiv = document.getElementById('recent-guests');
+      // Sort by last_checkin DESC and take 5
+      const recent5 = [...allGuests]
+        .filter(g => g.last_checkin)
+        .sort((a, b) => (b.last_checkin || '').localeCompare(a.last_checkin || ''))
+        .slice(0, 5);
+
+      if (!recent5.length) {
+        recentDiv.innerHTML = `<div class="empty-state" style="padding:1.5rem;"><div class="empty-icon">👥</div><p>Belum ada data check-in.</p></div>`;
+      } else {
+        recentDiv.innerHTML = recent5.map((g, idx) => `
+          <div style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 0;${idx < recent5.length-1 ? 'border-bottom:1px solid var(--border);' : ''}cursor:pointer;" onclick="guestsPanel.showDetail(${g.id})">
+            <div class="user-avatar" style="width:38px;height:38px;font-size:0.85rem;flex-shrink:0;">${getInitials(g.nama_tamu)}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:0.9rem;">${escHtml(g.nama_tamu)}</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">
+                ${g.last_checkin ? formatDate(g.last_checkin) : '—'}${g.last_room ? ' · Kamar <strong style="color:var(--primary);">' + escHtml(g.last_room) + '</strong>' : ''}
+              </div>
+            </div>
+            ${identityBadge(g.jenis_identitas)}
           </div>
-          ${identityBadge(g.jenis_identitas)}
-        </div>
-      `).join('');
-    } catch {}
+        `).join('');
+      }
+
+    } catch (err) {
+      console.error('[Home] loadHomeStats error:', err);
+    }
   },
 
   openCheckinModal(guestId, guestName) {
