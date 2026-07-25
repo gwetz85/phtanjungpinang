@@ -110,10 +110,14 @@ async function initDB() {
 /**
  * Helper to compute calculated fields for a guest (total_checkins, last_checkin, last_room)
  */
+/**
+ * Helper to compute calculated fields for a guest (total_checkins, last_checkin, last_room)
+ */
 function enrichGuest(guest) {
   if (!guest) return null;
-  const guestCheckins = (dbData.checkins || [])
-    .filter(c => c && String(c.guest_id) === String(guest.id))
+  const checkins = (dbData.checkins || []).filter(Boolean);
+  const guestCheckins = checkins
+    .filter(c => String(c.guest_id) === String(guest.id))
     .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
 
   const lastCi = guestCheckins[0] || null;
@@ -131,23 +135,26 @@ function enrichGuest(guest) {
  */
 function queryAll(sql, params = []) {
   const cleanSql = sql.replace(/\s+/g, ' ').trim();
+  const safeUsers = (dbData.users || []).filter(Boolean);
+  const safeGuests = (dbData.guests || []).filter(Boolean);
+  const safeCheckins = (dbData.checkins || []).filter(Boolean);
 
   // 1. SELECT users
   if (cleanSql.toLowerCase().includes('from users')) {
     if (cleanSql.toLowerCase().includes('where username =')) {
-      const u = dbData.users.find(x => x.username === params[0]);
+      const u = safeUsers.find(x => x.username === params[0]);
       return u ? [u] : [];
     }
     if (cleanSql.toLowerCase().includes('where id =')) {
-      const u = dbData.users.find(x => String(x.id) === String(params[0]));
+      const u = safeUsers.find(x => String(x.id) === String(params[0]));
       return u ? [u] : [];
     }
-    return [...dbData.users].sort((a,b) => a.role.localeCompare(b.role) || a.nama.localeCompare(b.nama));
+    return [...safeUsers].sort((a,b) => (a.role || '').localeCompare(b.role || '') || (a.nama || '').localeCompare(b.nama || ''));
   }
 
   // 2. GET guests with checkin history (Paginated / Search)
   if (cleanSql.toLowerCase().includes('from guests')) {
-    let list = [...(dbData.guests || [])];
+    let list = [...safeGuests];
 
     // Filter by search / nationality if present
     if (params.length > 0) {
@@ -161,7 +168,7 @@ function queryAll(sql, params = []) {
     }
 
     // Enrich guests with check-in info
-    const enriched = list.map(enrichGuest);
+    const enriched = list.map(enrichGuest).filter(Boolean);
 
     // Sort by updated_at DESC
     enriched.sort((a, b) => new Date(b.updated_at || 0) - new Date(a.updated_at || 0));
@@ -196,12 +203,12 @@ function queryAll(sql, params = []) {
   // 3. SELECT checkins for guest
   if (cleanSql.toLowerCase().includes('from checkins')) {
     const guestId = params[0];
-    const list = (dbData.checkins || [])
-      .filter(c => c && String(c.guest_id) === String(guestId))
+    const list = safeCheckins
+      .filter(c => String(c.guest_id) === String(guestId))
       .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
 
     return list.map(c => {
-      const u = dbData.users.find(x => String(x.id) === String(c.created_by));
+      const u = safeUsers.find(x => String(x.id) === String(c.created_by));
       return { ...c, petugas: u ? u.nama : '-' };
     });
   }
@@ -211,10 +218,12 @@ function queryAll(sql, params = []) {
 
 function queryOne(sql, params = []) {
   const cleanSql = sql.replace(/\s+/g, ' ').trim().toLowerCase();
+  const safeUsers = (dbData.users || []).filter(Boolean);
+  const safeGuests = (dbData.guests || []).filter(Boolean);
 
   // COUNT guests
   if (cleanSql.includes('count(*)') && cleanSql.includes('from guests')) {
-    let list = [...(dbData.guests || [])];
+    let list = [...safeGuests];
     if (params.length > 0 && params[0]) {
       const searchStr = String(params[0]).replace(/%/g, '').toLowerCase();
       list = list.filter(g =>
@@ -228,20 +237,20 @@ function queryOne(sql, params = []) {
   // GET single user
   if (cleanSql.includes('from users')) {
     if (cleanSql.includes('where username =')) {
-      return dbData.users.find(x => x.username === String(params[0]).trim()) || null;
+      return safeUsers.find(x => x.username === String(params[0]).trim()) || null;
     }
     if (cleanSql.includes('where id =')) {
-      return dbData.users.find(x => String(x.id) === String(params[0])) || null;
+      return safeUsers.find(x => String(x.id) === String(params[0])) || null;
     }
   }
 
   // GET single guest
   if (cleanSql.includes('from guests')) {
     if (cleanSql.includes('where no_identitas =')) {
-      return dbData.guests.find(x => x.no_identitas === String(params[0]).trim()) || null;
+      return safeGuests.find(x => x.no_identitas === String(params[0]).trim()) || null;
     }
     if (cleanSql.includes('where id =')) {
-      return dbData.guests.find(x => String(x.id) === String(params[0])) || null;
+      return safeGuests.find(x => String(x.id) === String(params[0])) || null;
     }
   }
 
