@@ -64,7 +64,7 @@ if (!process.env.VERCEL) {
         }
       }
       console.log('\n========================================');
-      console.log('  PH Hotel DB - Server Berjalan');
+      console.log('  Pelangi Hotel DB - Server Berjalan');
       console.log(`  Lokal  : http://localhost:${PORT}`);
       console.log(`  Jaringan: http://${localIP}:${PORT}`);
       console.log('  (Bagikan alamat jaringan ke komputer lain)');

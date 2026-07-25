@@ -279,7 +279,7 @@ router.get('/export', authorize('admin', 'superadmin'), (req, res) => {
   XLSX.utils.book_append_sheet(wb, ws, 'Data Tamu');
 
   const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
-  const filename = `PH-Hotel-Export-${new Date().toISOString().split('T')[0]}.xlsx`;
+  const filename = `Pelangi-Hotel-Export-${new Date().toISOString().split('T')[0]}.xlsx`;
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.send(buf);

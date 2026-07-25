@@ -1,9 +1,8 @@
-@echo off
-title PH Hotel DB - Server
+title Pelangi Hotel DB - Server
 color 0A
 echo.
 echo  ==========================================
-echo    PH Hotel Tanjungpinang - Database Server
+echo    PELANGI HOTEL Tanjungpinang - Server
 echo  ==========================================
 echo.
 echo  Memulai server...
