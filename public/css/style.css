@@ -480,7 +480,39 @@ select.form-control option:hover {
 
 .sidebar-footer {
   padding: 1rem;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid rgba(14, 165, 233, 0.2);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.sys-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sys-info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+}
+
+.sys-info-item span {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.65rem;
+}
+
+.sys-info-item strong {
+  color: var(--text-secondary);
+  font-family: monospace;
+  font-size: 0.75rem;
+  text-align: right;
+  max-width: 60%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .user-card {

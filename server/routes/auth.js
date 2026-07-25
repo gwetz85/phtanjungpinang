@@ -35,12 +35,50 @@ router.post('/login', (req, res) => {
 
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 
+  // Update last login
+  const { run } = require('../db');
+  run('UPDATE users SET last_login = ? WHERE id = ?', [new Date().toISOString(), user.id]);
+
   res.json({
     success: true,
     message: 'Login berhasil.',
     token,
     user: payload
   });
+});
+
+// GET /api/auth/system-info
+router.get('/system-info', (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    let userRecord = null;
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        userRecord = queryOne('SELECT * FROM users WHERE id = ?', [decoded.id]);
+      } catch (e) {}
+    }
+
+    const { getDB } = require('../db');
+    const dbData = getDB();
+    const totalData = dbData.guests ? dbData.guests.length : 0;
+    
+    // Get client IP
+    let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+    if (ip.includes(',')) ip = ip.split(',')[0].trim();
+    if (ip === '::1') ip = '127.0.0.1';
+
+    res.json({
+      success: true,
+      data: {
+        totalData,
+        ip,
+        lastLogin: userRecord ? userRecord.last_login : null
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
 });
 
 // POST /api/auth/logout

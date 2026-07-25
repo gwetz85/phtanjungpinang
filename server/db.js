@@ -441,7 +441,10 @@ function run(sql, params = []) {
 
   // 5. UPDATE users
   else if (cleanSql.toLowerCase().startsWith('update users')) {
-    if (params.length === 4) {
+    if (cleanSql.toLowerCase().includes('last_login')) {
+      const u = dbData.users.find(x => String(x.id) === String(params[1]));
+      if (u) { u.last_login = params[0]; }
+    } else if (params.length === 4) {
       // nama, role, password, id
       const u = dbData.users.find(x => String(x.id) === String(params[3]));
       if (u) { u.nama = params[0]; u.role = params[1]; u.password = params[2]; }

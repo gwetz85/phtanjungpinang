@@ -18,9 +18,33 @@ const dashboard = {
     // Poll for running text updates every 30 seconds
     setInterval(() => this.loadRunningText(), 30000);
     this.startClock();
+    this.loadSystemInfo();
 
     // Navigate to default panel
     this.navigate('panel-home');
+  },
+
+  async loadSystemInfo() {
+    try {
+      const res = await api.get('/auth/system-info');
+      if (res && res.success) {
+        let deviceId = localStorage.getItem('deviceId');
+        if (!deviceId) {
+          deviceId = 'DEV-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+          localStorage.setItem('deviceId', deviceId);
+        }
+        
+        const data = res.data;
+        document.getElementById('sys-username').textContent = this.user.username;
+        document.getElementById('sys-fullname').textContent = this.user.nama;
+        document.getElementById('sys-deviceid').textContent = deviceId;
+        document.getElementById('sys-lastlogin').textContent = data.lastLogin ? formatDateTime(data.lastLogin) : 'Baru saja';
+        document.getElementById('sys-totaldata').textContent = data.totalData + ' Tamu';
+        document.getElementById('sys-ip').textContent = data.ip;
+      }
+    } catch (e) {
+      console.error('Failed to load system info', e);
+    }
   },
 
   renderUserInfo() {
