@@ -309,11 +309,16 @@ function queryOne(sql, params = []) {
 
   // GET single guest
   if (cleanSql.includes('from guests')) {
-    if (cleanSql.includes('where no_identitas =')) {
-      return safeGuests.find(x => x.no_identitas === String(params[0]).trim()) || null;
+    if (cleanSql.includes('no_identitas')) {
+      const searchId = String(params[0] || '').trim().toLowerCase();
+      return safeGuests.find(x => x.no_identitas && String(x.no_identitas).trim().toLowerCase() === searchId) || null;
     }
     if (cleanSql.includes('where id =')) {
       return safeGuests.find(x => String(x.id) === String(params[0])) || null;
+    }
+    if (cleanSql.includes('nama_tamu')) {
+      const searchName = String(params[0] || '').replace(/\s+/g, ' ').trim().toLowerCase();
+      return safeGuests.find(x => x.nama_tamu && String(x.nama_tamu).replace(/\s+/g, ' ').trim().toLowerCase() === searchName) || null;
     }
   }
 
