@@ -16,21 +16,20 @@ const PORT = process.env.PORT || 3000;
 // ── Ensure DB is initialized and Firebase is synced ──
 app.use(async (req, res, next) => {
   try {
+    // For write operations, force fresh sync from Firebase first
+    if (req.method !== 'GET' && req.path.startsWith('/api/')) {
+      const { syncFromFirebase } = require('./server/db');
+      await syncFromFirebase();
+    }
     await initDB();
     
-    // Intercept res.json to ensure Firebase is updated BEFORE Vercel suspends the function
-    const originalJson = res.json;
+    // After response is sent, sync to Firebase in background (non-blocking)
+    const originalJson = res.json.bind(res);
     res.json = function (body) {
+      originalJson(body);
       if (req.method !== 'GET') {
         const { syncToFirebase } = require('./server/db');
-        syncToFirebase().then(() => {
-          originalJson.call(res, body);
-        }).catch(err => {
-          console.error('[Firebase Sync Error]', err);
-          originalJson.call(res, body);
-        });
-      } else {
-        originalJson.call(res, body);
+        syncToFirebase().catch(err => console.error('[Firebase Sync]', err));
       }
     };
     
@@ -46,8 +45,12 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// ── Static Files (Frontend) ──
-app.use(express.static(path.join(__dirname, 'public')));
+// ── Static Files (Frontend) with caching ──
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: '1h',
+  etag: true,
+  lastModified: true
+}));
 
 // ── API Routes ──
 app.use('/api/auth',   authRoutes);

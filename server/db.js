@@ -35,7 +35,7 @@ async function firebaseFetch(endpoint, method = 'GET', data = null) {
 }
 
 /**
- * Persist memory state to disk and Firebase
+ * Persist memory state to disk and Firebase (non-blocking)
  */
 function persist() {
   // Local JSON fallback
@@ -44,6 +44,8 @@ function persist() {
       fs.writeFileSync(LOCAL_JSON, JSON.stringify(dbData, null, 2));
     } catch (e) {}
   }
+  // Fire-and-forget Firebase sync
+  syncToFirebase().catch(() => {});
 }
 
 async function syncToFirebase() {
@@ -94,16 +96,27 @@ function sanitizeData() {
   }
 }
 
-async function initDB() {
-  // Try loading local JSON file if exists
-  if (!process.env.VERCEL && fs.existsSync(LOCAL_JSON)) {
-    try {
-      dbData = JSON.parse(fs.readFileSync(LOCAL_JSON, 'utf8'));
-    } catch (e) {}
-  }
+let lastSyncTime = 0;
+const SYNC_INTERVAL_MS = 30000; // Re-sync from Firebase every 30 seconds max
 
-  // Sync from Firebase Cloud
-  await syncFromFirebase();
+async function initDB() {
+  const now = Date.now();
+
+  // For local (non-Vercel): only init once
+  if (!process.env.VERCEL) {
+    if (isInitialized) return;
+    if (fs.existsSync(LOCAL_JSON)) {
+      try {
+        dbData = JSON.parse(fs.readFileSync(LOCAL_JSON, 'utf8'));
+      } catch (e) {}
+    }
+    await syncFromFirebase();
+  } else {
+    // For Vercel: sync from Firebase only if cache is stale (>30s)
+    if (isInitialized && (now - lastSyncTime) < SYNC_INTERVAL_MS) return;
+    await syncFromFirebase();
+    lastSyncTime = now;
+  }
 
   sanitizeData();
 
