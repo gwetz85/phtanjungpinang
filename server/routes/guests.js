@@ -7,45 +7,47 @@ router.use(authenticate);
 
 // ─── GET /api/guests ─── (admin, superadmin)
 router.get('/', authorize('admin', 'superadmin'), (req, res) => {
-  const { page = 1, limit = 20, search = '', nationality = '' } = req.query;
-  const offset = (parseInt(page) - 1) * parseInt(limit);
+  try {
+    const { page = 1, limit = 20, search = '', nationality = '' } = req.query;
+    const pageNum   = Math.max(1, parseInt(page) || 1);
+    const limitNum  = Math.max(1, parseInt(limit) || 20);
+    const offsetNum = (pageNum - 1) * limitNum;
 
-  let where = 'WHERE 1=1';
-  const params = [];
+    let where = '';
+    const filterParams = [];
 
-  if (search) {
-    where += ' AND (g.no_identitas LIKE ? OR g.nama_tamu LIKE ?)';
-    params.push(`%${search}%`, `%${search}%`);
-  }
-  if (nationality) {
-    where += ' AND g.kewarganegaraan LIKE ?';
-    params.push(`%${nationality}%`);
-  }
-
-  const countRow = queryOne(`SELECT COUNT(*) as total FROM guests g ${where}`, params);
-  const total = countRow?.total || 0;
-
-  const guests = queryAll(`
-    SELECT g.*,
-      (SELECT COUNT(*) FROM checkins WHERE guest_id = g.id) as total_checkins,
-      (SELECT tanggal_masuk FROM checkins WHERE guest_id = g.id ORDER BY created_at DESC LIMIT 1) as last_checkin,
-      (SELECT nomor_kamar FROM checkins WHERE guest_id = g.id ORDER BY created_at DESC LIMIT 1) as last_room
-    FROM guests g
-    ${where}
-    ORDER BY g.updated_at DESC
-    LIMIT ? OFFSET ?
-  `, [...params, parseInt(limit), offset]);
-
-  res.json({
-    success: true,
-    data: guests,
-    pagination: {
-      total,
-      page: parseInt(page),
-      limit: parseInt(limit),
-      totalPages: Math.ceil(total / parseInt(limit))
+    if (search) {
+      where += ' search:' + search;
+      filterParams.push(`%${search}%`, `%${search}%`);
     }
-  });
+    if (nationality) {
+      where += ' nationality:' + nationality;
+      filterParams.push(`%${nationality}%`);
+    }
+
+    const countRow = queryOne(`SELECT COUNT(*) as total FROM guests g ${where}`, filterParams);
+    const total    = countRow?.total || 0;
+
+    // Pass limit + offset as last two params — queryAll reads them from params[-2] and params[-1]
+    const guests = queryAll(
+      `SELECT * FROM guests g ${where} ORDER BY updated_at DESC LIMIT ? OFFSET ?`,
+      [...filterParams, limitNum, offsetNum]
+    );
+
+    res.json({
+      success: true,
+      data: guests,
+      pagination: {
+        total,
+        page:       pageNum,
+        limit:      limitNum,
+        totalPages: Math.ceil(total / limitNum)
+      }
+    });
+  } catch (err) {
+    console.error('[GET /guests] Error:', err);
+    res.status(500).json({ success: false, message: 'Gagal memuat data tamu: ' + err.message });
+  }
 });
 
 // ─── GET /api/guests/search ───

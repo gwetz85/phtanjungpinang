@@ -156,15 +156,40 @@ function queryAll(sql, params = []) {
   if (cleanSql.toLowerCase().includes('from guests')) {
     let list = [...safeGuests];
 
-    // Filter by search / nationality if present
-    if (params.length > 0) {
-      const searchStr = params[0] ? String(params[0]).replace(/%/g, '').toLowerCase() : '';
-      if (searchStr && cleanSql.toLowerCase().includes('like')) {
-        list = list.filter(g =>
-          (g.no_identitas && g.no_identitas.toLowerCase().includes(searchStr)) ||
-          (g.nama_tamu && g.nama_tamu.toLowerCase().includes(searchStr))
-        );
+    // Extract limit and offset from LAST two params (they are always appended last)
+    // Format: [...filterParams, limit, offset]
+    let limit  = null;
+    let offset = 0;
+    const sqlLower = cleanSql.toLowerCase();
+
+    if (sqlLower.includes('limit ?')) {
+      // Last two params are limit, offset
+      const allParams = [...params];
+      if (allParams.length >= 2) {
+        offset = parseInt(allParams[allParams.length - 1]) || 0;
+        limit  = parseInt(allParams[allParams.length - 2]) || null;
+      } else if (allParams.length === 1) {
+        limit = parseInt(allParams[0]) || null;
       }
+    }
+
+    // Filter by search keyword (encoded in SQL as "search:keyword")
+    const searchMatch = cleanSql.match(/search:([^\s]+)/i);
+    if (searchMatch) {
+      const term = searchMatch[1].toLowerCase();
+      list = list.filter(g =>
+        (g.no_identitas && g.no_identitas.toLowerCase().includes(term)) ||
+        (g.nama_tamu    && g.nama_tamu.toLowerCase().includes(term))
+      );
+    }
+
+    // Filter by nationality (encoded as "nationality:keyword")
+    const natMatch = cleanSql.match(/nationality:([^\s]+)/i);
+    if (natMatch) {
+      const term = natMatch[1].toLowerCase();
+      list = list.filter(g =>
+        g.kewarganegaraan && g.kewarganegaraan.toLowerCase().includes(term)
+      );
     }
 
     // Enrich guests with check-in info
@@ -189,11 +214,8 @@ function queryAll(sql, params = []) {
       }));
     }
 
-    // Handle LIMIT / OFFSET if present at end of query
-    const limitMatch = cleanSql.match(/limit\s+(\d+)(?:\s+offset\s+(\d+))?/i);
-    if (limitMatch) {
-      const limit = parseInt(limitMatch[1]);
-      const offset = limitMatch[2] ? parseInt(limitMatch[2]) : 0;
+    // Apply pagination
+    if (limit !== null) {
       return enriched.slice(offset, offset + limit);
     }
 
@@ -224,13 +246,26 @@ function queryOne(sql, params = []) {
   // COUNT guests
   if (cleanSql.includes('count(*)') && cleanSql.includes('from guests')) {
     let list = [...safeGuests];
-    if (params.length > 0 && params[0]) {
-      const searchStr = String(params[0]).replace(/%/g, '').toLowerCase();
+
+    // Search token format: "search:keyword"
+    const sMatch = cleanSql.match(/search:([^\s]+)/i);
+    if (sMatch) {
+      const term = sMatch[1].toLowerCase();
       list = list.filter(g =>
-        (g.no_identitas && g.no_identitas.toLowerCase().includes(searchStr)) ||
-        (g.nama_tamu && g.nama_tamu.toLowerCase().includes(searchStr))
+        (g.no_identitas && g.no_identitas.toLowerCase().includes(term)) ||
+        (g.nama_tamu    && g.nama_tamu.toLowerCase().includes(term))
       );
     }
+
+    // Nationality token format: "nationality:keyword"
+    const nMatch = cleanSql.match(/nationality:([^\s]+)/i);
+    if (nMatch) {
+      const term = nMatch[1].toLowerCase();
+      list = list.filter(g =>
+        g.kewarganegaraan && g.kewarganegaraan.toLowerCase().includes(term)
+      );
+    }
+
     return { total: list.length };
   }
 
