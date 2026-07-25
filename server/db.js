@@ -65,11 +65,35 @@ async function syncFromFirebase() {
         counters: cloudData.counters || { users: 1, guests: 1, checkins: 1 },
         runningText: cloudData.runningText || 'Selamat Datang di PELANGI HOTEL Tanjungpinang! Nikmati kenyamanan dan layanan terbaik kami.'
       };
+      sanitizeData();
       console.log('[Firebase] Cloud data synced successfully.');
       return true;
     }
   } catch (err) {}
   return false;
+}
+
+function sanitizeData() {
+  const invalid = ['NAMA TAMU', 'NAMA', 'NAME', 'DATANG', 'NATIONALITY', 'KEWARGANEGARAAN', 'IDENTITAS', 'ENTITAS', 'UMUR'];
+  if (dbData.guests) {
+    dbData.guests = dbData.guests.filter(g => {
+      if (!g || !g.nama_tamu) return false;
+      const u = String(g.nama_tamu).trim().toUpperCase();
+      if (invalid.includes(u) || u.includes('NAMA TAMU')) return false;
+      return true;
+    });
+  }
+  if (dbData.checkins) {
+    const validGuestIds = new Set((dbData.guests || []).map(g => String(g.id)));
+    dbData.checkins = dbData.checkins.filter(c => {
+      if (!c) return false;
+      if (!validGuestIds.has(String(c.guest_id))) return false;
+      const roomUpper = String(c.nomor_kamar || '').trim().toUpperCase();
+      const tglUpper = String(c.tanggal_masuk || '').trim().toUpperCase();
+      if (roomUpper === 'ROOM' || roomUpper === 'KAMAR' || tglUpper === 'TANGGAL' || tglUpper === 'DATANG') return false;
+      return true;
+    });
+  }
 }
 
 async function initDB() {
@@ -84,6 +108,8 @@ async function initDB() {
 
   // Sync from Firebase Cloud
   await syncFromFirebase();
+
+  sanitizeData();
 
   // Seed default users if empty
   if (!dbData.users || dbData.users.length === 0) {
