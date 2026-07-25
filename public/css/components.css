@@ -640,3 +640,42 @@
   animation: fadeIn 0.2s ease;
 }
 
+/* ═══════════════════════════════════════
+   RUNNING TEXT BANNER
+   ═══════════════════════════════════════ */
+.running-text-banner {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border);
+  padding: 0.6rem 1.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  z-index: 99;
+  position: sticky;
+  bottom: 0;
+}
+
+.running-text-banner .banner-label {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(79, 142, 247, 0.25);
+}
+
+.running-text-banner marquee {
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+  color: var(--text-secondary);
+}
+
+

@@ -14,6 +14,7 @@ const dashboard = {
     this.renderUserInfo();
     this.renderNav();
     this.setupLogout();
+    this.loadRunningText();
 
     // Navigate to default panel
     this.navigate('panel-home');
@@ -39,6 +40,7 @@ const dashboard = {
       { id: 'panel-guests', icon: '📋', label: 'Semua Data Tamu', roles: ['receptionist', 'admin', 'superadmin'] },
       { id: 'panel-users', icon: '👥', label: 'Manajemen Akun', roles: ['admin', 'superadmin'] },
       { id: 'panel-excel', icon: '📁', label: 'Upload Excel', roles: ['superadmin'] },
+      { id: 'panel-running-text', icon: '📢', label: 'Running Teks', roles: ['superadmin'] },
     ];
 
     nav.innerHTML = allItems
@@ -72,6 +74,7 @@ const dashboard = {
       'panel-guests': '📋 Semua Data Tamu',
       'panel-users': '👥 Manajemen Akun',
       'panel-excel': '📁 Upload Database Excel',
+      'panel-running-text': '📢 Atur Running Teks',
     };
     document.getElementById('main-title').textContent = titles[panelId] || '';
 
@@ -94,6 +97,7 @@ const dashboard = {
       case 'panel-guests':  guestsPanel.init(); break;
       case 'panel-users':   usersPanel.init(); break;
       case 'panel-excel':   excelPanel.init(); break;
+      case 'panel-running-text': this.initRunningTextPanel(); break;
     }
   },
 
@@ -261,6 +265,63 @@ const dashboard = {
     document.getElementById('sidebar-overlay')?.addEventListener('click', () => {
       document.getElementById('sidebar').classList.remove('open');
       document.getElementById('sidebar-overlay').classList.remove('show');
+    });
+  },
+
+  async loadRunningText() {
+    try {
+      const res = await api.get('/settings/running-text');
+      const text = res.runningText || '';
+      const banner = document.getElementById('running-text-banner');
+      const marquee = document.getElementById('running-text-marquee');
+      
+      if (marquee) {
+        marquee.textContent = text;
+      }
+      
+      if (banner) {
+        if (text.trim().length > 0) {
+          banner.style.display = 'flex';
+        } else {
+          banner.style.display = 'none';
+        }
+      }
+    } catch (err) {
+      console.error('[RunningText] loadRunningText error:', err);
+    }
+  },
+
+  async initRunningTextPanel() {
+    const txtArea = document.getElementById('rt-content');
+    const saveBtn = document.getElementById('rt-save-btn');
+    if (!txtArea || !saveBtn) return;
+
+    // Load current value
+    try {
+      const res = await api.get('/settings/running-text');
+      txtArea.value = res.runningText || '';
+    } catch (err) {
+      toast(err.message, 'error');
+    }
+
+    // Set save handler (clean old event listeners)
+    const newSaveBtn = saveBtn.cloneNode(true);
+    saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
+
+    newSaveBtn.addEventListener('click', async () => {
+      const val = txtArea.value.trim();
+      try {
+        newSaveBtn.disabled = true;
+        newSaveBtn.textContent = '⏳ Menyimpan...';
+        await api.put('/settings/running-text', { runningText: val });
+        toast('Running teks berhasil diperbarui!', 'success');
+        this.loadRunningText(); // Reload running text banner
+      } catch (err) {
+        toast(err.message, 'error');
+      } finally {
+        newSaveBtn.disabled = false;
+        newSaveBtn.textContent = '💾 Simpan & Terapkan';
+      }
     });
   }
 };

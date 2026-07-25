@@ -8,6 +8,7 @@ const authRoutes  = require('./server/routes/auth');
 const guestRoutes = require('./server/routes/guests');
 const excelRoutes = require('./server/routes/excel');
 const userRoutes  = require('./server/routes/users');
+const settingsRoutes = require('./server/routes/settings');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -36,6 +37,7 @@ app.use('/api/auth',   authRoutes);
 app.use('/api/guests', guestRoutes);
 app.use('/api/excel',  excelRoutes);
 app.use('/api/users',  userRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // ── SPA Fallback ──
 app.get('*', (req, res) => {

@@ -477,7 +477,33 @@
         </div>
       </div>
 
+      <!-- ══════════════════════════════════
+           PANEL: RUNNING TEKS (Superadmin only)
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-running-text">
+        <div class="card" style="max-width:600px;margin:1rem auto 2rem;">
+          <div class="card-header">
+            <div class="card-title">📢 Atur Running Teks</div>
+          </div>
+          <div class="card-body" style="padding:1.5rem;">
+            <div class="form-group">
+              <label class="form-label" for="rt-content">Isi Running Teks</label>
+              <textarea id="rt-content" class="form-control" rows="4" placeholder="Ketik pengumuman atau teks berjalan di sini..." required style="resize:vertical;"></textarea>
+              <span style="font-size:0.75rem;color:var(--text-muted);display:block;margin-top:0.4rem;line-height:1.4;">Teks ini akan ditampilkan berjalan di bagian bawah aplikasi untuk seluruh pengguna.</span>
+            </div>
+            <button class="btn btn-primary btn-block btn-lg" id="rt-save-btn" style="margin-top:1.5rem;">💾 Simpan & Terapkan</button>
+          </div>
+        </div>
+      </div>
+
     </main>
+
+    <!-- Running Text Banner -->
+    <div class="running-text-banner" id="running-text-banner" style="display:none;">
+      <span class="banner-label">INFO</span>
+      <marquee scrollamount="4" behavior="scroll" direction="left" id="running-text-marquee">Memuat pengumuman...</marquee>
+    </div>
+
   </div><!-- end main-content -->
 
 </div><!-- end dashboard-layout -->

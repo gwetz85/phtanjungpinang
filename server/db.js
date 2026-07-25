@@ -10,7 +10,8 @@ let dbData = {
   users: [],
   guests: [],
   checkins: [],
-  counters: { users: 1, guests: 1, checkins: 1 }
+  counters: { users: 1, guests: 1, checkins: 1 },
+  runningText: 'Selamat Datang di PELANGI HOTEL Tanjungpinang! Nikmati kenyamanan dan layanan terbaik kami.'
 };
 
 let isInitialized = false;
@@ -61,7 +62,8 @@ async function syncFromFirebase() {
         users: Array.isArray(cloudData.users) ? cloudData.users.filter(Boolean) : Object.values(cloudData.users),
         guests: Array.isArray(cloudData.guests) ? cloudData.guests.filter(Boolean) : (cloudData.guests ? Object.values(cloudData.guests) : []),
         checkins: Array.isArray(cloudData.checkins) ? cloudData.checkins.filter(Boolean) : (cloudData.checkins ? Object.values(cloudData.checkins) : []),
-        counters: cloudData.counters || { users: 1, guests: 1, checkins: 1 }
+        counters: cloudData.counters || { users: 1, guests: 1, checkins: 1 },
+        runningText: cloudData.runningText || 'Selamat Datang di PELANGI HOTEL Tanjungpinang! Nikmati kenyamanan dan layanan terbaik kami.'
       };
       console.log('[Firebase] Cloud data synced successfully.');
       return true;
@@ -448,4 +450,4 @@ function getDB() {
   return dbData;
 }
 
-module.exports = { initDB, getDB, queryAll, queryOne, run, transaction, detectIdentityType };
+module.exports = { initDB, getDB, queryAll, queryOne, run, transaction, detectIdentityType, persist };
