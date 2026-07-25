@@ -52,7 +52,6 @@ router.post('/login', (req, res) => {
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 
   // Update last login
-  const { run } = require('../db');
   run('UPDATE users SET last_login = ? WHERE id = ?', [new Date().toISOString(), user.id]);
 
   res.json({
