@@ -100,7 +100,8 @@ const searchPanel = (() => {
           </div>
         </div>
         <div class="guest-detail-grid" style="padding:1rem 1.5rem;">
-          <div class="detail-item"><label>Umur</label><span>${escHtml(String(g.umur || '-'))}</span></div>
+          <div class="detail-item"><label>Tanggal Lahir</label><span>${escHtml(g.umur || '-')}</span></div>
+          <div class="detail-item"><label>Umur</label><span style="font-weight:600;color:var(--primary);">${getRealtimeAge(g.umur)}</span></div>
           <div class="detail-item"><label>Kewarganegaraan</label><span>${escHtml(g.kewarganegaraan || '-')}</span></div>
           <div class="detail-item"><label>Datang Dari</label><span>${escHtml(g.datang_dari || '-')}</span></div>
           <div class="detail-item"><label>Expiry ID</label><span>${escHtml(g.expiry_identitas || '-')}</span></div>
@@ -131,7 +132,8 @@ const searchPanel = (() => {
             </div>
           </div>
           <div class="guest-detail-grid" style="padding:0; margin-bottom:1.5rem;">
-            <div class="detail-item"><label>Umur</label><span>${escHtml(String(g.umur || '-'))}</span></div>
+            <div class="detail-item"><label>Tanggal Lahir</label><span>${escHtml(g.umur || '-')}</span></div>
+            <div class="detail-item"><label>Umur (Real-time)</label><span style="font-weight:600;color:var(--primary);">${getRealtimeAge(g.umur)}</span></div>
             <div class="detail-item"><label>Expiry Identitas</label><span>${escHtml(g.expiry_identitas || '-')}</span></div>
             <div class="detail-item"><label>Datang Dari</label><span>${escHtml(g.datang_dari || '-')}</span></div>
             <div class="detail-item"><label>Total Menginap</label><span>${g.checkins?.length || 0}x</span></div>

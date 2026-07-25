@@ -142,7 +142,19 @@ const guestsPanel = (() => {
         const checkins = g.checkins || [];
 
         if (!checkins.length) {
-          contentEl.innerHTML = `<div style="padding:0.75rem 0;color:var(--text-muted);font-size:0.85rem;">Belum ada riwayat check-in.</div>`;
+          contentEl.innerHTML = `
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:0.75rem;padding:0.75rem 1rem;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border);margin-top:0.75rem;margin-bottom:1rem;font-size:0.85rem;">
+              <div><span style="color:var(--text-muted);">Tanggal Lahir:</span> <strong style="color:var(--text-primary);">${escHtml(g.umur || '-')}</strong></div>
+              <div><span style="color:var(--text-muted);">Umur (Real-time):</span> <strong style="color:var(--primary);">${getRealtimeAge(g.umur)}</strong></div>
+              <div><span style="color:var(--text-muted);">Expiry ID:</span> <strong style="color:var(--text-primary);">${escHtml(g.expiry_identitas || '-')}</strong></div>
+              <div><span style="color:var(--text-muted);">Datang Dari:</span> <strong style="color:var(--text-primary);">${escHtml(g.datang_dari || '-')}</strong></div>
+            </div>
+            <div style="padding:0.5rem 0;color:var(--text-muted);font-size:0.85rem;">Belum ada riwayat check-in.</div>
+            <div style="padding:0.5rem 0;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:0.5rem;margin-top:0.5rem;">
+              <button class="btn btn-primary btn-sm" onclick="dashboard.openCheckinModal('${guestId}', '${escHtml(g.nama_tamu)}')">➕ Check-in Baru</button>
+              <button class="btn btn-ghost btn-sm" onclick="guestsPanel.editGuest(${guestId})">✏️ Edit</button>
+            </div>
+          `;
         } else {
           // Group by year-month
           const grouped = {};
@@ -155,6 +167,14 @@ const guestsPanel = (() => {
           const sortedKeys = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
           contentEl.innerHTML = `
+            <!-- Guest Details Grid -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:0.75rem;padding:0.75rem 1rem;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border);margin-top:0.75rem;margin-bottom:1.25rem;font-size:0.85rem;">
+              <div><span style="color:var(--text-muted);">Tanggal Lahir:</span> <strong style="color:var(--text-primary);">${escHtml(g.umur || '-')}</strong></div>
+              <div><span style="color:var(--text-muted);">Umur (Real-time):</span> <strong style="color:var(--primary);">${getRealtimeAge(g.umur)}</strong></div>
+              <div><span style="color:var(--text-muted);">Expiry ID:</span> <strong style="color:var(--text-primary);">${escHtml(g.expiry_identitas || '-')}</strong></div>
+              <div><span style="color:var(--text-muted);">Datang Dari:</span> <strong style="color:var(--text-primary);">${escHtml(g.datang_dari || '-')}</strong></div>
+            </div>
+
             <div style="margin-top:0.5rem;">
               ${sortedKeys.map(ym => {
                 const [yr, mo] = ym.split('-');
@@ -254,8 +274,8 @@ const guestsPanel = (() => {
                 <input type="text" id="eg-nama" class="form-control" value="${escHtml(g.nama_tamu)}" required>
               </div>
               <div class="form-group">
-                <label class="form-label" for="eg-umur">Umur</label>
-                <input type="text" id="eg-umur" class="form-control" value="${escHtml(String(g.umur || ''))}">
+                <label class="form-label" for="eg-umur">Tanggal Lahir</label>
+                <input type="date" id="eg-umur" class="form-control" value="${g.umur && /^\d{4}-\d{2}-\d{2}$/.test(String(g.umur).trim()) ? String(g.umur).trim() : ''}">
               </div>
             </div>
             <div class="form-row">

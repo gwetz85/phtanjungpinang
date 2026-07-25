@@ -198,6 +198,20 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
             const tglMasuk = parseDate(row[map.tanggal_masuk]);
             const expiry   = parseDate(row[map.expiry_identitas]);
 
+            let rawUmur = row[map.umur];
+            let parsedUmur = '';
+            if (rawUmur !== undefined && rawUmur !== null) {
+              if (typeof rawUmur === 'number') {
+                if (rawUmur > 10000) {
+                  parsedUmur = parseDate(rawUmur);
+                } else {
+                  parsedUmur = String(rawUmur);
+                }
+              } else {
+                parsedUmur = String(rawUmur).trim();
+              }
+            }
+
             // Upsert guest (insert or update info only — never re-add duplicate)
             const existing = queryOne('SELECT id FROM guests WHERE no_identitas = ?', [cleanNoId]);
             let guestId;
@@ -205,14 +219,14 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
             if (existing) {
               run(
                 `UPDATE guests SET nama_tamu=?, umur=?, expiry_identitas=?, kewarganegaraan=?, datang_dari=?, updated_at=? WHERE no_identitas=?`,
-                [namaTamu, String(row[map.umur] || ''), expiry, String(row[map.kewarganegaraan] || ''), String(row[map.datang_dari] || ''), now, cleanNoId]
+                [namaTamu, parsedUmur, expiry, String(row[map.kewarganegaraan] || ''), String(row[map.datang_dari] || ''), now, cleanNoId]
               );
               guestId = existing.id;
               updated++;
             } else {
               const result = run(
                 `INSERT INTO guests (no_identitas, jenis_identitas, nama_tamu, umur, expiry_identitas, kewarganegaraan, datang_dari, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [cleanNoId, jenis, namaTamu, String(row[map.umur] || ''), expiry, String(row[map.kewarganegaraan] || ''), String(row[map.datang_dari] || ''), now, now]
+                [cleanNoId, jenis, namaTamu, parsedUmur, expiry, String(row[map.kewarganegaraan] || ''), String(row[map.datang_dari] || ''), now, now]
               );
               guestId = result.lastInsertRowid;
               imported++;

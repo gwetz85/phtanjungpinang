@@ -116,5 +116,41 @@ function nationalityBadge(nat) {
 // ─── Initials for avatar ───
 function getInitials(name) {
   if (!name) return '?';
-  return name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
+  const parts = String(name).trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function getRealtimeAge(birthDateStr) {
+  if (!birthDateStr) return '-';
+  const cleanStr = String(birthDateStr).trim();
+  const yyyymmdd = /^\d{4}-\d{2}-\d{2}$/;
+  let birthDate = null;
+  
+  if (yyyymmdd.test(cleanStr)) {
+    birthDate = new Date(cleanStr);
+  } else {
+    const parts = cleanStr.split(/[-/]/);
+    if (parts.length === 3) {
+      if (parts[0].length === 4) {
+        birthDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      } else if (parts[2].length === 4) {
+        birthDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+      }
+    }
+  }
+
+  if (!birthDate || isNaN(birthDate.getTime())) {
+    return cleanStr;
+  }
+
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  
+  if (age < 0) return '0 tahun';
+  return `${age} tahun`;
 }

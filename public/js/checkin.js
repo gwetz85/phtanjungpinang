@@ -48,7 +48,7 @@ const checkinModule = (() => {
         populateGuestInfo(found);
         // Pre-fill fields
         document.getElementById('ci-nama').value = found.nama_tamu || '';
-        document.getElementById('ci-umur').value = found.umur || '';
+        document.getElementById('ci-umur').value = found.umur && /^\d{4}-\d{2}-\d{2}$/.test(String(found.umur).trim()) ? String(found.umur).trim() : '';
         document.getElementById('ci-expiry').value = found.expiry_identitas || '';
         document.getElementById('ci-nationality').value = found.kewarganegaraan || '';
         document.getElementById('ci-dari').value = found.datang_dari || '';
