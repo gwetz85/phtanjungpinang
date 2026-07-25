@@ -103,7 +103,10 @@ function roleBadge(role) {
 }
 
 function identityBadge(jenis) {
-  return `<span class="badge badge-${(jenis||'').toLowerCase()}">${jenis || 'ID'}</span>`;
+  const j = String(jenis || '').toUpperCase().trim();
+  if (j === 'NIK') return `<span class="badge badge-nik">Nomor NIK</span>`;
+  if (j === 'PASSPORT' || j === 'PSP NO' || j === 'PSP') return `<span class="badge badge-passport">Nomor Passport</span>`;
+  return `<span class="badge badge-lainnya">${jenis || 'ID'}</span>`;
 }
 
 // ─── Nationality flag ───
