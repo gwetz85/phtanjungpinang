@@ -11,25 +11,25 @@ const excelPanel = (() => {
   // Default column mapping — keywords to match against Excel headers (case-insensitive)
   // Multiple aliases supported per field
   const MAPPING_ALIASES = {
-    no_identitas:    ['IDENTITAS', 'NIK', 'PASSPORT', 'NO IDENTITAS', 'NO_IDENTITAS', 'ID'],
-    nama_tamu:       ['NAMA TAMU', 'NAMA', 'NAME', 'GUEST NAME', 'NAMA_TAMU'],
-    umur:            ['UMUR', 'AGE', 'USIA'],
-    expiry_identitas:['EXPIRY', 'EXPIRED', 'MASA BERLAKU', 'EXP'],
+    no_identitas:    ['IDENTITAS', 'NIK / PSP NO', 'NIK', 'PSP NO', 'PASSPORT', 'NO IDENTITAS', 'ID'],
+    nama_tamu:       ['NAMA TAMU', 'NAMA', 'NAME', 'NAMA_TAMU'],
+    umur:            ['TANGGAL LAHIR', 'TGL LAHIR', 'UMUR', 'AGE', 'USIA'],
+    expiry_identitas:['EXPIRY', 'EXPIRY DATE', 'EXPIRED', 'EXP'],
     kewarganegaraan: ['NATIONALITY', 'KEWARGANEGARAAN', 'WN', 'NEGARA'],
-    datang_dari:     ['DATANG DARI', 'DATANG_DARI', 'ASAL', 'FROM', 'ORIGIN'],
-    nomor_kamar:     ['ROOM NO', 'ROOM', 'KAMAR', 'NO KAMAR', 'ROOM NUMBER', 'NO ROOM'],
-    tanggal_masuk:   ['TANGGAL MASUK', 'TGL MASUK', 'CHECK IN', 'CHECKIN', 'CHECK-IN', 'DATE IN'],
-    keterangan:      ['KET', 'KETERANGAN', 'NOTES', 'NOTE', 'REMARKS', 'INFO'],
+    datang_dari:     ['DATANG DARI', 'ASAL', 'FROM', 'ORIGIN'],
+    nomor_kamar:     ['NOMOR ROOM', 'ROOM NO', 'KAMAR', 'ROOM', 'NO KAMAR', 'NO ROOM'],
+    tanggal_masuk:   ['TANGGAL MASUK', 'TANGGAL', 'TGL MASUK', 'CHECK IN', 'DATE IN'],
+    keterangan:      ['KETERANGAN', 'KET', 'NOTES', 'REMARKS'],
   };
 
   const FIELD_LABELS = {
-    no_identitas:    'No. Identitas (NIK/Passport)',
+    no_identitas:    'Identitas (NIK / Psp no) *',
     nama_tamu:       'Nama Tamu *',
-    umur:            'Umur',
-    expiry_identitas:'Expiry ID',
-    kewarganegaraan: 'Kewarganegaraan',
+    umur:            'Tanggal Lahir (untuk hitung Umur)',
+    expiry_identitas:'Expiry',
+    kewarganegaraan: 'Nationality',
     datang_dari:     'Datang Dari',
-    nomor_kamar:     'Nomor Kamar',
+    nomor_kamar:     'Nomor Room',
     tanggal_masuk:   'Tanggal Masuk',
     keterangan:      'Keterangan',
   };
