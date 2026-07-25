@@ -145,7 +145,7 @@ const guestsPanel = (() => {
           contentEl.innerHTML = `
             <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:0.75rem;padding:0.75rem 1rem;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border);margin-top:0.75rem;margin-bottom:1rem;font-size:0.85rem;">
               <div><span style="color:var(--text-muted);">Tanggal Lahir:</span> <strong style="color:var(--text-primary);">${escHtml(g.umur || '-')}</strong></div>
-              <div><span style="color:var(--text-muted);">Umur (Real-time):</span> <strong style="color:var(--primary);">${getRealtimeAge(g.umur)}</strong></div>
+              <div><span style="color:var(--text-muted);">Umur (Real-time):</span> <strong style="color:var(--primary);">${getRealtimeAge(g.umur) || '-'}</strong></div>
               <div><span style="color:var(--text-muted);">Expiry ID:</span> <strong style="color:var(--text-primary);">${escHtml(g.expiry_identitas || '-')}</strong></div>
               <div><span style="color:var(--text-muted);">Datang Dari:</span> <strong style="color:var(--text-primary);">${escHtml(g.datang_dari || '-')}</strong></div>
             </div>
@@ -167,10 +167,9 @@ const guestsPanel = (() => {
           const sortedKeys = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
           contentEl.innerHTML = `
-            <!-- Guest Details Grid -->
             <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:0.75rem;padding:0.75rem 1rem;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border);margin-top:0.75rem;margin-bottom:1.25rem;font-size:0.85rem;">
               <div><span style="color:var(--text-muted);">Tanggal Lahir:</span> <strong style="color:var(--text-primary);">${escHtml(g.umur || '-')}</strong></div>
-              <div><span style="color:var(--text-muted);">Umur (Real-time):</span> <strong style="color:var(--primary);">${getRealtimeAge(g.umur)}</strong></div>
+              <div><span style="color:var(--text-muted);">Umur (Real-time):</span> <strong style="color:var(--primary);">${getRealtimeAge(g.umur) || '-'}</strong></div>
               <div><span style="color:var(--text-muted);">Expiry ID:</span> <strong style="color:var(--text-primary);">${escHtml(g.expiry_identitas || '-')}</strong></div>
               <div><span style="color:var(--text-muted);">Datang Dari:</span> <strong style="color:var(--text-primary);">${escHtml(g.datang_dari || '-')}</strong></div>
             </div>

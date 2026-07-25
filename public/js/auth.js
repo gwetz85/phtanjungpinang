@@ -126,8 +126,11 @@ function getInitials(name) {
 }
 
 function getRealtimeAge(birthDateStr) {
-  if (!birthDateStr) return '-';
+  if (!birthDateStr) return '';
   const cleanStr = String(birthDateStr).trim();
+  if (!cleanStr || cleanStr === '-' || cleanStr.toLowerCase() === 'n/a' || cleanStr.toLowerCase() === 'null') {
+    return '';
+  }
   const yyyymmdd = /^\d{4}-\d{2}-\d{2}$/;
   let birthDate = null;
   
