@@ -9,7 +9,11 @@ router.use(authorize('admin', 'superadmin'));
 
 // GET /api/users
 router.get('/', (req, res) => {
-  const users = queryAll('SELECT id, username, nama, role, created_at FROM users ORDER BY role, nama');
+  let users = queryAll('SELECT id, username, nama, role, created_at FROM users ORDER BY role, nama');
+  // Admin cannot see superadmin accounts
+  if (req.user.role === 'admin') {
+    users = users.filter(u => u.role !== 'superadmin');
+  }
   res.json({ success: true, data: users });
 });
 
@@ -22,6 +26,10 @@ router.post('/', (req, res) => {
   const validRoles = ['superadmin', 'admin', 'receptionist'];
   if (!validRoles.includes(role)) {
     return res.status(400).json({ success: false, message: 'Role tidak valid.' });
+  }
+  // Admin cannot create superadmin accounts
+  if (req.user.role === 'admin' && role === 'superadmin') {
+    return res.status(403).json({ success: false, message: 'Admin tidak bisa membuat akun superadmin.' });
   }
   const existing = queryOne('SELECT id FROM users WHERE username = ?', [username]);
   if (existing) {
@@ -36,6 +44,11 @@ router.post('/', (req, res) => {
 router.put('/:id', (req, res) => {
   const user = queryOne('SELECT * FROM users WHERE id = ?', [req.params.id]);
   if (!user) return res.status(404).json({ success: false, message: 'User tidak ditemukan.' });
+
+  // Admin cannot edit superadmin accounts or promote to superadmin
+  if (req.user.role === 'admin' && (user.role === 'superadmin' || req.body.role === 'superadmin')) {
+    return res.status(403).json({ success: false, message: 'Admin tidak bisa mengelola akun superadmin.' });
+  }
 
   const { nama, role, password } = req.body;
   if (password && password.length > 0) {
@@ -54,6 +67,10 @@ router.delete('/:id', (req, res) => {
   }
   const user = queryOne('SELECT * FROM users WHERE id = ?', [req.params.id]);
   if (!user) return res.status(404).json({ success: false, message: 'User tidak ditemukan.' });
+  // Admin cannot delete superadmin accounts
+  if (req.user.role === 'admin' && user.role === 'superadmin') {
+    return res.status(403).json({ success: false, message: 'Admin tidak bisa menghapus akun superadmin.' });
+  }
   run('DELETE FROM users WHERE id = ?', [req.params.id]);
   res.json({ success: true, message: 'User berhasil dihapus.' });
 });

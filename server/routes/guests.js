@@ -5,8 +5,8 @@ const { authenticate, authorize } = require('../middleware/auth');
 
 router.use(authenticate);
 
-// ─── GET /api/guests ─── (admin, superadmin)
-router.get('/', authorize('admin', 'superadmin'), (req, res) => {
+// ─── GET /api/guests ─── (receptionist, admin, superadmin)
+router.get('/', authorize('receptionist', 'admin', 'superadmin'), (req, res) => {
   try {
     const { page = 1, limit = 20, search = '', nationality = '' } = req.query;
     const pageNum   = Math.max(1, parseInt(page) || 1);

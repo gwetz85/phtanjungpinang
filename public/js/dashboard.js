@@ -16,8 +16,7 @@ const dashboard = {
     this.setupLogout();
 
     // Navigate to default panel
-    const defaultPanel = this.user.role === 'receptionist' ? 'panel-search' : 'panel-home';
-    this.navigate(defaultPanel);
+    this.navigate('panel-home');
   },
 
   renderUserInfo() {
@@ -34,10 +33,10 @@ const dashboard = {
     const nav = document.getElementById('sidebar-nav');
 
     const allItems = [
-      { id: 'panel-home', icon: '🏠', label: 'Beranda', roles: ['admin', 'superadmin'] },
+      { id: 'panel-home', icon: '🏠', label: 'Beranda', roles: ['receptionist', 'admin', 'superadmin'] },
       { id: 'panel-search', icon: '🔍', label: 'Cari Tamu', roles: ['receptionist', 'admin', 'superadmin'] },
       { id: 'panel-checkin', icon: '➕', label: 'Check-in Baru', roles: ['receptionist', 'admin', 'superadmin'] },
-      { id: 'panel-guests', icon: '📋', label: 'Semua Data Tamu', roles: ['admin', 'superadmin'] },
+      { id: 'panel-guests', icon: '📋', label: 'Semua Data Tamu', roles: ['receptionist', 'admin', 'superadmin'] },
       { id: 'panel-users', icon: '👥', label: 'Manajemen Akun', roles: ['admin', 'superadmin'] },
       { id: 'panel-excel', icon: '📁', label: 'Upload Excel', roles: ['superadmin'] },
     ];

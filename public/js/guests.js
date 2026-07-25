@@ -52,6 +52,8 @@ const guestsPanel = (() => {
       }
 
       const startNo = ((pagination.page - 1) * 20) + 1;
+      const u = auth.getUser();
+      const isAdmin = u && (u.role === 'admin' || u.role === 'superadmin');
 
       tbody.innerHTML = data.map((g, i) => {
         const age = getRealtimeAge(g.umur);
@@ -81,8 +83,10 @@ const guestsPanel = (() => {
             <td onclick="event.stopPropagation()">
               <div class="actions-cell">
                 <button class="btn btn-ghost btn-sm" title="Detail" onclick="guestsPanel.toggleExpand(${g.id})">👁️</button>
-                <button class="btn btn-warning btn-sm" title="Edit" onclick="guestsPanel.editGuest(${g.id})">✏️</button>
-                <button class="btn btn-danger btn-sm" title="Hapus" onclick="guestsPanel.deleteGuest(${g.id}, '${escHtml(g.nama_tamu)}')">🗑️</button>
+                ${isAdmin ? `
+                  <button class="btn btn-warning btn-sm" title="Edit" onclick="guestsPanel.editGuest(${g.id})">✏️</button>
+                  <button class="btn btn-danger btn-sm" title="Hapus" onclick="guestsPanel.deleteGuest(${g.id}, '${escHtml(g.nama_tamu)}')">🗑️</button>
+                ` : ''}
               </div>
             </td>
           </tr>
@@ -155,13 +159,16 @@ const guestsPanel = (() => {
           </div>
         `;
 
+        const u = auth.getUser();
+        const isAdmin = u && (u.role === 'admin' || u.role === 'superadmin');
+
         if (!checkins.length) {
           contentEl.innerHTML = `
             ${detailGrid}
             <div style="padding:0.5rem 0;color:var(--text-muted);font-size:0.85rem;">Belum ada riwayat check-in.</div>
             <div style="padding:0.5rem 0;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:0.5rem;margin-top:0.5rem;">
               <button class="btn btn-primary btn-sm" onclick="dashboard.openCheckinModal('${guestId}', '${escHtml(g.nama_tamu)}')">➕ Check-in Baru</button>
-              <button class="btn btn-ghost btn-sm" onclick="guestsPanel.editGuest(${guestId})">✏️ Edit</button>
+              ${isAdmin ? `<button class="btn btn-ghost btn-sm" onclick="guestsPanel.editGuest(${guestId})">✏️ Edit</button>` : ''}
             </div>
           `;
         } else {
@@ -201,7 +208,7 @@ const guestsPanel = (() => {
             </table>
             <div style="display:flex;justify-content:flex-end;gap:0.5rem;">
               <button class="btn btn-primary btn-sm" onclick="dashboard.openCheckinModal('${guestId}', '${escHtml(g.nama_tamu)}')">➕ Check-in Baru</button>
-              <button class="btn btn-ghost btn-sm" onclick="guestsPanel.editGuest(${guestId})">✏️ Edit</button>
+              ${isAdmin ? `<button class="btn btn-ghost btn-sm" onclick="guestsPanel.editGuest(${guestId})">✏️ Edit</button>` : ''}
             </div>
           `;
         }

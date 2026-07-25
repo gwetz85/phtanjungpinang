@@ -45,6 +45,18 @@ const usersPanel = (() => {
   }
 
   function openAddModal() {
+    const currentUser = auth.getUser();
+    const roleOptions = currentUser?.role === 'superadmin' 
+      ? `
+        <option value="receptionist">Receptionist</option>
+        <option value="admin">Admin</option>
+        <option value="superadmin">Super Admin</option>
+      `
+      : `
+        <option value="receptionist">Receptionist</option>
+        <option value="admin">Admin</option>
+      `;
+
     createModal({
       id: 'add-user-modal',
       title: '➕ Tambah User Baru',
@@ -69,9 +81,7 @@ const usersPanel = (() => {
               <label class="form-label" for="au-role">Role</label>
               <select id="au-role" class="form-control" required>
                 <option value="">Pilih Role</option>
-                <option value="receptionist">Receptionist</option>
-                <option value="admin">Admin</option>
-                <option value="superadmin">Super Admin</option>
+                ${roleOptions}
               </select>
             </div>
           </div>
@@ -111,6 +121,18 @@ const usersPanel = (() => {
       const user = res.data.find(u => u.id === userId);
       if (!user) { toast('User tidak ditemukan', 'error'); return; }
 
+      const currentUser = auth.getUser();
+      const roleOptions = currentUser?.role === 'superadmin'
+        ? `
+          <option value="receptionist" ${user.role === 'receptionist' ? 'selected' : ''}>Receptionist</option>
+          <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+          <option value="superadmin" ${user.role === 'superadmin' ? 'selected' : ''}>Super Admin</option>
+        `
+        : `
+          <option value="receptionist" ${user.role === 'receptionist' ? 'selected' : ''}>Receptionist</option>
+          <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+        `;
+
       createModal({
         id: 'edit-user-modal',
         title: `✏️ Edit User: ${escHtml(user.nama)}`,
@@ -134,9 +156,7 @@ const usersPanel = (() => {
               <div class="form-group">
                 <label class="form-label" for="eu-role">Role</label>
                 <select id="eu-role" class="form-control" required>
-                  <option value="receptionist" ${user.role === 'receptionist' ? 'selected' : ''}>Receptionist</option>
-                  <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
-                  <option value="superadmin" ${user.role === 'superadmin' ? 'selected' : ''}>Super Admin</option>
+                  ${roleOptions}
                 </select>
               </div>
             </div>
