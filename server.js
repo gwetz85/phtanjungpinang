@@ -12,6 +12,17 @@ const userRoutes  = require('./server/routes/users');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
+// ── Ensure DB is initialized for serverless invocations ──
+app.use(async (req, res, next) => {
+  try {
+    await initDB();
+    next();
+  } catch (err) {
+    console.error('[DB Init Error]', err);
+    res.status(500).json({ success: false, message: 'Database error: ' + err.message });
+  }
+});
+
 // ── Middleware ──
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
@@ -37,28 +48,32 @@ app.use((err, req, res, next) => {
   res.status(500).json({ success: false, message: 'Server error: ' + err.message });
 });
 
-// ── Start ──
-initDB().then(() => {
-  app.listen(PORT, '0.0.0.0', () => {
-    const os = require('os');
-    const nets = os.networkInterfaces();
-    let localIP = 'localhost';
-    for (const name of Object.keys(nets)) {
-      for (const net of nets[name]) {
-        if (net.family === 'IPv4' && !net.internal) {
-          localIP = net.address;
-          break;
+// ── Start listener for local mode ──
+if (!process.env.VERCEL) {
+  initDB().then(() => {
+    app.listen(PORT, '0.0.0.0', () => {
+      const os = require('os');
+      const nets = os.networkInterfaces();
+      let localIP = 'localhost';
+      for (const name of Object.keys(nets)) {
+        for (const net of nets[name]) {
+          if (net.family === 'IPv4' && !net.internal) {
+            localIP = net.address;
+            break;
+          }
         }
       }
-    }
-    console.log('\n========================================');
-    console.log('  PH Hotel DB - Server Berjalan');
-    console.log(`  Lokal  : http://localhost:${PORT}`);
-    console.log(`  Jaringan: http://${localIP}:${PORT}`);
-    console.log('  (Bagikan alamat jaringan ke komputer lain)');
-    console.log('========================================\n');
+      console.log('\n========================================');
+      console.log('  PH Hotel DB - Server Berjalan');
+      console.log(`  Lokal  : http://localhost:${PORT}`);
+      console.log(`  Jaringan: http://${localIP}:${PORT}`);
+      console.log('  (Bagikan alamat jaringan ke komputer lain)');
+      console.log('========================================\n');
+    });
+  }).catch(err => {
+    console.error('[ERROR] Gagal start server:', err.message);
+    process.exit(1);
   });
-}).catch(err => {
-  console.error('[ERROR] Gagal start server:', err.message);
-  process.exit(1);
-});
+}
+
+module.exports = app;

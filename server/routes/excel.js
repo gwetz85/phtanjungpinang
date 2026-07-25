@@ -7,7 +7,9 @@ const fs = require('fs');
 const { queryAll, queryOne, run, transaction, detectIdentityType } = require('../db');
 const { authenticate, authorize } = require('../middleware/auth');
 
-const UPLOAD_DIR = path.join(__dirname, '..', '..', 'uploads');
+const UPLOAD_DIR = process.env.VERCEL
+  ? path.join('/tmp', 'uploads')
+  : path.join(__dirname, '..', '..', 'uploads');
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 const storage = multer.diskStorage({

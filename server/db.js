@@ -3,7 +3,9 @@ const bcrypt = require('bcryptjs');
 const path = require('path');
 const fs = require('fs');
 
-const DB_PATH = path.join(__dirname, '..', 'hotel.db');
+const DB_PATH = process.env.VERCEL
+  ? path.join('/tmp', 'hotel.db')
+  : path.join(__dirname, '..', 'hotel.db');
 
 let db = null;
 let SQL = null;
@@ -26,18 +28,18 @@ function persist() {
  */
 function startAutoPersist() {
   setInterval(persist, 10000);
-  // Persist on exit
   process.on('exit', persist);
   process.on('SIGINT', () => { persist(); process.exit(0); });
   process.on('SIGTERM', () => { persist(); process.exit(0); });
 }
 
 function getDB() {
-  if (!db) throw new Error('Database not initialized yet.');
+  if (!db) throw new Error('Database belum diinisialisasi.');
   return db;
 }
 
 async function initDB() {
+  if (db) return db;
   SQL = await initSqlJs();
 
   // Load existing DB or create new
