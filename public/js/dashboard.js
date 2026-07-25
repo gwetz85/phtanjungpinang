@@ -260,10 +260,10 @@ const dashboard = {
 
   setupLogout() {
     document.getElementById('logout-btn')?.addEventListener('click', () => {
-      confirmDialog('Anda yakin ingin keluar?', () => auth.logout(), { title: 'Logout', danger: false });
+      confirmDialog('Anda yakin ingin keluar?', () => auth.logout(), { title: 'Logout', danger: true });
     });
     document.getElementById('logout-sidebar-btn')?.addEventListener('click', () => {
-      confirmDialog('Anda yakin ingin keluar?', () => auth.logout(), { title: 'Logout', danger: false });
+      confirmDialog('Anda yakin ingin keluar?', () => auth.logout(), { title: 'Logout', danger: true });
     });
 
     // Mobile hamburger

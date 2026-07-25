@@ -65,14 +65,31 @@ function createModal({ id, title, body, footer = '', size = '' }) {
 }
 
 // ─── Confirm dialog ───
-function confirmDialog(message, onConfirm, { title = 'Konfirmasi', danger = true } = {}) {
+function confirmDialog(message, onConfirm, { title = 'Konfirmasi', danger = true, icon = null } = {}) {
+  const defaultIcon = danger ? '🚪' : 'ℹ️'; // Using door icon for logout typically
+  const displayIcon = icon || defaultIcon;
+  
   const modal = createModal({
     id: 'confirm-modal',
-    title: `${danger ? '⚠️' : 'ℹ️'} ${title}`,
-    body: `<p style="color:var(--text-secondary);">${message}</p>`,
+    title: '', // Hide standard header title to make body pop
+    body: `
+      <div style="text-align:center; padding: 1rem 0.5rem 0.5rem;">
+        <div style="font-size:3.5rem; margin-bottom:1rem; line-height:1; animation: popIn 0.3s ease;">${displayIcon}</div>
+        <h3 style="margin-bottom:0.5rem; color:var(--text-primary); font-size:1.2rem; font-weight:600;">${title}</h3>
+        <p style="color:var(--text-secondary); font-size:0.95rem; line-height:1.5;">${message}</p>
+      </div>
+      <style>
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        #confirm-modal .modal-header { border-bottom: none; padding-bottom: 0; position: absolute; right: 0; top: 0; z-index: 10; }
+        #confirm-modal .modal-title { display: none; }
+        #confirm-modal .modal { max-width: 400px; }
+      </style>
+    `,
     footer: `
-      <button class="btn btn-secondary" onclick="document.getElementById('confirm-modal').remove()">Batal</button>
-      <button class="btn ${danger ? 'btn-danger' : 'btn-primary'}" id="confirm-ok-btn">Ya, Lanjutkan</button>
+      <div style="display:flex; justify-content:center; gap:1rem; width:100%; padding: 0 0.5rem;">
+        <button class="btn btn-secondary" style="flex:1; padding: 0.6rem;" onclick="document.getElementById('confirm-modal').remove()">Batal</button>
+        <button class="btn ${danger ? 'btn-danger' : 'btn-primary'}" style="flex:1; padding: 0.6rem;" id="confirm-ok-btn">Ya, Lanjutkan</button>
+      </div>
     `
   });
   document.getElementById('confirm-ok-btn').addEventListener('click', () => {
