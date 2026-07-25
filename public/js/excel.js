@@ -73,6 +73,7 @@ const excelPanel = (() => {
 
     document.getElementById('excel-import-btn')?.addEventListener('click', doImport);
     document.getElementById('excel-reset-btn')?.addEventListener('click', resetPanel);
+    document.getElementById('excel-clear-db-btn')?.addEventListener('click', clearDatabase);
   }
 
   async function handleFile(file) {
@@ -415,6 +416,45 @@ const excelPanel = (() => {
   }
 
   function escHtml(str) { return searchPanel.escHtml(str); }
+
+  async function clearDatabase() {
+    const btn = document.getElementById('excel-clear-db-btn');
+
+    // First confirmation
+    const confirmed1 = window.confirm(
+      '⚠️ PERINGATAN!\n\nAnda akan menghapus SEMUA data tamu dan riwayat check-in dari database.\n\nTindakan ini tidak dapat dibatalkan!\n\nLanjutkan?'
+    );
+    if (!confirmed1) return;
+
+    // Second confirmation
+    const confirmed2 = window.confirm(
+      '🔴 KONFIRMASI AKHIR\n\nApakah Anda BENAR-BENAR yakin ingin menghapus seluruh database?\n\nKlik OK untuk melanjutkan, atau Cancel untuk membatalkan.'
+    );
+    if (!confirmed2) return;
+
+    if (btn) { btn.disabled = true; btn.innerHTML = '<div class="spinner" style="display:inline-block;width:14px;height:14px;margin-right:6px;"></div> Menghapus...'; }
+
+    try {
+      const res = await api.post('/excel/clear-database', {});
+
+      const resDiv = document.getElementById('import-result');
+      if (resDiv) {
+        resDiv.innerHTML = `
+          <div class="alert alert-success" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
+            <div style="font-weight:700;">✅ Database Berhasil Dihapus</div>
+            <div style="font-size:0.88rem;">${escHtml(res.message)}</div>
+          </div>`;
+        resDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      toast(res.message, 'success', 5000);
+      resetPanel(true);
+    } catch (err) {
+      toast('Gagal menghapus database: ' + err.message, 'error', 6000);
+    } finally {
+      if (btn) { btn.disabled = false; btn.innerHTML = '🗑️ Hapus Semua Database'; }
+    }
+  }
 
   return { init, resetPanel };
 })();

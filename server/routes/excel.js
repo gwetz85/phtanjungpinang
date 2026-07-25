@@ -281,4 +281,35 @@ router.get('/export', authorize('admin', 'superadmin'), (req, res) => {
   res.send(buf);
 });
 
+// ─── POST /api/excel/clear-database ─── (superadmin - purge guest/checkin data)
+router.post('/clear-database', authorize('superadmin'), (req, res) => {
+  try {
+    const { getDB } = require('../db');
+
+    const dbData = getDB();
+    const guestCount   = (dbData.guests   || []).length;
+    const checkinCount = (dbData.checkins || []).length;
+
+    // Wipe collections
+    dbData.guests   = [];
+    dbData.checkins = [];
+
+    // Reset counters
+    if (dbData.counters) {
+      dbData.counters.guests   = 1;
+      dbData.counters.checkins = 1;
+    }
+
+    // Persist to Firebase
+    run('DELETE FROM guests');
+
+    res.json({
+      success: true,
+      message: `Berhasil menghapus ${guestCount} data tamu dan ${checkinCount} riwayat check-in dari database.`
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Gagal membersihkan database: ' + err.message });
+  }
+});
+
 module.exports = router;
