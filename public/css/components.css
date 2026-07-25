@@ -646,7 +646,8 @@
 .running-text-banner {
   position: fixed;
   bottom: 0;
-  left: 0;
+  /* Start AFTER the sidebar so it doesn't overlap */
+  left: var(--sidebar-width);
   right: 0;
   z-index: 999;
   display: flex;

@@ -285,9 +285,9 @@ const dashboard = {
       primary.textContent = text;
       if (clone) clone.textContent = text;
 
-      // Duration proportional to text length: ~6px per char, 100px/s speed
+      // Duration proportional to text length — lower divisor = slower speed
       const charPx   = Math.max(text.length * 9, 400);
-      const duration = Math.max(Math.round(charPx / 90), 10) + 's';
+      const duration = Math.max(Math.round(charPx / 55), 18) + 's';
       primary.style.animationDuration = duration;
       if (clone) {
         clone.style.animationDuration = duration;

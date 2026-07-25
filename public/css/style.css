@@ -894,6 +894,9 @@ input, select, textarea {
   .modal-container { width: 95vw; max-height: 90vh; }
   .modal-lg { width: 95vw; }
 
+  /* Running text banner: full width on mobile (sidebar is off-canvas) */
+  .running-text-banner { left: 0; }
+
   /* Hamburger visible */
   #hamburger-btn { display: flex !important; }
 
