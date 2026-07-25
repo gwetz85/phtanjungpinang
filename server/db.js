@@ -353,32 +353,33 @@ function run(sql, params = []) {
 
   // 4. UPDATE guests
   else if (cleanSql.toLowerCase().startsWith('update guests')) {
-    if (cleanSql.toLowerCase().includes('where no_identitas=')) {
-      // params: [nama_tamu, umur, expiry_identitas, kewarganegaraan, datang_dari, updated_at, no_identitas]
-      const g = dbData.guests.find(x => x.no_identitas === params[6]);
+    try {
+      const setPart = cleanSql.toLowerCase().split('set')[1].split('where')[0];
+      const wherePart = cleanSql.toLowerCase().split('where')[1];
+      const cols = setPart.split(',').map(s => s.split('=')[0].trim());
+
+      let g = null;
+      const whereVal = params[params.length - 1];
+
+      if (wherePart.includes('no_identitas')) {
+        g = dbData.guests.find(x => String(x.no_identitas).trim() === String(whereVal).trim());
+      } else if (wherePart.includes('id')) {
+        g = dbData.guests.find(x => String(x.id) === String(whereVal));
+      }
+
       if (g) {
-        g.nama_tamu = params[0];
-        g.umur = params[1];
-        g.expiry_identitas = params[2];
-        g.kewarganegaraan = params[3];
-        g.datang_dari = params[4];
-        g.updated_at = params[5] || now;
+        cols.forEach((col, idx) => {
+          if (col === 'nama_tamu') g.nama_tamu = params[idx];
+          else if (col === 'jenis_identitas') g.jenis_identitas = params[idx];
+          else if (col === 'umur') g.umur = params[idx];
+          else if (col === 'expiry_identitas') g.expiry_identitas = params[idx];
+          else if (col === 'kewarganegaraan') g.kewarganegaraan = params[idx];
+          else if (col === 'datang_dari') g.datang_dari = params[idx];
+          else if (col === 'updated_at') g.updated_at = params[idx] || now;
+        });
       }
-    } else if (cleanSql.toLowerCase().includes('where id=')) {
-      if (params.length === 2 && cleanSql.includes('updated_at=?')) {
-        const g = dbData.guests.find(x => String(x.id) === String(params[1]));
-        if (g) g.updated_at = params[0];
-      } else {
-        const g = dbData.guests.find(x => String(x.id) === String(params[5]));
-        if (g) {
-          g.nama_tamu = params[0];
-          g.umur = params[1];
-          g.expiry_identitas = params[2];
-          g.kewarganegaraan = params[3];
-          g.datang_dari = params[4];
-          g.updated_at = now;
-        }
-      }
+    } catch (e) {
+      console.error('[DB UPDATE guests] parse error:', e);
     }
   }
 
@@ -437,8 +438,9 @@ function transaction(fn) {
 
 function detectIdentityType(noIdentitas) {
   if (!noIdentitas) return 'LAINNYA';
-  const clean = String(noIdentitas).trim().replace(/\s/g, '');
-  if (/^\d{16}$/.test(clean)) return 'NIK';
+  const clean = String(noIdentitas).trim().replace(/\s/g, '').toUpperCase();
+  if (clean.startsWith('NIK') || /^\d{16}$/.test(clean)) return 'NIK';
+  if (clean.startsWith('SIM') || /^\d{12}$/.test(clean)) return 'SIM';
   return 'PASSPORT';
 }
 

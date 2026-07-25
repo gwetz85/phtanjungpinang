@@ -264,9 +264,19 @@ const guestsPanel = (() => {
         title: `✏️ Edit Tamu`,
         body: `
           <form id="edit-guest-form">
-            <div class="form-group">
-              <label class="form-label">No. Identitas</label>
-              <input class="form-control" value="${escHtml(g.no_identitas)}" disabled style="opacity:0.6;">
+            <div class="form-row">
+              <div class="form-group" style="flex: 0 0 35%;">
+                <label class="form-label" for="eg-jenis-identitas">Jenis Identitas</label>
+                <select id="eg-jenis-identitas" class="form-control">
+                  <option value="NIK" ${g.jenis_identitas === 'NIK' ? 'selected' : ''}>NIK</option>
+                  <option value="PASSPORT" ${g.jenis_identitas === 'PASSPORT' ? 'selected' : ''}>Psp no</option>
+                  <option value="SIM" ${g.jenis_identitas === 'SIM' ? 'selected' : ''}>SIM</option>
+                </select>
+              </div>
+              <div class="form-group" style="flex: 1;">
+                <label class="form-label">No. Identitas</label>
+                <input class="form-control" value="${escHtml(g.no_identitas)}" disabled style="opacity:0.6;">
+              </div>
             </div>
             <div class="form-row">
               <div class="form-group">
@@ -304,6 +314,7 @@ const guestsPanel = (() => {
         try {
           await api.put(`/guests/${guestId}`, {
             nama_tamu:        document.getElementById('eg-nama').value.trim(),
+            jenis_identitas:  document.getElementById('eg-jenis-identitas').value,
             umur:             document.getElementById('eg-umur').value.trim(),
             kewarganegaraan:  document.getElementById('eg-nat').value.trim(),
             expiry_identitas: document.getElementById('eg-expiry').value.trim(),

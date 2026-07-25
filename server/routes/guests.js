@@ -95,7 +95,7 @@ router.get('/:id', (req, res) => {
 // ─── POST /api/guests ─── (tambah tamu baru + check-in)
 router.post('/', (req, res) => {
   const {
-    no_identitas, nama_tamu, umur, expiry_identitas,
+    no_identitas, jenis_identitas, nama_tamu, umur, expiry_identitas,
     kewarganegaraan, datang_dari,
     nomor_kamar, tanggal_masuk, keterangan
   } = req.body;
@@ -105,7 +105,7 @@ router.post('/', (req, res) => {
   }
 
   const cleanId = String(no_identitas).trim();
-  const jenis = detectIdentityType(cleanId);
+  const jenis = jenis_identitas || detectIdentityType(cleanId);
   const now = new Date().toISOString();
 
   const existing = queryOne('SELECT * FROM guests WHERE no_identitas = ?', [cleanId]);
@@ -115,10 +115,10 @@ router.post('/', (req, res) => {
   if (existing) {
     run(`
       UPDATE guests SET
-        nama_tamu=?, umur=?, expiry_identitas=?,
+        nama_tamu=?, jenis_identitas=?, umur=?, expiry_identitas=?,
         kewarganegaraan=?, datang_dari=?, updated_at=?
       WHERE no_identitas=?
-    `, [nama_tamu, umur, expiry_identitas, kewarganegaraan, datang_dari, now, cleanId]);
+    `, [nama_tamu, jenis, umur, expiry_identitas, kewarganegaraan, datang_dari, now, cleanId]);
     guestId = existing.id;
   } else {
     const result = run(`
@@ -151,7 +151,7 @@ router.post('/', (req, res) => {
 
 // ─── PUT /api/guests/:id ─── (admin+)
 router.put('/:id', authorize('admin', 'superadmin'), (req, res) => {
-  const { nama_tamu, umur, expiry_identitas, kewarganegaraan, datang_dari } = req.body;
+  const { nama_tamu, jenis_identitas, umur, expiry_identitas, kewarganegaraan, datang_dari } = req.body;
   const now = new Date().toISOString();
 
   const guest = queryOne('SELECT * FROM guests WHERE id = ?', [req.params.id]);
@@ -161,10 +161,10 @@ router.put('/:id', authorize('admin', 'superadmin'), (req, res) => {
 
   run(`
     UPDATE guests SET
-      nama_tamu=?, umur=?, expiry_identitas=?,
+      nama_tamu=?, jenis_identitas=?, umur=?, expiry_identitas=?,
       kewarganegaraan=?, datang_dari=?, updated_at=?
     WHERE id=?
-  `, [nama_tamu, umur, expiry_identitas, kewarganegaraan, datang_dari, now, req.params.id]);
+  `, [nama_tamu, jenis_identitas || guest.jenis_identitas, umur, expiry_identitas, kewarganegaraan, datang_dari, now, req.params.id]);
 
   const updated = queryOne('SELECT * FROM guests WHERE id = ?', [req.params.id]);
   res.json({ success: true, message: 'Data tamu berhasil diperbarui.', data: updated });

@@ -48,6 +48,7 @@ const checkinModule = (() => {
         populateGuestInfo(found);
         // Pre-fill fields
         document.getElementById('ci-nama').value = found.nama_tamu || '';
+        document.getElementById('ci-jenis-identitas').value = found.jenis_identitas || 'NIK';
         document.getElementById('ci-umur').value = found.umur && /^\d{4}-\d{2}-\d{2}$/.test(String(found.umur).trim()) ? String(found.umur).trim() : '';
         document.getElementById('ci-expiry').value = found.expiry_identitas || '';
         document.getElementById('ci-nationality').value = found.kewarganegaraan || '';
@@ -114,6 +115,7 @@ const checkinModule = (() => {
 
     const body = {
       no_identitas: document.getElementById('ci-identitas').value.trim(),
+      jenis_identitas: document.getElementById('ci-jenis-identitas').value,
       nama_tamu: document.getElementById('ci-nama').value.trim(),
       umur: document.getElementById('ci-umur').value.trim(),
       expiry_identitas: document.getElementById('ci-expiry').value.trim(),
@@ -143,6 +145,7 @@ const checkinModule = (() => {
         // Also update guest data
         await api.put(`/guests/${foundGuestId}`, {
           nama_tamu: body.nama_tamu,
+          jenis_identitas: body.jenis_identitas,
           umur: body.umur,
           expiry_identitas: body.expiry_identitas,
           kewarganegaraan: body.kewarganegaraan,

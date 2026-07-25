@@ -106,6 +106,7 @@ function identityBadge(jenis) {
   const j = String(jenis || '').toUpperCase().trim();
   if (j === 'NIK') return `<span class="badge badge-nik">Nomor NIK</span>`;
   if (j === 'PASSPORT' || j === 'PSP NO' || j === 'PSP') return `<span class="badge badge-passport">Nomor Passport</span>`;
+  if (j === 'SIM') return `<span class="badge badge-sim">SIM</span>`;
   return `<span class="badge badge-lainnya">${jenis || 'ID'}</span>`;
 }
 

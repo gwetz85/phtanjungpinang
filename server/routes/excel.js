@@ -174,6 +174,23 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
               continue;
             }
 
+            let jenis = 'PASSPORT';
+            const rawNoIdUpper = rawNoId.toUpperCase();
+            if (rawNoIdUpper.startsWith('NIK') || /^\d{16}$/.test(rawNoId.replace(/\s/g, ''))) {
+              jenis = 'NIK';
+            } else if (rawNoIdUpper.startsWith('SIM')) {
+              jenis = 'SIM';
+            } else if (rawNoIdUpper.startsWith('PSP') || rawNoIdUpper.startsWith('PASSPORT')) {
+              jenis = 'PASSPORT';
+            } else {
+              const digitsOnly = rawNoId.replace(/\D/g, '');
+              if (digitsOnly.length === 16) {
+                jenis = 'NIK';
+              } else if (digitsOnly.length === 12) {
+                jenis = 'SIM';
+              }
+            }
+
             let cleanNoId = rawNoId.replace(/^(nik|psp|psp\s*no|sim|sim\s*no|ktp|id)\.?:?\s*/i, '').trim();
 
             if (!cleanNoId) {
@@ -181,7 +198,6 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
               cleanNoId = `AUTO-${slugify(namaTamu)}-${room || autoIdCounter++}`;
             }
 
-            const jenis = detectIdentityType(cleanNoId);
             const now   = new Date().toISOString();
 
             const parseDate = (val) => {

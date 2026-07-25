@@ -646,6 +646,7 @@ input, select, textarea {
 .badge-receptionist { background: rgba(16,185,129,0.2); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
 .badge-nik { background: rgba(6,182,212,0.15); color: #67e8f9; border: 1px solid rgba(6,182,212,0.25); }
 .badge-passport { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.25); }
+.badge-sim { background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.25); }
 .badge-wni { background: rgba(16,185,129,0.15); color: #6ee7b7; }
 .badge-wna { background: rgba(239,68,68,0.15); color: #fca5a5; }
 
