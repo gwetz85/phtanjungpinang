@@ -25,11 +25,17 @@ const dashboard = {
 
   renderUserInfo() {
     const u = this.user;
-    document.getElementById('header-user-name').textContent = u.nama;
-    document.getElementById('sidebar-user-name').textContent = u.nama;
-    document.getElementById('sidebar-user-role').innerHTML = roleBadge(u.role);
-    document.getElementById('sidebar-user-avatar').textContent = getInitials(u.nama);
-    document.getElementById('header-user-avatar').textContent = getInitials(u.nama);
+    const headerName = document.getElementById('header-user-name');
+    const headerAvatar = document.getElementById('header-user-avatar');
+    if (headerName) headerName.textContent = u.nama;
+    if (headerAvatar) headerAvatar.textContent = getInitials(u.nama);
+
+    const sidebarName = document.getElementById('sidebar-user-name');
+    const sidebarRole = document.getElementById('sidebar-user-role');
+    const sidebarAvatar = document.getElementById('sidebar-user-avatar');
+    if (sidebarName) sidebarName.textContent = u.nama;
+    if (sidebarRole) sidebarRole.innerHTML = roleBadge(u.role);
+    if (sidebarAvatar) sidebarAvatar.textContent = getInitials(u.nama);
   },
 
   renderNav() {
