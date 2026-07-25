@@ -154,7 +154,62 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
         const { rows } = parseSheetData(sheet);
         if (!rows.length) continue;
 
+function formatBirthdate(val) {
+  if (!val || val === '"') return '';
+  if (typeof val === 'number') {
+    try {
+      const d = XLSX.SSF.parse_date_code(val);
+      let year = d.y < 100 ? (d.y > 26 ? 1900 + d.y : 2000 + d.y) : d.y;
+      return `${String(d.d).padStart(2,'0')}/${String(d.m).padStart(2,'0')}/${year}`;
+    } catch { return String(val); }
+  }
+  let str = String(val).trim();
+  const match = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if (match) {
+    let day = String(match[1]).padStart(2, '0');
+    let month = String(match[2]).padStart(2, '0');
+    let year = parseInt(match[3]);
+    if (year < 100) {
+      year = year > 26 ? 1900 + year : 2000 + year;
+    }
+    return `${day}/${month}/${year}`;
+  }
+  return str;
+}
+
+function formatCheckinDate(val, importMonth) {
+  if (!val || val === '"') return '';
+  if (typeof val === 'number') {
+    try {
+      const d = XLSX.SSF.parse_date_code(val);
+      let year = d.y < 100 ? (d.y > 50 ? 1900 + d.y : 2000 + d.y) : d.y;
+      return `${year}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;
+    } catch { return String(val); }
+  }
+  let str = String(val).trim();
+  const match = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if (match) {
+    let day = parseInt(match[1]);
+    let month = parseInt(match[2]);
+    let year = parseInt(match[3]);
+    if (year < 100) {
+      year = year > 50 ? 1900 + year : 2000 + year;
+    }
+    return `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+  if (importMonth && /^\d{1,2}$/.test(str)) {
+    return `${importMonth}-${String(str).padStart(2,'0')}`;
+  }
+  return str;
+}
+
         let imported = 0, updated = 0, skipped = 0;
+        let lastRoom = '';
+        let lastNationality = '';
+        let lastDatang = '';
+        let lastTanggal = '';
+        let lastKet = '';
 
         for (let i = 0; i < rows.length; i++) {
           const row = rows[i];
@@ -162,8 +217,8 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
             const map = columnMapping;
             const namaTamu = String(row[map.nama_tamu] || '').trim();
 
-            // Skip row if guest name is missing, empty, or is a header label
-            if (!namaTamu || ['NAMA TAMU', 'NAMA', 'NAME', 'GUEST NAME'].includes(namaTamu.toUpperCase())) {
+            const nameUpper = namaTamu.toUpperCase();
+            if (!namaTamu || nameUpper.includes('NAMA TAMU') || nameUpper === 'NAMA' || nameUpper === 'NAME' || nameUpper === 'GUEST NAME' || nameUpper === 'IDENTITAS' || nameUpper === 'KEWARGANEGARAAN') {
               skipped++;
               continue;
             }
@@ -173,6 +228,19 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
               skipped++;
               continue;
             }
+
+            // Carry-forward / ditto mark (") handling for group guests
+            let room = String(row[map.nomor_kamar] || '').trim();
+            let nationality = String(row[map.kewarganegaraan] || '').trim();
+            let datang = String(row[map.datang_dari] || '').trim();
+            let tglRaw = String(row[map.tanggal_masuk] || '').trim();
+            let ket = String(row[map.keterangan] || '').trim();
+
+            if (room === '"' || !room) room = lastRoom; else lastRoom = room;
+            if (nationality === '"' || !nationality) nationality = lastNationality; else lastNationality = nationality;
+            if (datang === '"' || !datang) datang = lastDatang; else lastDatang = datang;
+            if (tglRaw === '"' || !tglRaw) tglRaw = lastTanggal; else lastTanggal = tglRaw;
+            if (ket === '"' || !ket) ket = lastKet; else lastKet = ket;
 
             let jenis = 'PASSPORT';
             const rawNoIdUpper = rawNoId.toUpperCase();
@@ -194,14 +262,13 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
             let cleanNoId = rawNoId.replace(/^(nik|psp|psp\s*no|sim|sim\s*no|ktp|id)\.?:?\s*/i, '').trim();
 
             if (!cleanNoId) {
-              const room = String(row[map.nomor_kamar] || '').trim();
               cleanNoId = `AUTO-${slugify(namaTamu)}-${room || autoIdCounter++}`;
             }
 
             const now   = new Date().toISOString();
 
             const parseDate = (val) => {
-              if (!val) return '';
+              if (!val || val === '"') return '';
               if (typeof val === 'number') {
                 try {
                   const d = XLSX.SSF.parse_date_code(val);
@@ -211,22 +278,9 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
               return String(val);
             };
 
-            const tglMasuk = parseDate(row[map.tanggal_masuk]);
+            const tglMasuk = formatCheckinDate(tglRaw, importMonth);
             const expiry   = parseDate(row[map.expiry_identitas]);
-
-            let rawUmur = row[map.umur];
-            let parsedUmur = '';
-            if (rawUmur !== undefined && rawUmur !== null) {
-              if (typeof rawUmur === 'number') {
-                if (rawUmur > 10000) {
-                  parsedUmur = parseDate(rawUmur);
-                } else {
-                  parsedUmur = String(rawUmur);
-                }
-              } else {
-                parsedUmur = String(rawUmur).trim();
-              }
-            }
+            const birthdateFormatted = formatBirthdate(row[map.umur]);
 
             // Smart Upsert: match by ID first (if non-AUTO), then match by exact Name
             let existing = null;
@@ -241,7 +295,7 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
             let guestId;
 
             if (existing) {
-              // Update metadata for existing guest (only overwrite if value is provided)
+              // Update metadata for existing guest
               run(
                 `UPDATE guests SET
                   nama_tamu = ?,
@@ -255,7 +309,7 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
                  WHERE id = ?`,
                 [
                   namaTamu, cleanNoId, jenis, cleanNoId, cleanNoId,
-                  parsedUmur, expiry, String(row[map.kewarganegaraan] || ''), String(row[map.datang_dari] || ''),
+                  birthdateFormatted, expiry, nationality, datang,
                   now, existing.id
                 ]
               );
@@ -264,17 +318,16 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
             } else {
               const result = run(
                 `INSERT INTO guests (no_identitas, jenis_identitas, nama_tamu, umur, expiry_identitas, kewarganegaraan, datang_dari, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [cleanNoId, jenis, namaTamu, parsedUmur, expiry, String(row[map.kewarganegaraan] || ''), String(row[map.datang_dari] || ''), now, now]
+                [cleanNoId, jenis, namaTamu, birthdateFormatted, expiry, nationality, datang, now, now]
               );
               guestId = result.lastInsertRowid;
               imported++;
             }
 
-            const nomorKamar = String(row[map.nomor_kamar] || '').trim();
-            if (nomorKamar || tglMasuk) {
+            if (room || tglMasuk) {
               run(
                 `INSERT INTO checkins (guest_id, nomor_kamar, tanggal_masuk, keterangan, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?)`,
-                [guestId, nomorKamar, tglMasuk, String(row[map.keterangan] || ''), req.user.id, now]
+                [guestId, room, tglMasuk, ket, req.user.id, now]
               );
             }
           } catch (rowErr) {
