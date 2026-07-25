@@ -108,7 +108,15 @@ router.post('/', (req, res) => {
   const jenis = jenis_identitas || detectIdentityType(cleanId);
   const now = new Date().toISOString();
 
-  const existing = queryOne('SELECT * FROM guests WHERE no_identitas = ?', [cleanId]);
+  const cleanName = String(nama_tamu).replace(/\s+/g, ' ').trim();
+  let existing = null;
+
+  if (cleanId && !cleanId.toUpperCase().startsWith('AUTO-')) {
+    existing = queryOne('SELECT * FROM guests WHERE no_identitas = ?', [cleanId]);
+  }
+  if (!existing && cleanName) {
+    existing = queryOne('SELECT * FROM guests WHERE LOWER(TRIM(nama_tamu)) = LOWER(TRIM(?))', [cleanName]);
+  }
 
   let guestId;
 
@@ -117,8 +125,8 @@ router.post('/', (req, res) => {
       UPDATE guests SET
         nama_tamu=?, jenis_identitas=?, umur=?, expiry_identitas=?,
         kewarganegaraan=?, datang_dari=?, updated_at=?
-      WHERE no_identitas=?
-    `, [nama_tamu, jenis, umur, expiry_identitas, kewarganegaraan, datang_dari, now, cleanId]);
+      WHERE id=?
+    `, [nama_tamu, jenis, umur, expiry_identitas, kewarganegaraan, datang_dari, now, existing.id]);
     guestId = existing.id;
   } else {
     const result = run(`

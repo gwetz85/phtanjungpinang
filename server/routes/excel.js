@@ -228,14 +228,36 @@ router.post('/import', authorize('superadmin'), upload.single('file'), (req, res
               }
             }
 
-            // Upsert guest (insert or update info only — never re-add duplicate)
-            const existing = queryOne('SELECT id FROM guests WHERE no_identitas = ?', [cleanNoId]);
+            // Smart Upsert: match by ID first (if non-AUTO), then match by exact Name
+            let existing = null;
+            if (cleanNoId && !cleanNoId.toUpperCase().startsWith('AUTO-')) {
+              existing = queryOne('SELECT id, no_identitas FROM guests WHERE no_identitas = ?', [cleanNoId]);
+            }
+            if (!existing && namaTamu) {
+              const cleanName = namaTamu.replace(/\s+/g, ' ').trim();
+              existing = queryOne('SELECT id, no_identitas FROM guests WHERE LOWER(TRIM(nama_tamu)) = LOWER(TRIM(?))', [cleanName]);
+            }
+
             let guestId;
 
             if (existing) {
+              // Update metadata for existing guest (only overwrite if value is provided)
               run(
-                `UPDATE guests SET nama_tamu=?, umur=?, expiry_identitas=?, kewarganegaraan=?, datang_dari=?, updated_at=? WHERE no_identitas=?`,
-                [namaTamu, parsedUmur, expiry, String(row[map.kewarganegaraan] || ''), String(row[map.datang_dari] || ''), now, cleanNoId]
+                `UPDATE guests SET
+                  nama_tamu = ?,
+                  jenis_identitas = CASE WHEN ? NOT LIKE 'AUTO-%' THEN ? ELSE jenis_identitas END,
+                  no_identitas = CASE WHEN ? NOT LIKE 'AUTO-%' THEN ? ELSE no_identitas END,
+                  umur = COALESCE(NULLIF(?, ''), umur),
+                  expiry_identitas = COALESCE(NULLIF(?, ''), expiry_identitas),
+                  kewarganegaraan = COALESCE(NULLIF(?, ''), kewarganegaraan),
+                  datang_dari = COALESCE(NULLIF(?, ''), datang_dari),
+                  updated_at = ?
+                 WHERE id = ?`,
+                [
+                  namaTamu, cleanNoId, jenis, cleanNoId, cleanNoId,
+                  parsedUmur, expiry, String(row[map.kewarganegaraan] || ''), String(row[map.datang_dari] || ''),
+                  now, existing.id
+                ]
               );
               guestId = existing.id;
               updated++;
