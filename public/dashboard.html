@@ -511,10 +511,13 @@
 
 </div><!-- end dashboard-layout -->
 
-<!-- Running Text Banner — FIXED at bottom, visible for ALL roles -->
+<!-- Running Text Banner — FIXED ticker at bottom, visible for ALL roles -->
 <div class="running-text-banner" id="running-text-banner" style="display:none;">
   <span class="banner-label">📢 INFO</span>
-  <marquee scrollamount="4" behavior="scroll" direction="left" id="running-text-marquee">Memuat pengumuman...</marquee>
+  <div class="ticker-track">
+    <span class="ticker-text" id="running-text-marquee"></span>
+    <span class="ticker-text ticker-clone" id="running-text-clone" aria-hidden="true"></span>
+  </div>
 </div>
 
 <!-- Responsive rules moved to style.css -->

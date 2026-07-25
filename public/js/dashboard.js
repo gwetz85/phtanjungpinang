@@ -272,34 +272,45 @@ const dashboard = {
   },
 
   async loadRunningText() {
-    const banner   = document.getElementById('running-text-banner');
-    const marquee  = document.getElementById('running-text-marquee');
-    if (!banner || !marquee) return;
+    const banner  = document.getElementById('running-text-banner');
+    const primary = document.getElementById('running-text-marquee');
+    const clone   = document.getElementById('running-text-clone');
+    if (!banner || !primary) return;
+
+    const applyText = (text) => {
+      if (!text || !text.trim()) {
+        banner.style.display = 'none';
+        return;
+      }
+      primary.textContent = text;
+      if (clone) clone.textContent = text;
+
+      // Duration proportional to text length: ~6px per char, 100px/s speed
+      const charPx   = Math.max(text.length * 9, 400);
+      const duration = Math.max(Math.round(charPx / 90), 10) + 's';
+      primary.style.animationDuration = duration;
+      if (clone) {
+        clone.style.animationDuration = duration;
+        // Clone starts exactly half-cycle later for seamless loop
+        clone.style.animationDelay = `calc(${duration} / 2)`;
+      }
+      banner.style.display = 'flex';
+      try { localStorage.setItem('ph_running_text', text); } catch(_) {}
+    };
 
     try {
       const res  = await api.get('/settings/running-text');
-      const text = (res.runningText || '').trim();
-
-      if (text.length > 0) {
-        marquee.textContent = text;
-        banner.style.display = 'flex';
-        // Cache for offline/fallback use
-        try { localStorage.setItem('ph_running_text', text); } catch(_) {}
-      } else {
-        banner.style.display = 'none';
-      }
+      applyText((res.runningText || '').trim());
     } catch (err) {
-      // On API failure, use cached text so banner doesn't disappear
+      // Fallback: use cached text
       try {
         const cached = localStorage.getItem('ph_running_text');
-        if (cached && cached.trim().length > 0) {
-          marquee.textContent = cached;
-          banner.style.display = 'flex';
-        }
+        applyText((cached || '').trim());
       } catch(_) {}
       console.warn('[RunningText] API error, using cache:', err);
     }
   },
+
 
   async initRunningTextPanel() {
     const txtArea = document.getElementById('rt-content');
