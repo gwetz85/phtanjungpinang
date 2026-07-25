@@ -280,32 +280,19 @@
             </div>
           </div>
           <div class="card-body" style="padding:1rem 1.5rem;">
-            <div class="table-toolbar">
-              <div class="search-bar">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="guests-search" placeholder="Cari nama atau identitas...">
-              </div>
+            <div class="search-bar">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="guests-search" placeholder="Cari nama atau identitas...">
             </div>
           </div>
-          <div class="table-wrapper" style="border:none;border-top:1px solid var(--border);border-radius:0;">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Nama Tamu</th>
-                  <th>Identitas</th>
-                  <th>Umur</th>
-                  <th>Kewarganegaraan</th>
-                  <th>Datang Dari</th>
-                  <th>Check-in Terakhir</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="guests-tbody">
-                <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-muted);">Memuat data...</td></tr>
-              </tbody>
-            </table>
+
+          <!-- Guest Card List -->
+          <div id="guests-list" style="padding:0 1.5rem 1rem;">
+            <div style="text-align:center;padding:2rem;color:var(--text-muted);">
+              <div class="spinner" style="margin:0 auto;"></div>
+            </div>
           </div>
+
           <div id="guests-pagination"></div>
         </div>
       </div>
@@ -376,21 +363,45 @@
             <!-- Pilih Bulan Import -->
             <div class="card" style="margin-bottom:1rem;">
               <div class="card-header">
-                <div class="card-title">📅 Pilih Bulan Import</div>
+                <div class="card-title">📅 Periode Import Data</div>
               </div>
               <div class="card-body">
-                <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem;line-height:1.6;">
-                  Pilih bulan data yang akan diimport. Data check-in bulan yang dipilih akan <strong style="color:var(--warning);">diganti otomatis</strong> — data bulan lain <strong style="color:var(--success);">tetap aman</strong>.
+                <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.6;">
+                  Pilih bulan &amp; tahun data yang diimport. Data check-in periode itu akan <strong style="color:var(--warning);">diganti otomatis</strong> — periode lain <strong style="color:var(--success);">tetap aman</strong>.
                 </p>
-                <input
-                  type="month"
-                  id="import-month-picker"
-                  class="form-control"
-                  style="width:100%;padding:0.6rem 0.9rem;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-primary);font-size:0.95rem;"
-                >
-                <div style="margin-top:0.6rem;font-size:0.78rem;color:var(--text-muted);">
-                  💡 Kosongkan jika tidak ingin membersihkan checkin bulan tertentu
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+                  <div>
+                    <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:0.3rem;">Bulan</label>
+                    <select id="import-month-select" class="form-control" style="width:100%;padding:0.6rem 0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-primary);font-size:0.9rem;">
+                      <option value="">— Pilih Bulan —</option>
+                      <option value="01">Januari</option>
+                      <option value="02">Februari</option>
+                      <option value="03">Maret</option>
+                      <option value="04">April</option>
+                      <option value="05">Mei</option>
+                      <option value="06">Juni</option>
+                      <option value="07">Juli</option>
+                      <option value="08">Agustus</option>
+                      <option value="09">September</option>
+                      <option value="10">Oktober</option>
+                      <option value="11">November</option>
+                      <option value="12">Desember</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:0.3rem;">Tahun</label>
+                    <select id="import-year-select" class="form-control" style="width:100%;padding:0.6rem 0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-primary);font-size:0.9rem;" id="import-year-select">
+                      <option value="">— Pilih Tahun —</option>
+                      <option value="2023">2023</option>
+                      <option value="2024">2024</option>
+                      <option value="2025">2025</option>
+                      <option value="2026" selected>2026</option>
+                      <option value="2027">2027</option>
+                      <option value="2028">2028</option>
+                    </select>
+                  </div>
                 </div>
+                <div id="import-period-display" style="margin-top:0.75rem;font-size:0.82rem;color:var(--text-muted);min-height:1.2rem;"></div>
               </div>
             </div>
 

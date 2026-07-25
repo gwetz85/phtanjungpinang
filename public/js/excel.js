@@ -75,11 +75,29 @@ const excelPanel = (() => {
     document.getElementById('excel-reset-btn')?.addEventListener('click', resetPanel);
     document.getElementById('excel-clear-db-btn')?.addEventListener('click', clearDatabase);
 
-    // Pre-fill month picker with current month (YYYY-MM)
-    const picker = document.getElementById('import-month-picker');
-    if (picker) {
-      const now = new Date();
-      picker.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    // Pre-fill Bulan + Tahun with current date
+    const now = new Date();
+    const moSel = document.getElementById('import-month-select');
+    const yrSel = document.getElementById('import-year-select');
+    if (moSel) moSel.value = String(now.getMonth() + 1).padStart(2, '0');
+    if (yrSel) yrSel.value = String(now.getFullYear());
+    updatePeriodDisplay();
+
+    moSel?.addEventListener('change', updatePeriodDisplay);
+    yrSel?.addEventListener('change', updatePeriodDisplay);
+  }
+
+  function updatePeriodDisplay() {
+    const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    const mo = document.getElementById('import-month-select')?.value;
+    const yr = document.getElementById('import-year-select')?.value;
+    const el = document.getElementById('import-period-display');
+    if (!el) return;
+    if (mo && yr) {
+      const moName = MONTHS_ID[parseInt(mo) - 1];
+      el.innerHTML = `⚠️ Data check-in <strong style="color:var(--warning);">${moName} ${yr}</strong> akan dibersihkan sebelum import.`;
+    } else {
+      el.innerHTML = '⚠️ Pilih bulan &amp; tahun untuk mencegah data duplikat.';
     }
   }
 
@@ -363,8 +381,9 @@ const excelPanel = (() => {
       formData.append('columnMapping', JSON.stringify(columnMapping));
 
       // Include selected import month for per-month cleanup
-      const picker = document.getElementById('import-month-picker');
-      const importMonth = picker?.value?.trim() || '';
+      const mo = document.getElementById('import-month-select')?.value?.trim();
+      const yr = document.getElementById('import-year-select')?.value?.trim();
+      const importMonth = (mo && yr) ? `${yr}-${mo}` : '';
       if (importMonth) formData.append('importMonth', importMonth);
 
       const res = await api.upload('/excel/import', formData);
