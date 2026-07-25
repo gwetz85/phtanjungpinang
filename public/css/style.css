@@ -498,6 +498,8 @@ input, select, textarea {
 .content-area {
   flex: 1;
   padding: 2rem;
+  /* Extra bottom space so content doesn't hide behind fixed running text banner */
+  padding-bottom: calc(2rem + 44px);
 }
 
 /* ═══════════════════════════════════════

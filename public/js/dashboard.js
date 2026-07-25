@@ -272,20 +272,32 @@ const dashboard = {
   },
 
   async loadRunningText() {
+    const banner   = document.getElementById('running-text-banner');
+    const marquee  = document.getElementById('running-text-marquee');
+    if (!banner || !marquee) return;
+
     try {
-      const res = await api.get('/settings/running-text');
-      const text = res.runningText || '';
-      const banner = document.getElementById('running-text-banner');
-      if (banner) {
-        if (text.trim().length > 0) {
-          banner.innerHTML = `<span class="banner-label">INFO</span><marquee scrollamount="4" behavior="scroll" direction="left" id="running-text-marquee">${escHtml(text)}</marquee>`;
-          banner.style.display = 'flex';
-        } else {
-          banner.style.display = 'none';
-        }
+      const res  = await api.get('/settings/running-text');
+      const text = (res.runningText || '').trim();
+
+      if (text.length > 0) {
+        marquee.textContent = text;
+        banner.style.display = 'flex';
+        // Cache for offline/fallback use
+        try { localStorage.setItem('ph_running_text', text); } catch(_) {}
+      } else {
+        banner.style.display = 'none';
       }
     } catch (err) {
-      console.error('[RunningText] loadRunningText error:', err);
+      // On API failure, use cached text so banner doesn't disappear
+      try {
+        const cached = localStorage.getItem('ph_running_text');
+        if (cached && cached.trim().length > 0) {
+          marquee.textContent = cached;
+          banner.style.display = 'flex';
+        }
+      } catch(_) {}
+      console.warn('[RunningText] API error, using cache:', err);
     }
   },
 
