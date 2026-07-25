@@ -9,7 +9,7 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '8h';
 
 // POST /api/auth/login
 router.post('/login', (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, deviceId } = req.body;
 
   if (!username || !password) {
     return res.status(400).json({ success: false, message: 'Username dan password wajib diisi.' });
@@ -24,6 +24,22 @@ router.post('/login', (req, res) => {
   const valid = bcrypt.compareSync(password, user.password);
   if (!valid) {
     return res.status(401).json({ success: false, message: 'Password salah.' });
+  }
+  
+  const { run } = require('../db');
+
+  // Device Lock Logic (Skip for superadmin)
+  if (user.role !== 'superadmin' && deviceId) {
+    if (!user.device_id) {
+      // First time login on a device, bind it
+      run('UPDATE users SET device_id = ? WHERE id = ?', [deviceId, user.id]);
+    } else if (user.device_id !== deviceId) {
+      // Trying to login from a different device
+      return res.status(403).json({ 
+        success: false, 
+        message: 'Perangkat tidak dikenali. Akun ini sudah terikat dengan perangkat lain. Hubungi admin untuk mereset perangkat.' 
+      });
+    }
   }
 
   const payload = {

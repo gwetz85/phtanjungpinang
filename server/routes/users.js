@@ -60,6 +60,19 @@ router.put('/:id', (req, res) => {
   res.json({ success: true, message: 'User berhasil diperbarui.' });
 });
 
+// POST /api/users/:id/reset-device
+router.post('/:id/reset-device', (req, res) => {
+  const userToReset = queryOne('SELECT * FROM users WHERE id = ?', [req.params.id]);
+  if (!userToReset) return res.status(404).json({ success: false, message: 'User tidak ditemukan.' });
+  
+  if (req.user.role === 'admin' && userToReset.role === 'superadmin') {
+    return res.status(403).json({ success: false, message: 'Admin tidak bisa reset perangkat superadmin.' });
+  }
+
+  run('UPDATE users SET device_id = NULL WHERE id = ?', [req.params.id]);
+  res.json({ success: true, message: 'Perangkat user berhasil direset.' });
+});
+
 // DELETE /api/users/:id
 router.delete('/:id', (req, res) => {
   if (parseInt(req.params.id) === req.user.id) {

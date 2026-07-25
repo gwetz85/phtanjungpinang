@@ -167,8 +167,15 @@
       spinner.style.display = 'inline-block';
       errorDiv.style.display = 'none';
 
+      // Get or generate deviceId
+      let deviceId = localStorage.getItem('deviceId');
+      if (!deviceId) {
+        deviceId = 'DEV-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        localStorage.setItem('deviceId', deviceId);
+      }
+
       try {
-        const res = await api.post('/auth/login', { username, password });
+        const res = await api.post('/auth/login', { username, password, deviceId });
         if (res.success) {
           localStorage.setItem('token', res.token);
           localStorage.setItem('user', JSON.stringify(res.user));

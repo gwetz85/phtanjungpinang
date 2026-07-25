@@ -441,7 +441,13 @@ function run(sql, params = []) {
 
   // 5. UPDATE users
   else if (cleanSql.toLowerCase().startsWith('update users')) {
-    if (cleanSql.toLowerCase().includes('last_login')) {
+    if (cleanSql.toLowerCase().includes('device_id = null')) {
+      const u = dbData.users.find(x => String(x.id) === String(params[0]));
+      if (u) { u.device_id = null; }
+    } else if (cleanSql.toLowerCase().includes('device_id = ?')) {
+      const u = dbData.users.find(x => String(x.id) === String(params[1]));
+      if (u) { u.device_id = params[0]; }
+    } else if (cleanSql.toLowerCase().includes('last_login')) {
       const u = dbData.users.find(x => String(x.id) === String(params[1]));
       if (u) { u.last_login = params[0]; }
     } else if (params.length === 4) {
