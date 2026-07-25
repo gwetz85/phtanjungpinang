@@ -4,32 +4,32 @@
    DESIGN TOKENS
 ═══════════════════════════════════════ */
 :root {
-  --primary: #4f8ef7;
-  --primary-dark: #2563eb;
-  --primary-glow: rgba(79, 142, 247, 0.3);
-  --secondary: #7c3aed;
-  --accent: #06b6d4;
+  --primary: #0ea5e9;
+  --primary-dark: #0284c7;
+  --primary-glow: rgba(14, 165, 233, 0.35);
+  --secondary: #0891b2;
+  --accent: #06d6a0;
   --success: #10b981;
   --warning: #f59e0b;
   --danger: #ef4444;
   --danger-dark: #dc2626;
 
-  --bg-base: #0a0e1a;
-  --bg-surface: #111827;
-  --bg-card: #1a2235;
-  --bg-card-hover: #1e2a40;
-  --bg-input: #0f1929;
-  --bg-modal: rgba(10, 14, 26, 0.95);
+  --bg-base: #0f2334;
+  --bg-surface: #152d42;
+  --bg-card: #1a3854;
+  --bg-card-hover: #1f4163;
+  --bg-input: #0d1e2e;
+  --bg-modal: rgba(15, 35, 52, 0.97);
 
-  --border: rgba(255, 255, 255, 0.08);
-  --border-focus: rgba(79, 142, 247, 0.6);
+  --border: rgba(14, 165, 233, 0.12);
+  --border-focus: rgba(14, 165, 233, 0.6);
 
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #475569;
+  --text-primary: #e2f4ff;
+  --text-secondary: #7ecbf0;
+  --text-muted: #4a8aac;
 
-  --glass: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass: rgba(14, 165, 233, 0.07);
+  --glass-border: rgba(14, 165, 233, 0.15);
 
   --sidebar-width: 260px;
   --header-height: 64px;
@@ -39,8 +39,8 @@
   --radius-lg: 16px;
   --radius-xl: 24px;
 
-  --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 48px rgba(0, 0, 0, 0.6);
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 48px rgba(0, 0, 0, 0.45);
   --shadow-glow: 0 0 40px var(--primary-glow);
 
   --transition: 0.2s ease;
@@ -337,8 +337,8 @@ select.form-control option:hover {
 /* Sidebar */
 .sidebar {
   width: var(--sidebar-width);
-  background: var(--bg-surface);
-  border-right: 1px solid var(--border);
+  background: linear-gradient(180deg, #0c2840 0%, #0a1f33 60%, #071828 100%);
+  border-right: 1px solid rgba(14, 165, 233, 0.18);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -528,8 +528,8 @@ select.form-control option:hover {
 
 .main-header {
   height: var(--header-height);
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border);
+  background: linear-gradient(90deg, #0f2e47 0%, #112a42 100%);
+  border-bottom: 1px solid rgba(14, 165, 233, 0.2);
   display: flex;
   align-items: center;
   justify-content: space-between;
