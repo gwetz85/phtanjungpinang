@@ -138,24 +138,35 @@ async function initDB() {
 /**
  * Helper to compute calculated fields for a guest (total_checkins, last_checkin, last_room)
  */
-/**
- * Helper to compute calculated fields for a guest (total_checkins, last_checkin, last_room)
- */
 function enrichGuest(guest) {
-  if (!guest) return null;
-  const checkins = (dbData.checkins || []).filter(Boolean);
-  const guestCheckins = checkins
-    .filter(c => String(c.guest_id) === String(guest.id))
-    .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+  if (!guest || typeof guest !== 'object' || !guest.id) return null;
+  try {
+    const checkins = (dbData.checkins || []).filter(c => c && typeof c === 'object' && c.guest_id);
+    const guestCheckins = checkins
+      .filter(c => String(c.guest_id) === String(guest.id))
+      .sort((a, b) => {
+        const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return (isNaN(timeB) ? 0 : timeB) - (isNaN(timeA) ? 0 : timeA);
+      });
 
-  const lastCi = guestCheckins[0] || null;
+    const lastCi = guestCheckins[0] || null;
 
-  return {
-    ...guest,
-    total_checkins: guestCheckins.length,
-    last_checkin: lastCi ? lastCi.tanggal_masuk : null,
-    last_room: lastCi ? lastCi.nomor_kamar : null
-  };
+    return {
+      ...guest,
+      total_checkins: guestCheckins.length,
+      last_checkin: lastCi ? (lastCi.tanggal_masuk || null) : null,
+      last_room: lastCi ? (lastCi.nomor_kamar || null) : null
+    };
+  } catch (e) {
+    console.error('[enrichGuest] Error:', e);
+    return {
+      ...guest,
+      total_checkins: 0,
+      last_checkin: null,
+      last_room: null
+    };
+  }
 }
 
 /**
@@ -164,17 +175,13 @@ function enrichGuest(guest) {
 function queryAll(sql, params = []) {
   const cleanSql = sql.replace(/\s+/g, ' ').trim();
   const safeUsers = (dbData.users || []).filter(Boolean);
-  const safeGuests = (dbData.guests || []).filter(Boolean);
-  const safeCheckins = (dbData.checkins || []).filter(Boolean);
+  const safeGuests = (dbData.guests || []).filter(g => g && typeof g === 'object' && g.id);
+  const safeCheckins = (dbData.checkins || []).filter(c => c && typeof c === 'object');
 
   // 1. SELECT users
   if (cleanSql.toLowerCase().includes('from users')) {
     if (cleanSql.toLowerCase().includes('where username =')) {
       const u = safeUsers.find(x => x.username === params[0]);
-      return u ? [u] : [];
-    }
-    if (cleanSql.toLowerCase().includes('where id =')) {
-      const u = safeUsers.find(x => String(x.id) === String(params[0]));
       return u ? [u] : [];
     }
     return [...safeUsers].sort((a,b) => (a.role || '').localeCompare(b.role || '') || (a.nama || '').localeCompare(b.nama || ''));
@@ -185,13 +192,11 @@ function queryAll(sql, params = []) {
     let list = [...safeGuests];
 
     // Extract limit and offset from LAST two params (they are always appended last)
-    // Format: [...filterParams, limit, offset]
     let limit  = null;
     let offset = 0;
     const sqlLower = cleanSql.toLowerCase();
 
     if (sqlLower.includes('limit ?')) {
-      // Last two params are limit, offset
       const allParams = [...params];
       if (allParams.length >= 2) {
         offset = parseInt(allParams[allParams.length - 1]) || 0;
@@ -204,27 +209,31 @@ function queryAll(sql, params = []) {
     // Filter by search keyword (encoded in SQL as "search:keyword")
     const searchMatch = cleanSql.match(/search:([^\s]+)/i);
     if (searchMatch) {
-      const term = searchMatch[1].toLowerCase();
+      const term = decodeURIComponent(searchMatch[1]).toLowerCase();
       list = list.filter(g =>
-        (g.no_identitas && g.no_identitas.toLowerCase().includes(term)) ||
-        (g.nama_tamu    && g.nama_tamu.toLowerCase().includes(term))
+        (g.no_identitas && String(g.no_identitas).toLowerCase().includes(term)) ||
+        (g.nama_tamu    && String(g.nama_tamu).toLowerCase().includes(term))
       );
     }
 
     // Filter by nationality (encoded as "nationality:keyword")
     const natMatch = cleanSql.match(/nationality:([^\s]+)/i);
     if (natMatch) {
-      const term = natMatch[1].toLowerCase();
+      const term = decodeURIComponent(natMatch[1]).toLowerCase();
       list = list.filter(g =>
-        g.kewarganegaraan && g.kewarganegaraan.toLowerCase().includes(term)
+        g.kewarganegaraan && String(g.kewarganegaraan).toLowerCase().includes(term)
       );
     }
 
     // Enrich guests with check-in info
     const enriched = list.map(enrichGuest).filter(Boolean);
 
-    // Sort by updated_at DESC
-    enriched.sort((a, b) => new Date(b.updated_at || 0) - new Date(a.updated_at || 0));
+    // Sort by updated_at DESC safely
+    enriched.sort((a, b) => {
+      const timeA = a && a.updated_at ? new Date(a.updated_at).getTime() : 0;
+      const timeB = b && b.updated_at ? new Date(b.updated_at).getTime() : 0;
+      return (isNaN(timeB) ? 0 : timeB) - (isNaN(timeA) ? 0 : timeA);
+    });
 
     // Export query check
     if (cleanSql.includes('ROW_NUMBER()') || cleanSql.includes('"ROOM NO"')) {
