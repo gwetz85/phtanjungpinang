@@ -702,7 +702,7 @@
   font-size: 0.83rem;
   font-weight: 500;
   letter-spacing: 0.02em;
-  animation: ticker-scroll 30s linear infinite;
+  animation: ticker-scroll 65s linear infinite;
   will-change: transform;
 }
 
