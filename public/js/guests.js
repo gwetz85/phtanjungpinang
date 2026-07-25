@@ -1,5 +1,5 @@
 /**
- * Guests Panel — tampilan per Nama Tamu dengan riwayat check-in inline
+ * Guests Panel — Table View with expandable check-in history
  */
 
 const guestsPanel = (() => {
@@ -7,7 +7,7 @@ const guestsPanel = (() => {
   let totalPages = 1;
   let searchTerm = '';
   let searchTimeout = null;
-  let expandedId = null; // Currently expanded guest
+  let expandedId = null;
 
   const MONTHS_ID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 
@@ -30,11 +30,11 @@ const guestsPanel = (() => {
   }
 
   async function loadGuests() {
-    const listEl = document.getElementById('guests-list');
+    const tbody = document.getElementById('guests-tbody');
     const infoEl = document.getElementById('guests-info');
-    if (!listEl) return;
+    if (!tbody) return;
 
-    listEl.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--text-muted);"><div class="spinner" style="margin:0 auto;"></div></div>`;
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--text-muted);"><div class="spinner" style="margin:0 auto;"></div></td></tr>`;
 
     try {
       const res = await api.get('/guests', { page: currentPage, limit: 20, search: searchTerm });
@@ -46,57 +46,55 @@ const guestsPanel = (() => {
       }
 
       if (!data || !data.length) {
-        listEl.innerHTML = `<div class="empty-state" style="padding:2.5rem;"><div class="empty-icon">👥</div><p>Belum ada data tamu.</p></div>`;
+        tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state" style="padding:2.5rem;"><div class="empty-icon">👥</div><p>Belum ada data tamu.</p></div></td></tr>`;
         renderPagination(0, 0);
         return;
       }
 
-      listEl.innerHTML = data.map((g, i) => `
-        <div class="guest-name-card" id="gc-${g.id}" data-guest-id="${g.id}">
-          <!-- ── Header Row (clickable) ── -->
-          <div class="guest-card-header" onclick="guestsPanel.toggleExpand(${g.id})">
-            <div class="user-avatar" style="width:44px;height:44px;font-size:1rem;flex-shrink:0;background:var(--primary-gradient);">
-              ${getInitials(g.nama_tamu)}
-            </div>
+      const startNo = ((pagination.page - 1) * 20) + 1;
 
-            <div style="flex:1;min-width:0;">
-              <div style="font-weight:700;font-size:1rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                ${escHtml(g.nama_tamu)}
-              </div>
-              <div style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;margin-top:0.25rem;">
+      tbody.innerHTML = data.map((g, i) => {
+        const age = getRealtimeAge(g.umur);
+        const ageDisplay = age ? `${age}` : '-';
+
+        return `
+          <tr class="guest-row" id="gr-${g.id}" onclick="guestsPanel.toggleExpand(${g.id})">
+            <td style="color:var(--text-muted);font-weight:600;">${startNo + i}</td>
+            <td>
+              <span class="guest-name-cell">${escHtml(g.nama_tamu)}</span>
+            </td>
+            <td>
+              <div class="identity-cell">
                 ${identityBadge(g.jenis_identitas)}
-                <code style="font-size:0.78rem;color:var(--text-muted);">${escHtml(g.no_identitas)}</code>
-                ${g.kewarganegaraan ? nationalityBadge(g.kewarganegaraan) : ''}
+                <code>${escHtml(g.no_identitas)}</code>
               </div>
-            </div>
-
-            <div style="text-align:right;flex-shrink:0;">
-              <div style="font-size:0.82rem;color:var(--text-secondary);">${formatDate(g.last_checkin) || '—'}</div>
-              ${g.last_room ? `<div style="font-size:0.75rem;color:var(--text-muted);">Kamar ${escHtml(g.last_room)}</div>` : ''}
-              <div style="font-size:0.72rem;font-weight:600;color:var(--primary);margin-top:2px;">
-                🏨 ${g.total_checkins || 0}x menginap
+            </td>
+            <td class="age-cell">
+              ${ageDisplay !== '-' ? `<span>${ageDisplay}</span><span class="age-unit">Tahun</span>` : '<span style="color:var(--text-muted);">-</span>'}
+            </td>
+            <td>${g.kewarganegaraan ? nationalityBadge(g.kewarganegaraan) : '<span style="color:var(--text-muted);">-</span>'}</td>
+            <td style="font-size:0.82rem;">${formatDate(g.last_checkin) || '<span style="color:var(--text-muted);">—</span>'}</td>
+            <td style="font-weight:600;color:var(--primary);">${g.last_room ? escHtml(g.last_room) : '<span style="color:var(--text-muted);">-</span>'}</td>
+            <td style="text-align:center;">
+              <span style="font-weight:700;color:var(--primary);">${g.total_checkins || 0}x</span>
+            </td>
+            <td onclick="event.stopPropagation()">
+              <div class="actions-cell">
+                <button class="btn btn-ghost btn-sm" title="Detail" onclick="guestsPanel.toggleExpand(${g.id})">👁️</button>
+                <button class="btn btn-warning btn-sm" title="Edit" onclick="guestsPanel.editGuest(${g.id})">✏️</button>
+                <button class="btn btn-danger btn-sm" title="Hapus" onclick="guestsPanel.deleteGuest(${g.id}, '${escHtml(g.nama_tamu)}')">🗑️</button>
               </div>
-            </div>
-
-            <div style="display:flex;flex-direction:column;gap:0.3rem;flex-shrink:0;" onclick="event.stopPropagation()">
-              <button class="btn btn-warning btn-sm btn-icon" title="Edit" onclick="guestsPanel.editGuest(${g.id})">✏️</button>
-              <button class="btn btn-danger btn-sm btn-icon" title="Hapus" onclick="guestsPanel.deleteGuest(${g.id}, '${escHtml(g.nama_tamu)}')">🗑️</button>
-            </div>
-
-            <div style="color:var(--text-muted);font-size:1rem;flex-shrink:0;transition:transform 0.2s;" id="arrow-${g.id}">▶</div>
-          </div>
-
-          <!-- ── Expandable Check-in History ── -->
-          <div id="history-${g.id}" style="display:none;border-top:1px solid var(--border);background:var(--surface-2);padding:0 1.25rem 1rem;">
-            <div style="padding-top:0.75rem;padding-bottom:0.25rem;font-size:0.8rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">
-              📋 Riwayat Check-in
-            </div>
-            <div id="history-content-${g.id}">
-              <div style="text-align:center;padding:1rem;color:var(--text-muted);"><div class="spinner" style="margin:0 auto;width:20px;height:20px;border-width:2px;"></div></div>
-            </div>
-          </div>
-        </div>
-      `).join('');
+            </td>
+          </tr>
+          <tr class="detail-row" id="detail-${g.id}" style="display:none;">
+            <td colspan="9">
+              <div class="detail-content" id="detail-content-${g.id}">
+                <div style="text-align:center;padding:1rem;color:var(--text-muted);"><div class="spinner" style="margin:0 auto;width:20px;height:20px;border-width:2px;"></div></div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
 
       // Auto-expand previously expanded guest
       if (expandedId && data.find(g => String(g.id) === String(expandedId))) {
@@ -105,32 +103,38 @@ const guestsPanel = (() => {
 
       renderPagination(currentPage, totalPages);
     } catch (err) {
-      listEl.innerHTML = `<div class="alert alert-error" style="margin:1rem 0;"><span>❌</span><span>${err.message}</span></div>`;
+      tbody.innerHTML = `<tr><td colspan="9"><div class="alert alert-error" style="margin:1rem;">\u274C ${err.message}</div></td></tr>`;
     }
   }
 
   async function toggleExpand(guestId, skipToggle = false) {
-    const historyEl = document.getElementById(`history-${guestId}`);
-    const arrowEl   = document.getElementById(`arrow-${guestId}`);
-    const cardEl    = document.getElementById(`gc-${guestId}`);
-    const contentEl = document.getElementById(`history-content-${guestId}`);
-    if (!historyEl) return;
+    const detailRow = document.getElementById(`detail-${guestId}`);
+    const guestRow  = document.getElementById(`gr-${guestId}`);
+    const contentEl = document.getElementById(`detail-content-${guestId}`);
+    if (!detailRow) return;
 
-    const isOpen = historyEl.style.display !== 'none';
+    const isOpen = detailRow.style.display !== 'none';
+
+    // Close all other detail rows first
+    document.querySelectorAll('.detail-row').forEach(row => {
+      if (row.id !== `detail-${guestId}`) {
+        row.style.display = 'none';
+        const otherId = row.id.replace('detail-', '');
+        const otherGuestRow = document.getElementById(`gr-${otherId}`);
+        if (otherGuestRow) otherGuestRow.style.background = '';
+      }
+    });
 
     if (!skipToggle && isOpen) {
-      // Collapse
-      historyEl.style.display = 'none';
-      if (arrowEl) arrowEl.style.transform = 'rotate(0deg)';
-      if (cardEl) cardEl.style.borderColor = '';
+      detailRow.style.display = 'none';
+      if (guestRow) guestRow.style.background = '';
       expandedId = null;
       return;
     }
 
     // Expand
-    historyEl.style.display = 'block';
-    if (arrowEl) arrowEl.style.transform = 'rotate(90deg)';
-    if (cardEl) { cardEl.style.borderColor = 'var(--primary)'; cardEl.style.boxShadow = '0 0 0 1px var(--primary)'; }
+    detailRow.style.display = 'table-row';
+    if (guestRow) guestRow.style.background = 'rgba(79, 142, 247, 0.08)';
     expandedId = guestId;
 
     // Load check-in history
@@ -141,14 +145,19 @@ const guestsPanel = (() => {
         const g = res.data;
         const checkins = g.checkins || [];
 
+        // Guest detail header grid
+        const detailGrid = `
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:0.75rem;padding:0.75rem 1rem;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border);margin-bottom:1rem;font-size:0.85rem;">
+            <div><span style="color:var(--text-muted);">Tanggal Lahir:</span> <strong style="color:var(--text-primary);">${escHtml(g.umur || '-')}</strong></div>
+            <div><span style="color:var(--text-muted);">Umur (Real-time):</span> <strong style="color:var(--primary);">${getRealtimeAge(g.umur) || '-'}</strong></div>
+            <div><span style="color:var(--text-muted);">Expiry ID:</span> <strong style="color:var(--text-primary);">${escHtml(g.expiry_identitas || '-')}</strong></div>
+            <div><span style="color:var(--text-muted);">Datang Dari:</span> <strong style="color:var(--text-primary);">${escHtml(g.datang_dari || '-')}</strong></div>
+          </div>
+        `;
+
         if (!checkins.length) {
           contentEl.innerHTML = `
-            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:0.75rem;padding:0.75rem 1rem;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border);margin-top:0.75rem;margin-bottom:1rem;font-size:0.85rem;">
-              <div><span style="color:var(--text-muted);">Tanggal Lahir:</span> <strong style="color:var(--text-primary);">${escHtml(g.umur || '-')}</strong></div>
-              <div><span style="color:var(--text-muted);">Umur (Real-time):</span> <strong style="color:var(--primary);">${getRealtimeAge(g.umur) || '-'}</strong></div>
-              <div><span style="color:var(--text-muted);">Expiry ID:</span> <strong style="color:var(--text-primary);">${escHtml(g.expiry_identitas || '-')}</strong></div>
-              <div><span style="color:var(--text-muted);">Datang Dari:</span> <strong style="color:var(--text-primary);">${escHtml(g.datang_dari || '-')}</strong></div>
-            </div>
+            ${detailGrid}
             <div style="padding:0.5rem 0;color:var(--text-muted);font-size:0.85rem;">Belum ada riwayat check-in.</div>
             <div style="padding:0.5rem 0;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:0.5rem;margin-top:0.5rem;">
               <button class="btn btn-primary btn-sm" onclick="dashboard.openCheckinModal('${guestId}', '${escHtml(g.nama_tamu)}')">➕ Check-in Baru</button>
@@ -166,46 +175,33 @@ const guestsPanel = (() => {
 
           const sortedKeys = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
+          // Render check-in history as mini table
           contentEl.innerHTML = `
-            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:0.75rem;padding:0.75rem 1rem;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid var(--border);margin-top:0.75rem;margin-bottom:1.25rem;font-size:0.85rem;">
-              <div><span style="color:var(--text-muted);">Tanggal Lahir:</span> <strong style="color:var(--text-primary);">${escHtml(g.umur || '-')}</strong></div>
-              <div><span style="color:var(--text-muted);">Umur (Real-time):</span> <strong style="color:var(--primary);">${getRealtimeAge(g.umur) || '-'}</strong></div>
-              <div><span style="color:var(--text-muted);">Expiry ID:</span> <strong style="color:var(--text-primary);">${escHtml(g.expiry_identitas || '-')}</strong></div>
-              <div><span style="color:var(--text-muted);">Datang Dari:</span> <strong style="color:var(--text-primary);">${escHtml(g.datang_dari || '-')}</strong></div>
-            </div>
-
-            <div style="margin-top:0.5rem;">
-              ${sortedKeys.map(ym => {
-                const [yr, mo] = ym.split('-');
-                const moName = mo && mo !== '—' ? MONTHS_ID[parseInt(mo) - 1] : '';
-                const label = moName ? `${moName} ${yr}` : ym;
-                return `
-                  <div style="margin-bottom:1rem;">
-                    <div style="font-size:0.78rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.4rem;">
-                      📅 ${label}
-                    </div>
-                    ${grouped[ym].map(ci => `
-                      <div style="display:grid;grid-template-columns:auto 1fr auto;gap:0.75rem;align-items:start;padding:0.55rem 0.75rem;border-radius:8px;background:var(--surface);margin-bottom:0.35rem;border:1px solid var(--border);">
-                        <div style="width:36px;height:36px;border-radius:8px;background:rgba(79,142,247,0.15);display:flex;align-items:center;justify-content:center;font-size:0.9rem;">🏠</div>
-                        <div>
-                          <div style="font-weight:600;color:var(--text-primary);font-size:0.88rem;">
-                            ${ci.tanggal_masuk ? formatDate(ci.tanggal_masuk) : '—'}
-                          </div>
-                          ${ci.keterangan ? `<div style="font-size:0.76rem;color:var(--text-muted);margin-top:2px;">${escHtml(ci.keterangan)}</div>` : ''}
-                        </div>
-                        <div style="text-align:right;">
-                          ${ci.nomor_kamar ? `<div style="font-weight:700;color:var(--primary);font-size:0.95rem;">Kamar ${escHtml(ci.nomor_kamar)}</div>` : ''}
-                          ${ci.petugas ? `<div style="font-size:0.72rem;color:var(--text-muted);">Oleh: ${escHtml(ci.petugas)}</div>` : ''}
-                        </div>
-                      </div>
-                    `).join('')}
-                  </div>
-                `;
-              }).join('')}
-              <div style="padding:0.5rem 0;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:0.5rem;margin-top:0.25rem;">
-                <button class="btn btn-primary btn-sm" onclick="dashboard.openCheckinModal('${guestId}', '${escHtml(g.nama_tamu)}')">➕ Check-in Baru</button>
-                <button class="btn btn-ghost btn-sm" onclick="guestsPanel.editGuest(${guestId})">✏️ Edit</button>
-              </div>
+            ${detailGrid}
+            <div style="font-size:0.8rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;">📋 Riwayat Check-in (${checkins.length}x)</div>
+            <table style="width:100%;border-collapse:collapse;font-size:0.82rem;margin-bottom:0.75rem;">
+              <thead>
+                <tr style="border-bottom:1px solid var(--border);">
+                  <th style="padding:0.5rem 0.75rem;text-align:left;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;">Tanggal</th>
+                  <th style="padding:0.5rem 0.75rem;text-align:left;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;">Kamar</th>
+                  <th style="padding:0.5rem 0.75rem;text-align:left;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;">Keterangan</th>
+                  <th style="padding:0.5rem 0.75rem;text-align:left;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;">Petugas</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${checkins.map(ci => `
+                  <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                    <td style="padding:0.5rem 0.75rem;color:var(--text-primary);">${ci.tanggal_masuk ? formatDate(ci.tanggal_masuk) : '—'}</td>
+                    <td style="padding:0.5rem 0.75rem;font-weight:600;color:var(--primary);">${ci.nomor_kamar ? escHtml(ci.nomor_kamar) : '-'}</td>
+                    <td style="padding:0.5rem 0.75rem;color:var(--text-secondary);">${ci.keterangan ? escHtml(ci.keterangan) : '-'}</td>
+                    <td style="padding:0.5rem 0.75rem;color:var(--text-muted);font-size:0.78rem;">${ci.petugas ? escHtml(ci.petugas) : '-'}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+            <div style="display:flex;justify-content:flex-end;gap:0.5rem;">
+              <button class="btn btn-primary btn-sm" onclick="dashboard.openCheckinModal('${guestId}', '${escHtml(g.nama_tamu)}')">➕ Check-in Baru</button>
+              <button class="btn btn-ghost btn-sm" onclick="guestsPanel.editGuest(${guestId})">✏️ Edit</button>
             </div>
           `;
         }
@@ -260,13 +256,14 @@ const guestsPanel = (() => {
       const g = res.data;
       createModal({
         id: 'edit-guest-modal',
-        title: `✏️ Edit Tamu`,
+        title: '✏️ Edit Data Tamu',
+        size: 'modal-lg',
         body: `
           <form id="edit-guest-form">
             <div class="form-row">
               <div class="form-group" style="flex: 0 0 35%;">
-                <label class="form-label" for="eg-jenis-identitas">Jenis Identitas</label>
-                <select id="eg-jenis-identitas" class="form-control">
+                <label class="form-label">Jenis Identitas</label>
+                <select id="eg-jenis-identitas" class="form-control" style="padding:0.6rem 0.5rem;">
                   <option value="NIK" ${g.jenis_identitas === 'NIK' ? 'selected' : ''}>NIK</option>
                   <option value="PASSPORT" ${g.jenis_identitas === 'PASSPORT' ? 'selected' : ''}>Psp no</option>
                   <option value="SIM" ${g.jenis_identitas === 'SIM' ? 'selected' : ''}>SIM</option>
@@ -322,7 +319,7 @@ const guestsPanel = (() => {
           toast('Data tamu berhasil diperbarui!', 'success');
           document.getElementById('edit-guest-modal').remove();
           // Invalidate cache for this guest
-          const contentEl = document.getElementById(`history-content-${guestId}`);
+          const contentEl = document.getElementById(`detail-content-${guestId}`);
           if (contentEl) delete contentEl.dataset.loaded;
           loadGuests();
         } catch (err) { toast(err.message, 'error'); }

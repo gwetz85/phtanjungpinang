@@ -534,33 +534,109 @@
 }
 
 /* ═══════════════════════════════════════
-   GUEST NAME CARDS (Semua Data Tamu List)
+   GUESTS TABLE (Semua Data Tamu)
    ═══════════════════════════════════════ */
-.guest-name-card {
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  margin-bottom: 0.75rem;
-  overflow: hidden;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
-  background: var(--surface);
+.guests-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.88rem;
 }
 
-.guest-name-card:hover {
-  border-color: rgba(79, 142, 247, 0.4);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.guests-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.85rem 1rem;
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
 }
 
-.guest-card-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.9rem 1.25rem;
-  cursor: pointer;
-  user-select: none;
+.guests-table tbody tr.guest-row {
   transition: background 0.15s;
+  cursor: pointer;
 }
 
-.guest-card-header:hover {
-  background: rgba(255, 255, 255, 0.025);
+.guests-table tbody tr.guest-row:hover {
+  background: rgba(79, 142, 247, 0.06);
+}
+
+.guests-table tbody tr.guest-row:nth-child(4n+1) {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.guests-table tbody tr.guest-row:nth-child(4n+1):hover {
+  background: rgba(79, 142, 247, 0.06);
+}
+
+.guests-table tbody td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.guests-table .guest-name-cell {
+  font-weight: 700;
+  color: var(--primary);
+  cursor: pointer;
+}
+
+.guests-table .guest-name-cell:hover {
+  text-decoration: underline;
+  color: var(--primary-light, #6ba3fa);
+}
+
+.guests-table .identity-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.guests-table .identity-cell code {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.guests-table .age-cell {
+  font-weight: 600;
+  text-align: center;
+}
+
+.guests-table .age-cell .age-unit {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.guests-table .actions-cell {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.guests-table .actions-cell .btn {
+  padding: 0.35rem 0.5rem;
+  font-size: 0.82rem;
+  border-radius: 6px;
+}
+
+/* Detail expand row */
+.guests-table tr.detail-row td {
+  padding: 0;
+  border-bottom: 2px solid var(--primary);
+}
+
+.guests-table tr.detail-row .detail-content {
+  padding: 1rem 1.25rem 1.25rem;
+  background: var(--surface-2);
+  animation: fadeIn 0.2s ease;
 }
 

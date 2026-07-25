@@ -289,18 +289,33 @@
               <button class="btn btn-success btn-sm" id="guests-export">📊 Export Excel</button>
             </div>
           </div>
-          <div class="card-body" style="padding:1rem 1.5rem;">
+          <div class="card-body" style="padding:1rem 1.5rem 0.5rem;">
             <div class="search-bar">
               <span class="search-icon">🔍</span>
               <input type="text" id="guests-search" placeholder="Cari nama atau identitas...">
             </div>
           </div>
 
-          <!-- Guest Card List -->
-          <div id="guests-list" style="padding:0 1.5rem 1rem;">
-            <div style="text-align:center;padding:2rem;color:var(--text-muted);">
-              <div class="spinner" style="margin:0 auto;"></div>
-            </div>
+          <!-- Guest Table -->
+          <div style="overflow-x:auto;">
+            <table class="guests-table" id="guests-table">
+              <thead>
+                <tr>
+                  <th style="width:50px;">NO</th>
+                  <th style="min-width:180px;">NAMA TAMU</th>
+                  <th style="min-width:180px;">IDENTITAS</th>
+                  <th style="width:80px;">UMUR</th>
+                  <th style="min-width:120px;">NATIONALITY</th>
+                  <th style="min-width:120px;">TERAKHIR CHECK-IN</th>
+                  <th style="width:90px;">KAMAR</th>
+                  <th style="width:70px;">TOTAL</th>
+                  <th style="width:120px;">AKSI</th>
+                </tr>
+              </thead>
+              <tbody id="guests-tbody">
+                <tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--text-muted);"><div class="spinner" style="margin:0 auto;"></div></td></tr>
+              </tbody>
+            </table>
           </div>
 
           <div id="guests-pagination"></div>
