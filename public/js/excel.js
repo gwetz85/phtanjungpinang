@@ -171,7 +171,7 @@ const excelPanel = (() => {
     });
   }
 
-  // Select ALL sheets
+  // Select ALL sheets & trigger import automatically!
   function selectAllSheets(sheets) {
     selectedSheets = sheets.map(s => s.name);
     sheetHeaders   = sheets[0]?.headers || [];
@@ -186,9 +186,12 @@ const excelPanel = (() => {
 
     renderMapping(sheetHeaders, `Mode: Import SEMUA Sheet (${sheets.length} sheet · ${sheets.reduce((sum, s) => sum + s.rowCount, 0).toLocaleString()} baris)`);
     showMappingAndScroll();
+
+    // Auto-start import immediately!
+    doImport();
   }
 
-  // Select ONE sheet
+  // Select ONE sheet & trigger import automatically!
   function selectOneSheet(sheetName, headers) {
     selectedSheets = [sheetName];
     sheetHeaders   = headers;
@@ -204,6 +207,9 @@ const excelPanel = (() => {
 
     renderMapping(headers, `Mode: Import Sheet "${escHtml(sheetName)}"`);
     showMappingAndScroll();
+
+    // Auto-start import immediately!
+    doImport();
   }
 
   function showMappingAndScroll() {
