@@ -816,12 +816,12 @@
   background: #ffffff;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 0.65rem 0.75rem;
-  margin-top: 0.25rem;
+  padding: clamp(0.55rem, 1vh, 0.85rem) clamp(0.65rem, 1vw, 0.85rem);
+  margin-top: 0;
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: clamp(0.32rem, 0.7vh, 0.55rem);
   transition: border-color var(--transition), box-shadow var(--transition);
 }
 
@@ -1155,5 +1155,67 @@
   color: var(--text-muted);
   text-align: center;
   margin-top: -0.1rem;
+}
+
+/* ── VERTICAL RESPONSIVENESS FOR WEATHER WIDGET ── */
+@media (min-height: 880px) {
+  .weather-widget-card {
+    padding: 0.85rem 1rem;
+    gap: 0.6rem;
+  }
+  .weather-anim-box {
+    width: 52px;
+    height: 52px;
+  }
+  .weather-art-icon {
+    width: 40px;
+    height: 40px;
+  }
+  .weather-temp-val {
+    font-size: 1.6rem;
+  }
+  .weather-condition-label {
+    font-size: 0.82rem;
+  }
+  .weather-stat-item {
+    padding: 0.4rem 0.55rem;
+    gap: 0.15rem;
+  }
+  .weather-air-card {
+    padding: 0.6rem 0.75rem;
+    gap: 0.25rem;
+  }
+}
+
+@media (max-height: 760px) {
+  .weather-widget-card {
+    padding: 0.5rem 0.65rem;
+    gap: 0.32rem;
+  }
+  .weather-anim-box {
+    width: 38px;
+    height: 38px;
+  }
+  .weather-art-icon {
+    width: 28px;
+    height: 28px;
+  }
+  .weather-temp-val {
+    font-size: 1.25rem;
+  }
+  .weather-condition-label {
+    font-size: 0.72rem;
+  }
+  .weather-stats-grid {
+    gap: 0.25rem;
+  }
+  .weather-stat-item {
+    padding: 0.22rem 0.38rem;
+    gap: 0.06rem;
+  }
+  .weather-air-card {
+    padding: 0.35rem 0.5rem;
+    gap: 0.12rem;
+  }
 }
 
