@@ -540,11 +540,10 @@ const dashboard = {
       feelsEl.textContent = `Terasa ${w.feelsLike || w.temperature}°C • Lembap ${w.humidity || 75}%`;
     }
 
-    // Animated weather art illustration
+    // Static crisp weather illustration
     const artIcon = document.getElementById('weather-art-icon');
     if (artIcon) {
-      artIcon.className = `weather-art weather-art-${w.animationType || 'partly-cloudy'}`;
-      artIcon.innerHTML = this.getWeatherAnimationHTML(w.animationType, w.isDay);
+      artIcon.innerHTML = this.getWeatherIconHTML(w.animationType, w.isDay);
     }
 
     // High & Low
@@ -577,7 +576,7 @@ const dashboard = {
       airPill.textContent = air.label || 'Normal (Baik)';
     }
     if (aqiValEl) {
-      aqiValEl.textContent = `AQI: ${air.aqi || 45} • PM2.5: ${air.pm25 || 12} µg/m³`;
+      aqiValEl.textContent = `Indeks AQI: ${air.aqi || 45} • PM2.5: ${air.pm25 || 12} µg/m³`;
     }
     if (airDescEl) {
       airDescEl.textContent = air.desc || 'Kualitas udara Kota Tanjungpinang bersih dan segar.';
@@ -594,49 +593,84 @@ const dashboard = {
     }
   },
 
-  getWeatherAnimationHTML(type, isDay = true) {
+  getWeatherIconHTML(type, isDay = true) {
     switch (type) {
       case 'clear-day':
         return `
-          <div class="art-sun-pulse"></div>
-          <div class="art-sun"></div>
+          <svg viewBox="0 0 48 48" width="42" height="42">
+            <defs>
+              <linearGradient id="sun-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f59e0b"/>
+                <stop offset="100%" stop-color="#fbbf24"/>
+              </linearGradient>
+            </defs>
+            <circle cx="24" cy="24" r="11" fill="url(#sun-grad)"/>
+            <g stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round">
+              <line x1="24" y1="4" x2="24" y2="8"/>
+              <line x1="24" y1="40" x2="24" y2="44"/>
+              <line x1="4" y1="24" x2="8" y2="24"/>
+              <line x1="40" y1="24" x2="44" y2="24"/>
+              <line x1="9.8" y1="9.8" x2="12.7" y2="12.7"/>
+              <line x1="35.3" y1="35.3" x2="38.2" y2="38.2"/>
+              <line x1="9.8" y1="38.2" x2="12.7" y2="35.3"/>
+              <line x1="35.3" y1="12.7" x2="38.2" y2="9.8"/>
+            </g>
+          </svg>
         `;
       case 'clear-night':
         return `
-          <div class="art-moon"></div>
-          <div class="art-star s1">✦</div>
-          <div class="art-star s2">✦</div>
+          <svg viewBox="0 0 48 48" width="40" height="40">
+            <path d="M26 8a16 16 0 1 0 14 23.8 17 17 0 0 1-14-23.8z" fill="#f59e0b"/>
+            <circle cx="36" cy="14" r="1.5" fill="#f59e0b"/>
+            <circle cx="12" cy="12" r="1.5" fill="#fbbf24"/>
+            <circle cx="10" cy="34" r="1.2" fill="#fbbf24"/>
+          </svg>
         `;
       case 'cloudy':
         return `
-          <div class="art-cloud cloud-back"></div>
-          <div class="art-cloud cloud-front"></div>
+          <svg viewBox="0 0 48 48" width="44" height="44">
+            <path d="M14 36h22a8 8 0 0 0 1-15.9 10 10 0 0 0-19.3-1.4A6.5 6.5 0 0 0 14 36z" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.8" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.06))"/>
+          </svg>
         `;
       case 'rain':
       case 'rain-heavy':
       case 'drizzle':
         return `
-          <div class="art-cloud"></div>
-          <div class="art-rain-drops">
-            <span class="drop d1"></span>
-            <span class="drop d2"></span>
-            <span class="drop d3"></span>
-          </div>
+          <svg viewBox="0 0 48 48" width="44" height="44">
+            <path d="M14 28h22a8 8 0 0 0 1-15.9 10 10 0 0 0-19.3-1.4A6.5 6.5 0 0 0 14 28z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.8"/>
+            <g stroke="#0284c7" stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="34" x2="15" y2="41"/>
+              <line x1="25" y1="34" x2="22" y2="41"/>
+              <line x1="32" y1="34" x2="29" y2="41"/>
+            </g>
+          </svg>
         `;
       case 'thunderstorm':
         return `
-          <div class="art-cloud cloud-storm"></div>
-          <div class="art-lightning">⚡</div>
-          <div class="art-rain-drops">
-            <span class="drop d1"></span>
-            <span class="drop d2"></span>
-          </div>
+          <svg viewBox="0 0 48 48" width="44" height="44">
+            <path d="M14 26h22a8 8 0 0 0 1-15.9 10 10 0 0 0-19.3-1.4A6.5 6.5 0 0 0 14 26z" fill="#64748b" stroke="#475569" stroke-width="1.8"/>
+            <polygon points="25,27 20,35 25,35 21,43 30,33 25,33" fill="#f59e0b"/>
+          </svg>
         `;
       case 'partly-cloudy':
       default:
         return `
-          <div class="art-sun"></div>
-          <div class="art-cloud"></div>
+          <svg viewBox="0 0 48 48" width="44" height="44">
+            <defs>
+              <linearGradient id="sun-partly" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f59e0b"/>
+                <stop offset="100%" stop-color="#fbbf24"/>
+              </linearGradient>
+            </defs>
+            <circle cx="19" cy="18" r="9" fill="url(#sun-partly)"/>
+            <g stroke="#f59e0b" stroke-width="2" stroke-linecap="round">
+              <line x1="19" y1="5" x2="19" y2="8"/>
+              <line x1="7" y1="18" x2="10" y2="18"/>
+              <line x1="10.5" y1="9.5" x2="12.6" y2="11.6"/>
+              <line x1="27.5" y1="9.5" x2="25.4" y2="11.6"/>
+            </g>
+            <path d="M16 38h20a8.5 8.5 0 0 0 1-16.9 9.5 9.5 0 0 0-18.4-1.5A7 7 0 0 0 16 38z" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.8" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.08))"/>
+          </svg>
         `;
     }
   }

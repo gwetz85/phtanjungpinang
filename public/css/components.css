@@ -822,7 +822,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
-  transition: all var(--transition);
+  transition: border-color var(--transition), box-shadow var(--transition);
 }
 
 .weather-widget-card:hover {
@@ -880,12 +880,11 @@
   white-space: nowrap;
 }
 
-.weather-pulse-dot {
+.weather-static-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: #10b981;
-  animation: pulse-live 1.8s infinite;
 }
 
 .weather-refresh-btn {
@@ -912,10 +911,11 @@
 }
 
 .weather-refresh-btn.rotating {
-  animation: spin-once 0.6s linear;
+  transform: rotate(360deg);
+  transition: transform 0.6s ease;
 }
 
-/* ── MAIN WEATHER ROW (ANIMATION + TEMP) ── */
+/* ── MAIN WEATHER ROW (CLEAN STATIC SVG + TEMP) ── */
 .weather-main-row {
   display: flex;
   align-items: center;
@@ -932,161 +932,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  overflow: hidden;
   flex-shrink: 0;
 }
 
-.weather-art {
-  position: relative;
-  width: 44px;
-  height: 44px;
+.weather-art-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-/* Sun animation */
-.art-sun {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f59e0b, #fbbf24);
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
-  position: absolute;
-  animation: sun-rotate 12s linear infinite;
-}
-
-.art-sun-pulse {
-  position: absolute;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(245, 158, 11, 0.2);
-  animation: sun-pulse 2.5s ease-in-out infinite;
-}
-
-/* Cloud animation */
-.art-cloud {
-  width: 30px;
-  height: 15px;
-  background: #ffffff;
-  border-radius: 12px;
-  position: absolute;
-  bottom: 8px;
-  right: 4px;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
-  animation: cloud-float 4s ease-in-out infinite alternate;
-}
-
-.art-cloud::before {
-  content: '';
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  background: #ffffff;
-  border-radius: 50%;
-  top: -6px;
-  left: 4px;
-}
-
-.art-cloud::after {
-  content: '';
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  background: #ffffff;
-  border-radius: 50%;
-  top: -4px;
-  right: 4px;
-}
-
-.cloud-storm {
-  background: #64748b;
-}
-.cloud-storm::before, .cloud-storm::after {
-  background: #64748b;
-}
-
-.art-lightning {
-  position: absolute;
-  bottom: 0;
-  font-size: 14px;
-  color: #fbbf24;
-  animation: flash 1.2s infinite;
-}
-
-/* Rain drops */
-.art-rain-drops {
-  position: absolute;
-  bottom: 0;
-  display: flex;
-  gap: 5px;
-}
-
-.drop {
-  width: 2px;
-  height: 6px;
-  background: #0284c7;
-  border-radius: 2px;
-  animation: rain-drop 0.8s linear infinite;
-}
-
-.d1 { animation-delay: 0s; }
-.d2 { animation-delay: 0.25s; }
-.d3 { animation-delay: 0.5s; }
-
-/* Moon & stars */
-.art-moon {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  box-shadow: 4px 4px 0 0 #f59e0b;
-  position: absolute;
-  animation: moon-float 3s ease-in-out infinite alternate;
-}
-
-.art-star {
-  color: #f59e0b;
-  font-size: 10px;
-  position: absolute;
-  animation: star-twinkle 1.5s ease-in-out infinite alternate;
-}
-.s1 { top: 4px; right: 6px; }
-.s2 { bottom: 8px; left: 6px; animation-delay: 0.7s; }
-
-/* Keyframe animations */
-@keyframes sun-rotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-@keyframes sun-pulse {
-  0%, 100% { transform: scale(0.9); opacity: 0.6; }
-  50% { transform: scale(1.18); opacity: 0.2; }
-}
-@keyframes cloud-float {
-  0% { transform: translateX(-3px); }
-  100% { transform: translateX(3px); }
-}
-@keyframes rain-drop {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(12px); opacity: 0; }
-}
-@keyframes moon-float {
-  0% { transform: translateY(-2px); }
-  100% { transform: translateY(2px); }
-}
-@keyframes star-twinkle {
-  0% { opacity: 0.4; transform: scale(0.8); }
-  100% { opacity: 1; transform: scale(1.1); }
-}
-@keyframes flash {
-  0%, 90%, 100% { opacity: 0; }
-  92%, 96% { opacity: 1; }
-}
-@keyframes spin-once {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  width: 44px;
+  height: 44px;
 }
 
 /* Temperature wrap */
@@ -1187,7 +1041,6 @@
 .wind-arrow-icon {
   display: inline-block;
   font-size: 0.88rem;
-  transition: transform 0.4s ease;
   line-height: 1;
 }
 
@@ -1200,43 +1053,42 @@
 /* ── AIR QUALITY STATUS (NORMAL - HIJAU, SEDANG - OREN, WASPADA - MERAH) ── */
 .weather-air-card {
   border-radius: var(--radius-sm);
-  padding: 0.6rem 0.75rem;
+  padding: 0.65rem 0.8rem;
   border: 1.5px solid;
-  transition: all 0.2s ease;
-}
-
-.air-card-top {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.3rem;
+  flex-direction: column;
   gap: 0.3rem;
 }
 
-.air-label-title {
-  font-size: 0.74rem;
-  font-weight: 800;
+.air-card-row-top {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.5rem;
 }
 
-.air-status-pill {
-  padding: 0.12rem 0.45rem;
-  border-radius: var(--radius-full);
-  font-size: 0.66rem;
+.air-card-label {
+  font-size: 0.76rem;
   font-weight: 800;
   white-space: nowrap;
 }
 
-.air-aqi-index {
+.air-status-pill {
+  padding: 0.12rem 0.5rem;
+  border-radius: var(--radius-full);
   font-size: 0.68rem;
   font-weight: 800;
   white-space: nowrap;
 }
 
+.air-card-metrics {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
 .air-card-desc {
-  font-size: 0.67rem;
+  font-size: 0.68rem;
   line-height: 1.35;
   font-weight: 500;
 }
@@ -1250,10 +1102,10 @@
   background: #10b981;
   color: #ffffff;
 }
-.aqi-normal .air-label-title {
+.aqi-normal .air-card-label {
   color: #065f46;
 }
-.aqi-normal .air-aqi-index {
+.aqi-normal .air-card-metrics {
   color: #059669;
 }
 .aqi-normal .air-card-desc {
@@ -1269,10 +1121,10 @@
   background: #f59e0b;
   color: #ffffff;
 }
-.aqi-sedang .air-label-title {
+.aqi-sedang .air-card-label {
   color: #92400e;
 }
-.aqi-sedang .air-aqi-index {
+.aqi-sedang .air-card-metrics {
   color: #d97706;
 }
 .aqi-sedang .air-card-desc {
@@ -1288,10 +1140,10 @@
   background: #ef4444;
   color: #ffffff;
 }
-.aqi-waspada .air-label-title {
+.aqi-waspada .air-card-label {
   color: #991b1b;
 }
-.aqi-waspada .air-aqi-index {
+.aqi-waspada .air-card-metrics {
   color: #dc2626;
 }
 .aqi-waspada .air-card-desc {
@@ -1302,6 +1154,5 @@
   font-size: 0.64rem;
   color: var(--text-muted);
   text-align: center;
-  margin-top: -0.2rem;
 }
 

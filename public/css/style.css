@@ -578,9 +578,18 @@ select.form-control option {
   flex: 1;
   padding: 1rem 1.25rem;
   overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
+}
+
+.launchpad-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
 }
 
 /* Launchpad Tile Cards */
