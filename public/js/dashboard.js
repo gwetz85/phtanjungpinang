@@ -75,9 +75,8 @@ const dashboard = {
       { id: 'panel-search', icon: '🔍', label: 'Cari Tamu', desc: 'Pencarian Cepat NIK & Nama', roles: ['receptionist', 'admin', 'superadmin'] },
       { id: 'panel-checkin', icon: '➕', label: 'Check-in Baru', desc: 'Registrasi Tamu Menginap', roles: ['receptionist', 'admin', 'superadmin'] },
       { id: 'panel-guests', icon: '📋', label: 'Semua Data Tamu', desc: 'Buku Tamu & Database Historis', roles: ['receptionist', 'admin', 'superadmin'] },
-      { id: 'panel-news', icon: '📰', label: 'Berita Tanjungpinang', desc: 'Warta Terkini Daerah Realtime', roles: ['receptionist', 'admin', 'superadmin'] },
       { id: 'panel-users', icon: '👥', label: 'Manajemen Akun', desc: 'Pengelolaan Staf & Akses', roles: ['admin', 'superadmin'] },
-      { id: 'panel-excel', icon: '📁', label: 'Upload Excel', desc: 'Import & Rekap Spreadsheet', roles: ['superadmin'] },
+      { id: 'panel-excel', icon: '📁', label: 'Upload Excel', desc: 'Import & Rekap Spreadsheet', roles: ['admin', 'superadmin'] },
     ];
 
     nav.innerHTML = allItems
