@@ -28,60 +28,45 @@
 <!-- ═══ DASHBOARD LAYOUT ═══ -->
 <div class="dashboard-layout">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-brand">
-        <img src="logo.png" alt="Logo" style="width:40px;height:40px;object-fit:contain;border-radius:6px;background:#fff;padding:2px;flex-shrink:0;">
-        <div class="brand-text">
-          <div class="hotel-name">PELANGI HOTEL</div>
-          <div class="hotel-sub">Tanjungpinang</div>
-        </div>
-      </div>
-    </div>
-
-    <nav class="sidebar-nav">
-      <div class="nav-section-label">Menu</div>
-      <div id="sidebar-nav"><!-- Rendered by dashboard.js --></div>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div class="sys-info">
-        <div class="sys-info-item"><span>Username</span><strong id="sys-username">-</strong></div>
-        <div class="sys-info-item"><span>Nama Lengkap</span><strong id="sys-fullname">-</strong></div>
-        <div class="sys-info-item"><span>Id Devices</span><strong id="sys-deviceid">-</strong></div>
-        <div class="sys-info-item"><span>Last Login</span><strong id="sys-lastlogin">-</strong></div>
-        <div class="sys-info-item"><span>Total Data</span><strong id="sys-totaldata">-</strong></div>
-        <div class="sys-info-item"><span>IP Perangkat</span><strong id="sys-ip">-</strong></div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- MAIN CONTENT -->
+  <!-- MAIN CONTENT (Center Stage) -->
   <div class="main-content">
 
-    <!-- HEADER -->
-    <header class="main-header" style="position:relative;">
-      <div style="display:flex;align-items:center;gap:0.75rem;">
-        <button class="btn btn-ghost btn-icon" id="hamburger-btn" style="display:none;" title="Menu">☰</button>
-        <h2 id="main-title">Beranda</h2>
-      </div>
-
-      <!-- Realtime Clock -->
-      <div id="realtime-clock" style="position: absolute; left: 50%; transform: translateX(-50%); font-size: 0.95rem; font-weight: 600; color: var(--text-secondary); font-family: inherit; user-select: none; white-space: nowrap;">
-        <span id="clock-time">Memuat jam...</span>
-      </div>
-
-      <div class="header-actions">
-        <div style="display:flex;align-items:center;gap:0.5rem;">
-          <div class="user-avatar" id="header-user-avatar" style="width:34px;height:34px;font-size:1.15rem;background:linear-gradient(135deg,rgba(79,142,247,0.25),rgba(124,58,237,0.25));border:1px solid rgba(79,142,247,0.4);color:#fff;">👤</div>
-          <span id="header-user-name" style="font-size:0.85rem;color:var(--text-secondary);"></span>
+    <!-- TOP HEADER -->
+    <header class="main-header">
+      <div class="header-left">
+        <button class="btn btn-ghost btn-icon" id="hamburger-btn" style="display:none;" title="Buka Menu Launchpad">☰</button>
+        <div class="header-title-wrap">
+          <h2 id="main-title">Beranda</h2>
+          <div class="header-subtitle">
+            <span class="status-badge-live"><span class="pulse-dot"></span> LIVE</span>
+            <span style="color:#cbd5e1;">•</span>
+            <span id="header-shift-info">Operasional Hotel Pelangi Tanjungpinang</span>
+          </div>
         </div>
-        <button class="btn btn-ghost btn-sm" id="logout-btn">🚪 Keluar</button>
+      </div>
+
+      <!-- TOP RIGHT: LOGO PELANGI HOTEL & USER PROFILE -->
+      <div class="header-right">
+        <div class="header-hotel-brand">
+          <img src="logo.png" alt="Logo Pelangi Hotel" id="header-hotel-logo">
+          <div class="brand-info">
+            <span class="brand-title">PELANGI HOTEL</span>
+            <span class="brand-sub">TANJUNGPINANG</span>
+          </div>
+        </div>
+
+        <div class="header-user-profile">
+          <div class="user-avatar" id="header-user-avatar">👤</div>
+          <div class="header-user-meta">
+            <span class="user-name" id="header-user-name">Pengguna</span>
+            <span class="user-role" id="header-user-role">Staf</span>
+          </div>
+          <button class="btn btn-outline btn-sm" id="logout-btn" title="Keluar">🚪 Keluar</button>
+        </div>
       </div>
     </header>
 
-    <!-- CONTENT AREA -->
+    <!-- CONTENT AREA (Central Workspace) -->
     <main class="content-area">
 
       <!-- ══════════════════════════════════
@@ -89,29 +74,29 @@
       ══════════════════════════════════ -->
       <div class="panel" id="panel-home">
 
-        <!-- ── STAT CARDS ── -->
-        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.5rem;">
+        <!-- ── STAT CARDS (Top KPI Grid) ── -->
+        <div class="stats-grid">
 
-          <div class="stat-card" style="background:linear-gradient(135deg,rgba(79,142,247,0.18),rgba(79,142,247,0.05));border:1px solid rgba(79,142,247,0.35);">
-            <div class="stat-icon blue">👥</div>
+          <div class="stat-card">
+            <div class="stat-icon emerald">👥</div>
             <div>
-              <div class="stat-value" id="stat-total-tamu" style="font-size:2rem;">—</div>
+              <div class="stat-value" id="stat-total-tamu">—</div>
               <div class="stat-label">Total Database Tamu</div>
             </div>
           </div>
 
-          <div class="stat-card" style="background:linear-gradient(135deg,rgba(16,185,129,0.18),rgba(16,185,129,0.05));border:1px solid rgba(16,185,129,0.35);">
-            <div class="stat-icon green">📅</div>
+          <div class="stat-card">
+            <div class="stat-icon emerald">📅</div>
             <div>
-              <div class="stat-value" id="stat-today" style="font-size:2rem;">—</div>
+              <div class="stat-value" id="stat-today">—</div>
               <div class="stat-label">Check-in Hari Ini</div>
             </div>
           </div>
 
-          <div class="stat-card" style="background:linear-gradient(135deg,rgba(168,85,247,0.18),rgba(168,85,247,0.05));border:1px solid rgba(168,85,247,0.35);">
-            <div class="stat-icon purple">📆</div>
+          <div class="stat-card">
+            <div class="stat-icon teal">📆</div>
             <div>
-              <div class="stat-value" id="stat-this-month" style="font-size:2rem;">—</div>
+              <div class="stat-value" id="stat-this-month">—</div>
               <div class="stat-label" id="stat-month-label">Tamu Check-in Bulan Ini</div>
             </div>
           </div>
@@ -569,19 +554,52 @@
 
   </div><!-- end main-content -->
 
+  <!-- RIGHT LAUNCHPAD SIDEBAR -->
+  <aside class="launchpad-sidebar" id="sidebar">
+    <div class="launchpad-header">
+      <div class="launchpad-title">
+        <span>🚀 Launchpad Menu</span>
+      </div>
+      <span class="launchpad-badge" id="sidebar-user-role-badge">STAF</span>
+    </div>
+
+    <nav class="launchpad-body" id="launchpad-nav">
+      <!-- Generated dynamically by dashboard.js renderNav() -->
+    </nav>
+
+    <div class="launchpad-footer">
+      <div class="sys-info-card">
+        <div class="sys-info-card-header">
+          <span>Status Sistem & Device</span>
+          <span style="color:var(--primary);font-size:0.65rem;font-weight:700;">● TERHUBUNG</span>
+        </div>
+        <div class="sys-info-item"><span>Username:</span><strong id="sys-username">-</strong></div>
+        <div class="sys-info-item"><span>Nama:</span><strong id="sys-fullname">-</strong></div>
+        <div class="sys-info-item"><span>ID Device:</span><strong id="sys-deviceid">-</strong></div>
+        <div class="sys-info-item"><span>Last Login:</span><strong id="sys-lastlogin">-</strong></div>
+        <div class="sys-info-item"><span>Total Tamu:</span><strong id="sys-totaldata">-</strong></div>
+        <div class="sys-info-item"><span>IP Jaringan:</span><strong id="sys-ip">-</strong></div>
+      </div>
+    </div>
+  </aside>
+
 </div><!-- end dashboard-layout -->
 
-<!-- Running Text Banner — FIXED continuous ticker at bottom, visible for ALL roles -->
+<!-- BOTTOM OPERATIONAL BAR: RUNNING TEKS & JAM REALTIME -->
 <div class="running-text-banner" id="running-text-banner" style="display:none;">
   <span class="banner-label">
     <span class="banner-icon">📢</span>
-    <span>INFO</span>
+    <span>INFORMASI</span>
   </span>
   <div class="ticker-track">
     <div class="ticker-wrap" id="running-text-wrap">
       <span class="ticker-content" id="running-text-content-1"></span>
       <span class="ticker-content" id="running-text-content-2" aria-hidden="true"></span>
     </div>
+  </div>
+  <div class="realtime-clock-bar" id="realtime-clock">
+    <span class="clock-tag"><span class="pulse-dot"></span> LIVE</span>
+    <span id="clock-time">Memuat jam...</span>
   </div>
 </div>
 

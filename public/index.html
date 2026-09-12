@@ -13,14 +13,15 @@
   <link rel="icon" sizes="192x192" href="icon-192.png">
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0ea5e9">
+  <meta name="theme-color" content="#059669">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Pelangi Hotel">
   <style>
-    /* ── Hotel Photo Background ── */
+    /* ── Modern White-Green Hotel Background ── */
     body {
-      background: #000;
+      background: #f1f5f3;
+      color: #1e293b;
     }
     .hotel-bg {
       position: fixed;
@@ -30,21 +31,22 @@
       background-size: cover;
       background-position: center center;
       background-repeat: no-repeat;
-      /* slight dark overlay so text stays readable */
-      filter: brightness(0.55);
+      filter: brightness(0.92) contrast(1.05);
       transition: filter 0.5s ease;
     }
-    /* Dark gradient overlay on top of photo */
+    /* Clean white-mint overlay with subtle gradient */
     .hotel-overlay {
       position: fixed;
       inset: 0;
       z-index: 1;
       background: linear-gradient(
         135deg,
-        rgba(5, 10, 25, 0.55) 0%,
-        rgba(10, 20, 50, 0.40) 50%,
-        rgba(5, 10, 25, 0.65) 100%
+        rgba(241, 245, 243, 0.88) 0%,
+        rgba(236, 253, 245, 0.84) 50%,
+        rgba(248, 250, 252, 0.90) 100%
       );
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
     /* ── Login page centering ── */
     .login-page {
@@ -54,30 +56,38 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 1.5rem;
     }
-    /* ── Glassmorphism login card ── */
+    /* ── Modern Minimalist White Card ── */
     .login-box {
-      background: rgba(10, 14, 26, 0.72) !important;
-      backdrop-filter: blur(20px) saturate(160%) !important;
-      -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
-      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 16px !important;
       box-shadow:
-        0 8px 48px rgba(0, 0, 0, 0.6),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+        0 20px 40px -15px rgba(5, 150, 105, 0.15),
+        0 0 0 1px rgba(5, 150, 105, 0.05),
+        0 8px 16px -4px rgba(15, 23, 42, 0.06) !important;
+      width: 100%;
+      max-width: 420px;
+      padding: 2.5rem 2.25rem;
     }
-    /* Subtle glow under the card */
-    .login-box::before {
-      content: '';
-      position: absolute;
-      inset: -1px;
-      border-radius: inherit;
-      background: linear-gradient(135deg, rgba(79,142,247,0.15), rgba(124,58,237,0.08));
-      z-index: -1;
-      pointer-events: none;
+    .login-logo h1 {
+      color: #0f172a;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+    }
+    .login-logo p {
+      color: #059669;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-top: 0.25rem;
     }
     /* Mobile: make bg stay sharp on small screens */
     @media (max-width: 480px) {
       .hotel-bg { background-position: 60% center; }
+      .login-box { padding: 2rem 1.5rem; }
     }
   </style>
 </head>

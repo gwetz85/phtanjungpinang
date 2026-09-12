@@ -50,38 +50,47 @@ const dashboard = {
   renderUserInfo() {
     const u = this.user;
     const headerName = document.getElementById('header-user-name');
+    const headerRole = document.getElementById('header-user-role');
     const headerAvatar = document.getElementById('header-user-avatar');
     if (headerName) headerName.textContent = u.nama;
-    if (headerAvatar) headerAvatar.innerHTML = '👤';
+    if (headerRole) headerRole.textContent = u.role ? u.role.toUpperCase() : 'STAF';
+    if (headerAvatar) headerAvatar.textContent = getInitials(u.nama) || '👤';
 
     const sidebarName = document.getElementById('sidebar-user-name');
     const sidebarRole = document.getElementById('sidebar-user-role');
     const sidebarAvatar = document.getElementById('sidebar-user-avatar');
+    const sidebarRoleBadge = document.getElementById('sidebar-user-role-badge');
     if (sidebarName) sidebarName.textContent = u.nama;
     if (sidebarRole) sidebarRole.innerHTML = roleBadge(u.role);
     if (sidebarAvatar) sidebarAvatar.textContent = getInitials(u.nama);
+    if (sidebarRoleBadge) sidebarRoleBadge.textContent = u.role ? u.role.toUpperCase() : 'STAF';
   },
 
   renderNav() {
     const u = this.user;
-    const nav = document.getElementById('sidebar-nav');
+    const nav = document.getElementById('launchpad-nav') || document.getElementById('sidebar-nav');
+    if (!nav) return;
 
     const allItems = [
-      { id: 'panel-home', icon: '🏠', label: 'Beranda', roles: ['receptionist', 'admin', 'superadmin'] },
-      { id: 'panel-search', icon: '🔍', label: 'Cari Tamu', roles: ['receptionist', 'admin', 'superadmin'] },
-      { id: 'panel-checkin', icon: '➕', label: 'Check-in Baru', roles: ['receptionist', 'admin', 'superadmin'] },
-      { id: 'panel-guests', icon: '📋', label: 'Semua Data Tamu', roles: ['receptionist', 'admin', 'superadmin'] },
-      { id: 'panel-users', icon: '👥', label: 'Manajemen Akun', roles: ['admin', 'superadmin'] },
-      { id: 'panel-excel', icon: '📁', label: 'Upload Excel', roles: ['superadmin'] },
-      { id: 'panel-running-text', icon: '📢', label: 'Running Teks', roles: ['superadmin'] },
+      { id: 'panel-home', icon: '🏠', label: 'Beranda', desc: 'Ringkasan & Dashboard Utama', roles: ['receptionist', 'admin', 'superadmin'] },
+      { id: 'panel-search', icon: '🔍', label: 'Cari Tamu', desc: 'Pencarian Cepat NIK & Nama', roles: ['receptionist', 'admin', 'superadmin'] },
+      { id: 'panel-checkin', icon: '➕', label: 'Check-in Baru', desc: 'Registrasi Tamu Menginap', roles: ['receptionist', 'admin', 'superadmin'] },
+      { id: 'panel-guests', icon: '📋', label: 'Semua Data Tamu', desc: 'Buku Tamu & Database Historis', roles: ['receptionist', 'admin', 'superadmin'] },
+      { id: 'panel-users', icon: '👥', label: 'Manajemen Akun', desc: 'Pengelolaan Staf & Akses', roles: ['admin', 'superadmin'] },
+      { id: 'panel-excel', icon: '📁', label: 'Upload Excel', desc: 'Import & Rekap Spreadsheet', roles: ['superadmin'] },
+      { id: 'panel-running-text', icon: '📢', label: 'Running Teks', desc: 'Atur Teks Berjalan & Kecepatan', roles: ['superadmin'] },
     ];
 
     nav.innerHTML = allItems
       .filter(item => item.roles.includes(u.role))
       .map(item => `
         <button class="nav-item" id="nav-${item.id}" onclick="dashboard.navigate('${item.id}')">
-          <span class="nav-icon">${item.icon}</span>
-          ${item.label}
+          <div class="nav-icon-wrap">${item.icon}</div>
+          <div class="nav-item-content">
+            <div class="nav-item-title">${item.label}</div>
+            <div class="nav-item-desc">${item.desc}</div>
+          </div>
+          <div class="nav-item-arrow">➔</div>
         </button>
       `).join('');
   },
@@ -205,12 +214,18 @@ const dashboard = {
               data: monthCounts,
               backgroundColor: monthCounts.map((v, i) =>
                 i === mo - 1
-                  ? 'rgba(79,142,247,0.9)'
-                  : 'rgba(79,142,247,0.35)'
+                  ? 'rgba(5, 150, 105, 0.95)'
+                  : 'rgba(16, 185, 129, 0.40)'
               ),
-              borderRadius: 8,
+              borderColor: monthCounts.map((v, i) =>
+                i === mo - 1
+                  ? '#047857'
+                  : 'transparent'
+              ),
+              borderWidth: 1,
+              borderRadius: 6,
               borderSkipped: false,
-              hoverBackgroundColor: 'rgba(79,142,247,0.95)',
+              hoverBackgroundColor: 'rgba(5, 150, 105, 1)',
             }]
           },
           options: {
@@ -223,23 +238,24 @@ const dashboard = {
                   title: (items) => `${MONTHS_ID[items[0].dataIndex]} ${yr}`,
                   label: (item) => ` ${item.raw} tamu check-in`
                 },
-                backgroundColor: 'rgba(15,20,40,0.92)',
-                titleColor: '#e2e8f0',
-                bodyColor: '#94a3b8',
-                borderColor: 'rgba(79,142,247,0.4)',
-                borderWidth: 1,
+                backgroundColor: '#ffffff',
+                titleColor: '#0f172a',
+                bodyColor: '#475569',
+                borderColor: '#e2e8f0',
+                borderWidth: 1.5,
                 padding: 10,
                 cornerRadius: 8,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
               }
             },
             scales: {
               x: {
-                grid: { color: 'rgba(255,255,255,0.05)' },
-                ticks: { color: '#94a3b8', font: { size: 11 } },
+                grid: { color: 'rgba(0, 0, 0, 0.04)' },
+                ticks: { color: '#64748b', font: { size: 11, weight: '500' } },
               },
               y: {
-                grid: { color: 'rgba(255,255,255,0.05)' },
-                ticks: { color: '#94a3b8', font: { size: 11 }, stepSize: 1 },
+                grid: { color: 'rgba(0, 0, 0, 0.04)' },
+                ticks: { color: '#64748b', font: { size: 11 }, stepSize: 1 },
                 min: 0,
                 suggestedMax: maxVal + 1,
               }

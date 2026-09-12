@@ -147,7 +147,7 @@ const excelPanel = (() => {
 
     list.innerHTML = `
       <div id="all-sheets-card" style="
-        background: linear-gradient(135deg, rgba(79,142,247,0.2), rgba(124,58,237,0.15));
+        background: linear-gradient(135deg, rgba(5,150,105,0.12), rgba(16,185,129,0.08));
         border: 2px solid var(--primary);
         border-radius: var(--radius);
         padding: 1rem 1.25rem;
@@ -157,7 +157,7 @@ const excelPanel = (() => {
         align-items: center;
         justify-content: space-between;
         transition: all var(--transition);
-        box-shadow: 0 4px 16px rgba(79,142,247,0.2);
+        box-shadow: 0 4px 16px rgba(5,150,105,0.15);
       ">
         <div>
           <div style="font-weight:700;color:var(--text-primary);font-size:1.05rem;">📦 Import SEMUA Sheet Sekaligus</div>
@@ -209,7 +209,7 @@ const excelPanel = (() => {
     const allCard = document.getElementById('all-sheets-card');
     if (allCard) {
       allCard.style.borderColor = 'var(--primary)';
-      allCard.style.background   = 'linear-gradient(135deg, rgba(79,142,247,0.3), rgba(124,58,237,0.2))';
+      allCard.style.background   = 'linear-gradient(135deg, rgba(5,150,105,0.2), rgba(16,185,129,0.15))';
     }
     document.querySelectorAll('.sheet-item').forEach(el => el.classList.remove('selected'));
 
@@ -227,8 +227,8 @@ const excelPanel = (() => {
 
     const allCard = document.getElementById('all-sheets-card');
     if (allCard) {
-      allCard.style.borderColor = 'rgba(79,142,247,0.4)';
-      allCard.style.background   = 'linear-gradient(135deg, rgba(79,142,247,0.15), rgba(124,58,237,0.1))';
+      allCard.style.borderColor = 'rgba(5,150,105,0.4)';
+      allCard.style.background   = 'linear-gradient(135deg, rgba(5,150,105,0.1), rgba(16,185,129,0.06))';
     }
     document.querySelectorAll('.sheet-item').forEach(el => {
       el.classList.toggle('selected', el.dataset.sheet === sheetName);

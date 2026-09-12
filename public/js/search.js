@@ -120,7 +120,7 @@ const searchPanel = (() => {
         title: `🧍 Detail Tamu`,
         size: 'modal-lg',
         body: `
-          <div class="guest-card-header" style="margin:-1.5rem -1.5rem 1.5rem; border-radius:0; background: linear-gradient(135deg, rgba(79,142,247,0.15), rgba(124,58,237,0.1));">
+          <div class="guest-card-header" style="margin:-1.5rem -1.5rem 1.5rem; border-radius:0; background: linear-gradient(135deg, rgba(5,150,105,0.12), rgba(16,185,129,0.06));">
             <div class="guest-avatar-lg">${getInitials(g.nama_tamu)}</div>
             <div class="guest-header-info">
               <h3 style="font-size:1.3rem;">${escHtml(g.nama_tamu)}</h3>
