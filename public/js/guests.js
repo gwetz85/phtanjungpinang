@@ -57,12 +57,12 @@ const guestsPanel = (() => {
 
       tbody.innerHTML = data.map((g, i) => {
         const age = getRealtimeAge(g.umur);
-        const ageDisplay = age ? `${age}` : '-';
+        const ageDisplay = age || '-';
 
         return `
           <tr class="guest-row" id="gr-${g.id}" onclick="guestsPanel.toggleExpand(${g.id})">
-            <td style="color:var(--text-muted);font-weight:600;">${startNo + i}</td>
-            <td>
+            <td style="text-align:center;color:var(--text-muted);font-weight:600;">${startNo + i}</td>
+            <td style="font-weight:600;color:var(--text-primary);">
               <span class="guest-name-cell">${escHtml(g.nama_tamu)}</span>
             </td>
             <td>
@@ -71,16 +71,22 @@ const guestsPanel = (() => {
                 <code>${escHtml(g.no_identitas)}</code>
               </div>
             </td>
-            <td class="age-cell">
-              ${ageDisplay !== '-' ? `<span>${ageDisplay}</span><span class="age-unit">Tahun</span>` : '<span style="color:var(--text-muted);">-</span>'}
+            <td style="text-align:center;white-space:nowrap;">
+              ${ageDisplay !== '-' ? `<span class="badge-age">${ageDisplay}</span>` : '<span style="color:var(--text-muted);">-</span>'}
             </td>
-            <td>${g.kewarganegaraan ? nationalityBadge(g.kewarganegaraan) : '<span style="color:var(--text-muted);">-</span>'}</td>
-            <td style="font-size:0.82rem;">${formatDate(g.last_checkin) || '<span style="color:var(--text-muted);">—</span>'}</td>
-            <td style="font-weight:600;color:var(--primary);">${g.last_room ? escHtml(g.last_room) : '<span style="color:var(--text-muted);">-</span>'}</td>
-            <td style="text-align:center;">
-              <span style="font-weight:700;color:var(--primary);">${g.total_checkins || 0}x</span>
+            <td style="text-align:center;white-space:nowrap;">
+              ${g.kewarganegaraan ? nationalityBadge(g.kewarganegaraan) : '<span style="color:var(--text-muted);">-</span>'}
             </td>
-            <td onclick="event.stopPropagation()">
+            <td style="text-align:center;font-size:0.84rem;white-space:nowrap;">
+              ${formatDate(g.last_checkin) || '<span style="color:var(--text-muted);">—</span>'}
+            </td>
+            <td style="text-align:center;white-space:nowrap;">
+              ${g.last_room ? `<span class="room-badge">${escHtml(g.last_room)}</span>` : '<span style="color:var(--text-muted);">-</span>'}
+            </td>
+            <td style="text-align:center;white-space:nowrap;">
+              <span class="total-badge">${g.total_checkins || 0}x</span>
+            </td>
+            <td style="text-align:center;" onclick="event.stopPropagation()">
               <div class="actions-cell">
                 <button class="btn btn-ghost btn-sm" title="Detail" onclick="guestsPanel.toggleExpand(${g.id})">👁️</button>
                 ${isAdmin ? `

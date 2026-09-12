@@ -148,21 +148,39 @@ function getRealtimeAge(birthDateStr) {
   if (!cleanStr || cleanStr === '-' || cleanStr.toLowerCase() === 'n/a' || cleanStr.toLowerCase() === 'null') {
     return '';
   }
+
+  // If already a number like "45", "45 tahun", "45 thn"
+  const numMatch = cleanStr.match(/^(\d{1,3})(\s*(tahun|thn|th))?$/i);
+  if (numMatch) {
+    const val = parseInt(numMatch[1], 10);
+    if (val < 130) {
+      return `${val} Thn`;
+    }
+  }
+
+  const today = new Date();
+
+  // If 4-digit birth year like "1945", "1982"
+  if (/^(19|20)\d{2}$/.test(cleanStr)) {
+    const yr = parseInt(cleanStr, 10);
+    const age = today.getFullYear() - yr;
+    return `${Math.max(0, age)} Thn`;
+  }
+
   const yyyymmdd = /^\d{4}-\d{2}-\d{2}$/;
   let birthDate = null;
-  const today = new Date();
 
   if (yyyymmdd.test(cleanStr)) {
     birthDate = new Date(cleanStr);
   } else {
     const parts = cleanStr.split(/[-/]/);
     if (parts.length === 3) {
-      const day = parseInt(parts[0]);
-      const month = parseInt(parts[1]);
-      let year = parseInt(parts[2]);
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10);
+      let year = parseInt(parts[2], 10);
 
       if (parts[0].length === 4) {
-        birthDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        birthDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
       } else if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
         if (year < 100) {
           const curYY = today.getFullYear() % 100;
@@ -183,6 +201,6 @@ function getRealtimeAge(birthDateStr) {
     age--;
   }
 
-  if (age < 0) return '0 tahun';
-  return `${age} tahun`;
+  if (age < 0) return '0 Thn';
+  return `${age} Thn`;
 }

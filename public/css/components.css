@@ -1,4 +1,4 @@
-﻿/* ══════════════════════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════════════════════
    TABLE COMPONENT (Modern White-Green Clean Theme)
    ══════════════════════════════════════════════════════════════════════════════ */
 .table-wrapper {
@@ -9,30 +9,31 @@
   box-shadow: var(--shadow-xs);
 }
 
-.data-table {
+.data-table,
+.guests-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.88rem;
   background: #ffffff;
 }
 
-.data-table thead {
+.data-table thead,
+.guests-table thead {
   background: #f8fafc;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+  border-bottom: 1.5px solid var(--border);
 }
 
-.data-table th {
-  padding: 0.9rem 1rem;
-  text-align: left;
-  font-size: 0.72rem;
+.data-table th,
+.guests-table th {
+  padding: 0.85rem 0.75rem;
+  font-size: 0.73rem;
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   border-bottom: 1.5px solid var(--border);
   white-space: nowrap;
+  vertical-align: middle;
 }
 
 .data-table th.sortable {
@@ -41,27 +42,119 @@
 }
 .data-table th.sortable:hover { color: var(--primary-dark); }
 
-.data-table td {
-  padding: 0.85rem 1rem;
+.data-table td,
+.guests-table td {
+  padding: 0.75rem 0.75rem;
   border-bottom: 1px solid #f1f5f9;
   color: var(--text-secondary);
   vertical-align: middle;
 }
 
-.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:last-child td,
+.guests-table tr:last-child td { border-bottom: none; }
 
-.data-table tbody tr {
+.data-table tbody tr,
+.guests-table tbody tr {
   transition: background var(--transition-fast);
 }
 
-.data-table tbody tr:hover {
-  background: #f0fdf4; /* Soft Mint Hover */
+.data-table tbody tr:hover,
+.guests-table tbody tr.guest-row:hover {
+  background: #f0fdf4 !important; /* Soft Mint/Emerald Hover */
   cursor: pointer;
 }
 
-.data-table .td-main {
+.data-table .td-main,
+.guests-table .td-main {
   color: var(--text-primary);
   font-weight: 600;
+}
+
+/* ── Specific Table Cell Elements ── */
+.identity-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  vertical-align: middle;
+}
+
+.identity-cell code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.03em;
+  background: #f8fafc;
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border);
+}
+
+.room-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  background: var(--primary-light);
+  border: 1px solid var(--border-emerald);
+  color: var(--primary-dark);
+  font-weight: 700;
+  border-radius: var(--radius-xs);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.total-badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  background: #f1f5f9;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.badge-age {
+  display: inline-block;
+  padding: 0.18rem 0.6rem;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+/* Action buttons in table - aligned neatly in single horizontal row */
+.actions-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.actions-cell .btn {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xs);
+  font-size: 0.92rem;
+  line-height: 1;
+  transition: all var(--transition-fast);
+  box-shadow: none;
+}
+
+.actions-cell .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-xs);
 }
 
 /* Table toolbar */
