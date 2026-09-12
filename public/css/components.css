@@ -808,3 +808,500 @@
     padding: 0 0.75rem;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   WEATHER & AIR QUALITY WIDGET (LAUNCHPAD SIDEBAR — KOTA TANJUNGPINANG)
+   ══════════════════════════════════════════════════════════════════════════════ */
+.weather-widget-card {
+  background: #ffffff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  margin-top: 0.65rem;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  transition: all var(--transition);
+}
+
+.weather-widget-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 6px 20px rgba(5, 150, 105, 0.08);
+}
+
+.weather-widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.weather-location-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.weather-loc-icon {
+  font-size: 1.1rem;
+}
+
+.weather-city-name {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.weather-province-name {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.weather-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.weather-live-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+  background: var(--primary-light);
+  border: 1px solid var(--border-emerald);
+  padding: 0.12rem 0.45rem;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+.weather-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: pulse-live 1.8s infinite;
+}
+
+.weather-refresh-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: #f8fafc;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+  padding: 0;
+}
+
+.weather-refresh-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.weather-refresh-btn.rotating {
+  animation: spin-once 0.6s linear;
+}
+
+/* ── MAIN WEATHER ROW (ANIMATION + TEMP) ── */
+.weather-main-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.2rem 0;
+}
+
+.weather-anim-box {
+  width: 62px;
+  height: 62px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  border: 1px solid var(--border-emerald);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.weather-art {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Sun animation */
+.art-sun {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+  position: absolute;
+  animation: sun-rotate 12s linear infinite;
+}
+
+.art-sun-pulse {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.2);
+  animation: sun-pulse 2.5s ease-in-out infinite;
+}
+
+/* Cloud animation */
+.art-cloud {
+  width: 30px;
+  height: 15px;
+  background: #ffffff;
+  border-radius: 12px;
+  position: absolute;
+  bottom: 8px;
+  right: 4px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+  animation: cloud-float 4s ease-in-out infinite alternate;
+}
+
+.art-cloud::before {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: #ffffff;
+  border-radius: 50%;
+  top: -6px;
+  left: 4px;
+}
+
+.art-cloud::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #ffffff;
+  border-radius: 50%;
+  top: -4px;
+  right: 4px;
+}
+
+.cloud-storm {
+  background: #64748b;
+}
+.cloud-storm::before, .cloud-storm::after {
+  background: #64748b;
+}
+
+.art-lightning {
+  position: absolute;
+  bottom: 0;
+  font-size: 14px;
+  color: #fbbf24;
+  animation: flash 1.2s infinite;
+}
+
+/* Rain drops */
+.art-rain-drops {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  gap: 5px;
+}
+
+.drop {
+  width: 2px;
+  height: 6px;
+  background: #0284c7;
+  border-radius: 2px;
+  animation: rain-drop 0.8s linear infinite;
+}
+
+.d1 { animation-delay: 0s; }
+.d2 { animation-delay: 0.25s; }
+.d3 { animation-delay: 0.5s; }
+
+/* Moon & stars */
+.art-moon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  box-shadow: 4px 4px 0 0 #f59e0b;
+  position: absolute;
+  animation: moon-float 3s ease-in-out infinite alternate;
+}
+
+.art-star {
+  color: #f59e0b;
+  font-size: 10px;
+  position: absolute;
+  animation: star-twinkle 1.5s ease-in-out infinite alternate;
+}
+.s1 { top: 4px; right: 6px; }
+.s2 { bottom: 8px; left: 6px; animation-delay: 0.7s; }
+
+/* Keyframe animations */
+@keyframes sun-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes sun-pulse {
+  0%, 100% { transform: scale(0.9); opacity: 0.6; }
+  50% { transform: scale(1.18); opacity: 0.2; }
+}
+@keyframes cloud-float {
+  0% { transform: translateX(-3px); }
+  100% { transform: translateX(3px); }
+}
+@keyframes rain-drop {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(12px); opacity: 0; }
+}
+@keyframes moon-float {
+  0% { transform: translateY(-2px); }
+  100% { transform: translateY(2px); }
+}
+@keyframes star-twinkle {
+  0% { opacity: 0.4; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.1); }
+}
+@keyframes flash {
+  0%, 90%, 100% { opacity: 0; }
+  92%, 96% { opacity: 1; }
+}
+@keyframes spin-once {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Temperature wrap */
+.weather-temp-wrap {
+  flex: 1;
+}
+
+.weather-temp-val {
+  font-size: 1.65rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.weather-unit {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-left: 2px;
+}
+
+.weather-condition-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-top: 0.2rem;
+}
+
+.weather-feels-like {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 0.15rem;
+}
+
+/* ── 2x2 STATS GRID (HIGH, LOW, WIND SPEED, WIND DIRECTION) ── */
+.weather-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+}
+
+.weather-stat-item {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.stat-icon-tag {
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 0.08rem 0.35rem;
+  border-radius: 4px;
+  width: fit-content;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.temp-high-tag {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+}
+
+.temp-low-tag {
+  background: #e0f2fe;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+}
+
+.wind-speed-tag {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.wind-dir-tag {
+  background: #f3f4f6;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.stat-data-value {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+.wind-arrow-icon {
+  display: inline-block;
+  font-size: 0.88rem;
+  transition: transform 0.4s ease;
+  line-height: 1;
+}
+
+.stat-data-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ── AIR QUALITY STATUS (NORMAL - HIJAU, SEDANG - OREN, WASPADA - MERAH) ── */
+.weather-air-card {
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.75rem;
+  border: 1.5px solid;
+  transition: all 0.2s ease;
+}
+
+.air-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.3rem;
+  gap: 0.3rem;
+}
+
+.air-label-title {
+  font-size: 0.74rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.air-status-pill {
+  padding: 0.12rem 0.45rem;
+  border-radius: var(--radius-full);
+  font-size: 0.66rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.air-aqi-index {
+  font-size: 0.68rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.air-card-desc {
+  font-size: 0.67rem;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+/* Normal - Hijau */
+.weather-air-card.aqi-normal {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+.air-status-pill.aqi-normal {
+  background: #10b981;
+  color: #ffffff;
+}
+.aqi-normal .air-label-title {
+  color: #065f46;
+}
+.aqi-normal .air-aqi-index {
+  color: #059669;
+}
+.aqi-normal .air-card-desc {
+  color: #047857;
+}
+
+/* Sedang - Oren */
+.weather-air-card.aqi-sedang {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+.air-status-pill.aqi-sedang {
+  background: #f59e0b;
+  color: #ffffff;
+}
+.aqi-sedang .air-label-title {
+  color: #92400e;
+}
+.aqi-sedang .air-aqi-index {
+  color: #d97706;
+}
+.aqi-sedang .air-card-desc {
+  color: #b45309;
+}
+
+/* Waspada - Merah */
+.weather-air-card.aqi-waspada {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+.air-status-pill.aqi-waspada {
+  background: #ef4444;
+  color: #ffffff;
+}
+.aqi-waspada .air-label-title {
+  color: #991b1b;
+}
+.aqi-waspada .air-aqi-index {
+  color: #dc2626;
+}
+.aqi-waspada .air-card-desc {
+  color: #b91c1c;
+}
+
+.weather-footer-sync {
+  font-size: 0.64rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: -0.2rem;
+}
+

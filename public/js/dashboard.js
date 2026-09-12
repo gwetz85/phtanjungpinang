@@ -16,6 +16,7 @@ const dashboard = {
     this.setupLogout();
     this.startClock();
     this.initNews();
+    this.initWeather();
     this.loadSystemInfo();
 
     // Navigate to default panel
@@ -487,6 +488,157 @@ const dashboard = {
         </div>
       </div>
     `).join('');
+  },
+
+  weatherData: null,
+  weatherTimer: null,
+
+  async initWeather() {
+    const refreshBtn = document.getElementById('weather-refresh-btn');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', async () => {
+        refreshBtn.classList.add('rotating');
+        await this.loadWeather(true);
+        setTimeout(() => refreshBtn.classList.remove('rotating'), 600);
+      });
+    }
+
+    // Initial weather load
+    await this.loadWeather();
+
+    // Auto-update every 5 minutes (300,000 ms)
+    if (this.weatherTimer) clearInterval(this.weatherTimer);
+    this.weatherTimer = setInterval(() => {
+      this.loadWeather(false);
+    }, 5 * 60 * 1000);
+  },
+
+  async loadWeather(force = false) {
+    try {
+      const res = await api.get('/weather' + (force ? '?refresh=1' : ''));
+      if (res && res.success && res.weather) {
+        this.weatherData = res;
+        this.renderWeather(res);
+      }
+    } catch (err) {
+      console.warn('[Weather] Load error:', err);
+    }
+  },
+
+  renderWeather(data) {
+    if (!data || !data.weather) return;
+    const w = data.weather;
+    const air = data.airQuality || {};
+
+    // Temperature & Conditions
+    const tempEl = document.getElementById('weather-temp');
+    const condEl = document.getElementById('weather-condition');
+    const feelsEl = document.getElementById('weather-feels');
+    if (tempEl) tempEl.textContent = typeof w.temperature === 'number' ? w.temperature.toFixed(1) : w.temperature;
+    if (condEl) condEl.textContent = w.condition || 'Cerah Berawan';
+    if (feelsEl) {
+      feelsEl.textContent = `Terasa ${w.feelsLike || w.temperature}°C • Lembap ${w.humidity || 75}%`;
+    }
+
+    // Animated weather art illustration
+    const artIcon = document.getElementById('weather-art-icon');
+    if (artIcon) {
+      artIcon.className = `weather-art weather-art-${w.animationType || 'partly-cloudy'}`;
+      artIcon.innerHTML = this.getWeatherAnimationHTML(w.animationType, w.isDay);
+    }
+
+    // High & Low
+    const maxEl = document.getElementById('weather-temp-max');
+    const minEl = document.getElementById('weather-temp-min');
+    if (maxEl) maxEl.textContent = `${w.tempMax !== undefined ? w.tempMax : '—'}°C`;
+    if (minEl) minEl.textContent = `${w.tempMin !== undefined ? w.tempMin : '—'}°C`;
+
+    // Wind Speed & Direction
+    const windSpeedEl = document.getElementById('weather-wind-speed');
+    const windTextEl = document.getElementById('weather-wind-text');
+    const windArrowEl = document.getElementById('weather-wind-arrow');
+    if (windSpeedEl) windSpeedEl.textContent = `${w.windSpeed || '0'} km/h`;
+    if (windTextEl) {
+      const dir = w.windDirection || {};
+      windTextEl.textContent = dir.text || `${dir.degrees || 0}° ${dir.code || 'U'}`;
+    }
+    if (windArrowEl && w.windDirection && typeof w.windDirection.degrees === 'number') {
+      windArrowEl.style.transform = `rotate(${w.windDirection.degrees}deg)`;
+    }
+
+    // Air Quality Status (Normal - Hijau, Sedang - Oren, Waspada - Merah)
+    const airPill = document.getElementById('weather-air-pill');
+    const aqiValEl = document.getElementById('weather-aqi-val');
+    const airDescEl = document.getElementById('weather-air-desc');
+    const airCard = document.getElementById('weather-air-card');
+
+    if (airPill) {
+      airPill.className = `air-status-pill ${air.badgeClass || 'aqi-normal'}`;
+      airPill.textContent = air.label || 'Normal (Baik)';
+    }
+    if (aqiValEl) {
+      aqiValEl.textContent = `AQI: ${air.aqi || 45} • PM2.5: ${air.pm25 || 12} µg/m³`;
+    }
+    if (airDescEl) {
+      airDescEl.textContent = air.desc || 'Kualitas udara Kota Tanjungpinang bersih dan segar.';
+    }
+    if (airCard) {
+      airCard.className = `weather-air-card ${air.badgeClass || 'aqi-normal'}`;
+    }
+
+    // Last updated
+    const lastUpdateEl = document.getElementById('weather-last-update');
+    if (lastUpdateEl) {
+      const timeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      lastUpdateEl.textContent = `Pembaruan: ${timeStr} WIB (Auto 5 mnt)`;
+    }
+  },
+
+  getWeatherAnimationHTML(type, isDay = true) {
+    switch (type) {
+      case 'clear-day':
+        return `
+          <div class="art-sun-pulse"></div>
+          <div class="art-sun"></div>
+        `;
+      case 'clear-night':
+        return `
+          <div class="art-moon"></div>
+          <div class="art-star s1">✦</div>
+          <div class="art-star s2">✦</div>
+        `;
+      case 'cloudy':
+        return `
+          <div class="art-cloud cloud-back"></div>
+          <div class="art-cloud cloud-front"></div>
+        `;
+      case 'rain':
+      case 'rain-heavy':
+      case 'drizzle':
+        return `
+          <div class="art-cloud"></div>
+          <div class="art-rain-drops">
+            <span class="drop d1"></span>
+            <span class="drop d2"></span>
+            <span class="drop d3"></span>
+          </div>
+        `;
+      case 'thunderstorm':
+        return `
+          <div class="art-cloud cloud-storm"></div>
+          <div class="art-lightning">⚡</div>
+          <div class="art-rain-drops">
+            <span class="drop d1"></span>
+            <span class="drop d2"></span>
+          </div>
+        `;
+      case 'partly-cloudy':
+      default:
+        return `
+          <div class="art-sun"></div>
+          <div class="art-cloud"></div>
+        `;
+    }
   }
 };
 

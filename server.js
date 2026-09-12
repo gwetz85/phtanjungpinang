@@ -10,6 +10,7 @@ const excelRoutes = require('./server/routes/excel');
 const userRoutes  = require('./server/routes/users');
 const settingsRoutes = require('./server/routes/settings');
 const newsRoutes  = require('./server/routes/news');
+const weatherRoutes = require('./server/routes/weather');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -60,6 +61,7 @@ app.use('/api/excel',  excelRoutes);
 app.use('/api/users',  userRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/news',     newsRoutes);
+app.use('/api/weather',  weatherRoutes);
 
 // ── SPA Fallback ──
 app.get('*', (req, res) => {

@@ -520,9 +520,95 @@
       <span class="launchpad-badge" id="sidebar-user-role-badge">STAF</span>
     </div>
 
-    <nav class="launchpad-body" id="launchpad-nav">
-      <!-- Generated dynamically by dashboard.js renderNav() -->
-    </nav>
+    <div class="launchpad-body">
+      <nav class="launchpad-nav-list" id="launchpad-nav">
+        <!-- Generated dynamically by dashboard.js renderNav() -->
+      </nav>
+
+      <!-- WIDGET CUACA REALTIME KOTA TANJUNGPINANG (DIBAWAH MENU UPLOAD EXCEL) -->
+      <div class="weather-widget-card" id="weather-widget">
+        <!-- Header: Wilayah & Auto 5 Menit -->
+        <div class="weather-widget-header">
+          <div class="weather-location-wrap">
+            <span class="weather-loc-icon">📍</span>
+            <div>
+              <div class="weather-city-name">Kota Tanjungpinang</div>
+              <div class="weather-province-name">Prov. Kepulauan Riau, Indonesia</div>
+            </div>
+          </div>
+          <div class="weather-header-actions">
+            <span class="weather-live-badge" title="Diperbarui otomatis tiap 5 menit">
+              <span class="weather-pulse-dot"></span> 5M
+            </span>
+            <button type="button" class="weather-refresh-btn" id="weather-refresh-btn" title="Refresh cuaca sekarang">🔄</button>
+          </div>
+        </div>
+
+        <!-- Main Display: Animated Illustration + Temp & Condition -->
+        <div class="weather-main-row">
+          <div class="weather-anim-box" id="weather-anim-box">
+            <!-- Animated Weather Illustration -->
+            <div class="weather-art weather-art-partly-cloudy" id="weather-art-icon">
+              <div class="art-sun"></div>
+              <div class="art-cloud"></div>
+            </div>
+          </div>
+          <div class="weather-temp-wrap">
+            <div class="weather-temp-val"><span id="weather-temp">—</span><span class="weather-unit">°C</span></div>
+            <div class="weather-condition-label" id="weather-condition">Memuat cuaca...</div>
+            <div class="weather-feels-like" id="weather-feels">Terasa —°C • Lembap —%</div>
+          </div>
+        </div>
+
+        <!-- 2x2 Stats Grid: Suhu Tertinggi, Suhu Terendah, Kecepatan Angin, Arah Mata Angin -->
+        <div class="weather-stats-grid">
+          <div class="weather-stat-item">
+            <span class="stat-icon-tag temp-high-tag">🔺 Max</span>
+            <div class="stat-data-value" id="weather-temp-max">—°C</div>
+            <div class="stat-data-label">Suhu Tertinggi</div>
+          </div>
+
+          <div class="weather-stat-item">
+            <span class="stat-icon-tag temp-low-tag">🔻 Min</span>
+            <div class="stat-data-value" id="weather-temp-min">—°C</div>
+            <div class="stat-data-label">Suhu Terendah</div>
+          </div>
+
+          <div class="weather-stat-item">
+            <span class="stat-icon-tag wind-speed-tag">💨 Angin</span>
+            <div class="stat-data-value" id="weather-wind-speed">— km/h</div>
+            <div class="stat-data-label">Kecepatan Angin</div>
+          </div>
+
+          <div class="weather-stat-item">
+            <span class="stat-icon-tag wind-dir-tag">🧭 Arah</span>
+            <div class="stat-data-value" id="weather-wind-dir">
+              <span class="wind-arrow-icon" id="weather-wind-arrow">↑</span>
+              <span id="weather-wind-text">—</span>
+            </div>
+            <div class="stat-data-label">Arah Mata Angin</div>
+          </div>
+        </div>
+
+        <!-- Air Quality Status (Status Kebersihan Udara) -->
+        <div class="weather-air-card" id="weather-air-card">
+          <div class="air-card-top">
+            <div class="air-label-title">
+              <span>🍃 Kebersihan Udara:</span>
+              <span class="air-status-pill aqi-sedang" id="weather-air-pill">Memuat...</span>
+            </div>
+            <span class="air-aqi-index" id="weather-aqi-val">AQI: —</span>
+          </div>
+          <div class="air-card-desc" id="weather-air-desc">
+            Mengambil indikator kualitas udara Tanjungpinang...
+          </div>
+        </div>
+
+        <div class="weather-footer-sync">
+          <span id="weather-last-update">Sinkronisasi cuaca otomatis</span>
+        </div>
+      </div>
+    </div>
 
     <div class="launchpad-footer">
       <div class="sys-info-card">
