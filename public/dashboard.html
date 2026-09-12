@@ -474,9 +474,38 @@
             </div>
           </div>
         </div>
+      <!-- ══════════════════════════════════
+           PANEL: BERITA KOTA TANJUNGPINANG
+      ══════════════════════════════════ -->
+      <div class="panel" id="panel-news">
+        <div class="card">
+          <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;">
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <span style="font-size:1.6rem;">📰</span>
+              <div>
+                <div class="card-title">Warta &amp; Berita Terkini Kota Tanjungpinang</div>
+                <div style="font-size:0.78rem;color:var(--text-muted);">
+                  Informasi realtime bersumber dari Google Berita, Antara News Kepri, Pemko Tanjungpinang, dan jaringan media internet
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:0.6rem;align-items:center;">
+              <span class="clock-tag" style="background:var(--primary-light);border:1px solid var(--border-emerald);padding:0.2rem 0.6rem;border-radius:20px;font-size:0.75rem;font-weight:700;color:var(--primary-dark);">
+                <span class="pulse-dot"></span> LIVE SYNC
+              </span>
+              <button class="btn btn-outline btn-sm" id="news-refresh-btn">🔄 Refresh Berita</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:1.5rem;">
+            <div id="news-grid-container" class="news-cards-grid">
+              <div style="text-align:center;padding:3rem;color:var(--text-muted);">
+                <div class="spinner" style="margin:0 auto 0.75rem;"></div>
+                Mengambil warta terkini Kota Tanjungpinang...
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-
-
 
     </main>
 
@@ -513,14 +542,34 @@
 
 </div><!-- end dashboard-layout -->
 
-<!-- BOTTOM OPERATIONAL BAR: STATUS & JAM REALTIME -->
+<!-- BOTTOM OPERATIONAL BAR: BRAND, BERITA TANJUNGPINANG REALTIME & JAM REALTIME -->
 <div class="operational-bottom-bar" id="operational-bottom-bar">
   <div class="bottom-bar-left">
     <span class="pulse-dot"></span>
     <span class="bottom-bar-brand">PELANGI HOTEL TANJUNGPINANG</span>
     <span class="bottom-bar-sep">•</span>
-    <span class="bottom-bar-info">Sistem Operasional &amp; Database Tamu</span>
   </div>
+
+  <!-- Realtime Tanjungpinang News Rotator -->
+  <div class="bottom-bar-news" id="bottom-bar-news">
+    <div class="news-live-tag" title="Berita dan informasi terkini daerah Kota Tanjungpinang dari internet">
+      <span class="news-pulse-dot"></span>
+      <span class="news-tag-text">KABAR TANJUNGPINANG</span>
+    </div>
+    <div class="news-headline-viewport" id="news-headline-viewport">
+      <a class="news-headline-link" id="news-headline-link" href="#" target="_blank" rel="noopener noreferrer" title="Klik untuk membuka berita">
+        <span class="news-source-tag" id="news-source-tag">MEMUAT</span>
+        <span class="news-title-text" id="news-title-text">Menghubungkan ke jaringan berita Kota Tanjungpinang...</span>
+        <span class="news-time-tag" id="news-time-tag"></span>
+      </a>
+    </div>
+    <div class="news-controls">
+      <button type="button" class="news-ctrl-btn" id="news-prev-btn" title="Berita Sebelumnya">‹</button>
+      <button type="button" class="news-ctrl-btn" id="news-next-btn" title="Berita Selanjutnya">›</button>
+      <button type="button" class="news-all-btn" id="news-all-btn" title="Buka Semua Warta Tanjungpinang">Semua Berita ↗</button>
+    </div>
+  </div>
+
   <div class="realtime-clock-bar" id="realtime-clock">
     <span class="clock-tag"><span class="pulse-dot"></span> LIVE</span>
     <span id="clock-time">Memuat jam...</span>

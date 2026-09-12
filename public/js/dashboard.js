@@ -15,6 +15,7 @@ const dashboard = {
     this.renderNav();
     this.setupLogout();
     this.startClock();
+    this.initNews();
     this.loadSystemInfo();
 
     // Navigate to default panel
@@ -73,6 +74,7 @@ const dashboard = {
       { id: 'panel-search', icon: '🔍', label: 'Cari Tamu', desc: 'Pencarian Cepat NIK & Nama', roles: ['receptionist', 'admin', 'superadmin'] },
       { id: 'panel-checkin', icon: '➕', label: 'Check-in Baru', desc: 'Registrasi Tamu Menginap', roles: ['receptionist', 'admin', 'superadmin'] },
       { id: 'panel-guests', icon: '📋', label: 'Semua Data Tamu', desc: 'Buku Tamu & Database Historis', roles: ['receptionist', 'admin', 'superadmin'] },
+      { id: 'panel-news', icon: '📰', label: 'Berita Tanjungpinang', desc: 'Warta Terkini Daerah Realtime', roles: ['receptionist', 'admin', 'superadmin'] },
       { id: 'panel-users', icon: '👥', label: 'Manajemen Akun', desc: 'Pengelolaan Staf & Akses', roles: ['admin', 'superadmin'] },
       { id: 'panel-excel', icon: '📁', label: 'Upload Excel', desc: 'Import & Rekap Spreadsheet', roles: ['superadmin'] },
     ];
@@ -110,6 +112,7 @@ const dashboard = {
       'panel-search': '🔍 Cari Tamu',
       'panel-checkin': '➕ Check-in Baru',
       'panel-guests': '📋 Semua Data Tamu',
+      'panel-news': '📰 Warta & Berita Terkini Kota Tanjungpinang',
       'panel-users': '👥 Manajemen Akun',
       'panel-excel': '📁 Upload Database Excel',
     };
@@ -132,6 +135,7 @@ const dashboard = {
       case 'panel-search':  searchPanel.init(); break;
       case 'panel-checkin': checkinModule.init(); break;
       case 'panel-guests':  guestsPanel.init(); break;
+      case 'panel-news':    this.initNewsPanel(); break;
       case 'panel-users':   usersPanel.init(); break;
       case 'panel-excel':   excelPanel.init(); break;
     }
@@ -334,6 +338,155 @@ const dashboard = {
 
     updateTime();
     setInterval(updateTime, 1000);
+  },
+
+  newsItems: [],
+  currentNewsIndex: 0,
+  newsRotateTimer: null,
+  isNewsHovered: false,
+
+  async initNews() {
+    const prevBtn = document.getElementById('news-prev-btn');
+    const nextBtn = document.getElementById('news-next-btn');
+    const allBtn = document.getElementById('news-all-btn');
+    const viewport = document.getElementById('news-headline-viewport');
+    const refreshBtn = document.getElementById('news-refresh-btn');
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.stepNews(-1);
+      });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.stepNews(1);
+      });
+    }
+    if (allBtn) {
+      allBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.navigate('panel-news');
+      });
+    }
+    if (viewport) {
+      viewport.addEventListener('mouseenter', () => { this.isNewsHovered = true; });
+      viewport.addEventListener('mouseleave', () => { this.isNewsHovered = false; });
+    }
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', async () => {
+        refreshBtn.disabled = true;
+        refreshBtn.textContent = '⏳ Sinkronisasi...';
+        await this.loadNews(true);
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = '🔄 Refresh Berita';
+      });
+    }
+
+    // Initial load
+    await this.loadNews();
+
+    // Background refresh every 10 minutes
+    setInterval(() => {
+      this.loadNews(false);
+    }, 10 * 60 * 1000);
+  },
+
+  async loadNews(force = false) {
+    try {
+      const res = await api.get('/news' + (force ? '?refresh=1' : ''));
+      if (res && res.success && Array.isArray(res.news) && res.news.length > 0) {
+        this.newsItems = res.news;
+        if (this.currentNewsIndex >= this.newsItems.length) this.currentNewsIndex = 0;
+        this.displayNewsHeadline(this.currentNewsIndex);
+        this.startNewsRotator();
+        if (this.currentPanel === 'panel-news') {
+          this.renderNewsGrid();
+        }
+      }
+    } catch (err) {
+      console.warn('[News] Load error:', err);
+    }
+  },
+
+  displayNewsHeadline(index) {
+    if (!this.newsItems || this.newsItems.length === 0) return;
+    const item = this.newsItems[index % this.newsItems.length];
+    const sourceEl = document.getElementById('news-source-tag');
+    const titleEl  = document.getElementById('news-title-text');
+    const timeEl   = document.getElementById('news-time-tag');
+    const linkEl   = document.getElementById('news-headline-link');
+
+    if (sourceEl) sourceEl.textContent = (item.source || 'Tanjungpinang').toUpperCase();
+    if (titleEl) {
+      titleEl.style.opacity = '0';
+      titleEl.style.transform = 'translateY(4px)';
+      setTimeout(() => {
+        titleEl.textContent = item.title;
+        titleEl.style.opacity = '1';
+        titleEl.style.transform = 'translateY(0)';
+      }, 150);
+    }
+    if (timeEl) timeEl.textContent = item.timeAgo ? `• ${item.timeAgo}` : '';
+    if (linkEl) {
+      linkEl.href = item.link || '#';
+      linkEl.title = `${item.title} (${item.source})`;
+    }
+  },
+
+  stepNews(delta) {
+    if (!this.newsItems || this.newsItems.length === 0) return;
+    this.currentNewsIndex = (this.currentNewsIndex + delta + this.newsItems.length) % this.newsItems.length;
+    this.displayNewsHeadline(this.currentNewsIndex);
+  },
+
+  startNewsRotator() {
+    if (this.newsRotateTimer) clearInterval(this.newsRotateTimer);
+    this.newsRotateTimer = setInterval(() => {
+      if (!this.isNewsHovered && this.newsItems && this.newsItems.length > 1) {
+        this.currentNewsIndex = (this.currentNewsIndex + 1) % this.newsItems.length;
+        this.displayNewsHeadline(this.currentNewsIndex);
+      }
+    }, 7000);
+  },
+
+  initNewsPanel() {
+    if (this.newsItems && this.newsItems.length > 0) {
+      this.renderNewsGrid();
+    } else {
+      this.loadNews().then(() => this.renderNewsGrid());
+    }
+  },
+
+  renderNewsGrid() {
+    const container = document.getElementById('news-grid-container');
+    if (!container) return;
+
+    if (!this.newsItems || this.newsItems.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center;padding:3rem;color:var(--text-muted);grid-column:1/-1;">
+          Tidak ada warta berita Tanjungpinang yang dapat ditampilkan saat ini.
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = this.newsItems.map((item, idx) => `
+      <div class="news-item-card">
+        <div class="news-item-badge-row">
+          <span class="news-item-source">${escHtml(item.source || 'Tanjungpinang')}</span>
+          <span class="news-item-time">${escHtml(item.timeAgo || 'Terkini')}</span>
+        </div>
+        <h4 class="news-item-title">${escHtml(item.title)}</h4>
+        <div class="news-item-footer">
+          <span class="news-item-location">📍 Kota Tanjungpinang</span>
+          <a href="${escHtml(item.link || '#')}" target="_blank" rel="noopener noreferrer" class="news-item-link">
+            Buka Berita Asli ↗
+          </a>
+        </div>
+      </div>
+    `).join('');
   }
 };
 
