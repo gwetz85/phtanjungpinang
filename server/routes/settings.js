@@ -13,7 +13,8 @@ router.get('/running-text', async (req, res) => {
     const db = getDB();
     res.json({
       success: true,
-      runningText: db.runningText || ''
+      runningText: db.runningText || '',
+      runningTextSpeed: db.runningTextSpeed || 'slow'
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -23,17 +24,21 @@ router.get('/running-text', async (req, res) => {
 // PUT /api/settings/running-text
 router.put('/running-text', authorize('superadmin'), (req, res) => {
   try {
-    const { runningText } = req.body;
+    const { runningText, speed } = req.body;
     if (runningText === undefined) {
       return res.status(400).json({ success: false, message: 'Running text tidak boleh kosong.' });
     }
     const db = getDB();
     db.runningText = String(runningText).trim();
+    if (speed && ['slow', 'normal', 'fast'].includes(speed)) {
+      db.runningTextSpeed = speed;
+    }
     persist();
     res.json({
       success: true,
       message: 'Running text berhasil diperbarui.',
-      runningText: db.runningText
+      runningText: db.runningText,
+      runningTextSpeed: db.runningTextSpeed || 'slow'
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

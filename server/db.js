@@ -11,7 +11,8 @@ let dbData = {
   guests: [],
   checkins: [],
   counters: { users: 1, guests: 1, checkins: 1 },
-  runningText: 'Selamat Datang di PELANGI HOTEL Tanjungpinang! Nikmati kenyamanan dan layanan terbaik kami.'
+  runningText: 'Selamat Datang di PELANGI HOTEL Tanjungpinang! Nikmati kenyamanan dan layanan terbaik kami.',
+  runningTextSpeed: 'slow'
 };
 
 let isInitialized = false;
@@ -63,7 +64,8 @@ async function syncFromFirebase() {
         guests: Array.isArray(cloudData.guests) ? cloudData.guests.filter(Boolean) : (cloudData.guests ? Object.values(cloudData.guests) : []),
         checkins: Array.isArray(cloudData.checkins) ? cloudData.checkins.filter(Boolean) : (cloudData.checkins ? Object.values(cloudData.checkins) : []),
         counters: cloudData.counters || { users: 1, guests: 1, checkins: 1 },
-        runningText: cloudData.runningText || 'Selamat Datang di PELANGI HOTEL Tanjungpinang! Nikmati kenyamanan dan layanan terbaik kami.'
+        runningText: cloudData.runningText || 'Selamat Datang di PELANGI HOTEL Tanjungpinang! Nikmati kenyamanan dan layanan terbaik kami.',
+        runningTextSpeed: cloudData.runningTextSpeed || dbData.runningTextSpeed || 'slow'
       };
       sanitizeData();
       console.log('[Firebase] Cloud data synced successfully.');
