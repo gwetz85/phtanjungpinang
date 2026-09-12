@@ -332,18 +332,19 @@ const dashboard = {
       return `<span class="ticker-item-text">${safe}</span>`;
     });
     
-    let html = segments.join('<span class="ticker-sep">✦</span>');
-    // Ensure one stream is long enough for seamless infinite scroll (>= 120 chars)
+    const sep = '<span class="ticker-sep">•</span>';
+    let html = segments.join(sep);
+    // Ensure stream is long enough for seamless infinite scroll (>= 120 chars)
     const totalChars = parts.join(' ').length;
-    if (totalChars < 120) {
-      const repeatCount = Math.ceil(150 / Math.max(totalChars, 10));
+    if (totalChars < 100) {
+      const repeatCount = Math.ceil(120 / Math.max(totalChars, 10));
       const repeated = [];
       for (let i = 0; i < repeatCount; i++) {
         repeated.push(html);
       }
-      html = repeated.join('<span class="ticker-sep">✦</span>');
+      html = repeated.join(sep);
     }
-    return html + '<span class="ticker-sep">✦</span>';
+    return html + sep;
   },
 
   async loadRunningText(force = false) {
@@ -377,9 +378,9 @@ const dashboard = {
 
       // Calculate smooth velocity-based animation duration
       requestAnimationFrame(() => {
-        const singleWidth = c1.offsetWidth || (cleanText.length * 8.5);
-        const speedPx = speed === 'fast' ? 70 : (speed === 'normal' ? 48 : 32);
-        const duration = Math.max(20, Math.round(singleWidth / speedPx)) + 's';
+        const singleWidth = c1.scrollWidth || c1.offsetWidth || (cleanText.length * 9);
+        const speedPx = speed === 'fast' ? 50 : (speed === 'normal' ? 36 : 24);
+        const duration = Math.max(25, Math.round(singleWidth / speedPx)) + 's';
         wrap.style.animationDuration = duration;
       });
 
@@ -429,9 +430,9 @@ const dashboard = {
       });
       if (previewBadge) {
         const labels = {
-          slow: 'Pelan (~32 px/dtk)',
-          normal: 'Sedang (~48 px/dtk)',
-          fast: 'Cepat (~70 px/dtk)'
+          slow: 'Pelan (~24 px/dtk)',
+          normal: 'Sedang (~36 px/dtk)',
+          fast: 'Cepat (~50 px/dtk)'
         };
         previewBadge.textContent = labels[speedVal] || labels.slow;
       }
@@ -447,8 +448,8 @@ const dashboard = {
 
       const speed = getSelectedSpeed();
       requestAnimationFrame(() => {
-        const singleWidth = prevC1.offsetWidth || (val.length * 8.5);
-        const speedPx = speed === 'fast' ? 70 : (speed === 'normal' ? 48 : 32);
+        const singleWidth = prevC1.scrollWidth || prevC1.offsetWidth || (val.length * 9);
+        const speedPx = speed === 'fast' ? 50 : (speed === 'normal' ? 36 : 24);
         const duration = Math.max(15, Math.round(singleWidth / speedPx)) + 's';
         previewWrap.style.animationDuration = duration;
       });
