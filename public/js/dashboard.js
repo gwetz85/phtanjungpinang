@@ -14,9 +14,6 @@ const dashboard = {
     this.renderUserInfo();
     this.renderNav();
     this.setupLogout();
-    this.loadRunningText();
-    // Poll for running text updates every 30 seconds
-    setInterval(() => this.loadRunningText(), 30000);
     this.startClock();
     this.loadSystemInfo();
 
@@ -78,7 +75,6 @@ const dashboard = {
       { id: 'panel-guests', icon: '📋', label: 'Semua Data Tamu', desc: 'Buku Tamu & Database Historis', roles: ['receptionist', 'admin', 'superadmin'] },
       { id: 'panel-users', icon: '👥', label: 'Manajemen Akun', desc: 'Pengelolaan Staf & Akses', roles: ['admin', 'superadmin'] },
       { id: 'panel-excel', icon: '📁', label: 'Upload Excel', desc: 'Import & Rekap Spreadsheet', roles: ['superadmin'] },
-      { id: 'panel-running-text', icon: '📢', label: 'Running Teks', desc: 'Atur Teks Berjalan & Kecepatan', roles: ['superadmin'] },
     ];
 
     nav.innerHTML = allItems
@@ -116,7 +112,6 @@ const dashboard = {
       'panel-guests': '📋 Semua Data Tamu',
       'panel-users': '👥 Manajemen Akun',
       'panel-excel': '📁 Upload Database Excel',
-      'panel-running-text': '📢 Atur Running Teks',
     };
     document.getElementById('main-title').textContent = titles[panelId] || '';
 
@@ -139,7 +134,6 @@ const dashboard = {
       case 'panel-guests':  guestsPanel.init(); break;
       case 'panel-users':   usersPanel.init(); break;
       case 'panel-excel':   excelPanel.init(); break;
-      case 'panel-running-text': this.initRunningTextPanel(); break;
     }
   },
 
@@ -315,209 +309,6 @@ const dashboard = {
       document.getElementById('sidebar').classList.remove('open');
       document.getElementById('sidebar-overlay').classList.remove('show');
     });
-  },
-
-  formatRunningTextHTML(text) {
-    if (!text) return '';
-    // Split by "|" if multiple segments, or keep text intact
-    const parts = text.split('|').map(s => s.trim()).filter(Boolean);
-    if (!parts.length) return '';
-    
-    // Create segment spans with safe encoding
-    const segments = parts.map(part => {
-      const safe = part
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-      return `<span class="ticker-item-text">${safe}</span>`;
-    });
-    
-    const sep = '<span class="ticker-sep">•</span>';
-    let html = segments.join(sep);
-    // Ensure stream is long enough for seamless infinite scroll (>= 120 chars)
-    const totalChars = parts.join(' ').length;
-    if (totalChars < 100) {
-      const repeatCount = Math.ceil(120 / Math.max(totalChars, 10));
-      const repeated = [];
-      for (let i = 0; i < repeatCount; i++) {
-        repeated.push(html);
-      }
-      html = repeated.join(sep);
-    }
-    return html + sep;
-  },
-
-  async loadRunningText(force = false) {
-    const banner = document.getElementById('running-text-banner');
-    const wrap   = document.getElementById('running-text-wrap');
-    const c1     = document.getElementById('running-text-content-1');
-    const c2     = document.getElementById('running-text-content-2');
-    if (!banner || !wrap || !c1 || !c2) return;
-
-    const applyData = (text, speed = 'slow') => {
-      const cleanText = (text || '').trim();
-      if (!cleanText) {
-        banner.style.display = 'none';
-        this._lastRunningText = '';
-        return;
-      }
-
-      // Check if unchanged to prevent animation stuttering on polling
-      if (!force && this._lastRunningText === cleanText && this._lastRunningSpeed === speed) {
-        return;
-      }
-
-      this._lastRunningText = cleanText;
-      this._lastRunningSpeed = speed;
-
-      const html = this.formatRunningTextHTML(cleanText);
-      c1.innerHTML = html;
-      c2.innerHTML = html;
-
-      banner.style.display = 'flex';
-
-      // Calculate smooth velocity-based animation duration
-      requestAnimationFrame(() => {
-        const singleWidth = c1.scrollWidth || c1.offsetWidth || (cleanText.length * 9);
-        const speedPx = speed === 'fast' ? 50 : (speed === 'normal' ? 36 : 24);
-        const duration = Math.max(25, Math.round(singleWidth / speedPx)) + 's';
-        wrap.style.animationDuration = duration;
-      });
-
-      try {
-        localStorage.setItem('ph_running_text', cleanText);
-        localStorage.setItem('ph_running_speed', speed);
-      } catch (_) {}
-    };
-
-    try {
-      const res = await api.get('/settings/running-text');
-      applyData(res.runningText || '', res.runningTextSpeed || 'slow');
-    } catch (err) {
-      try {
-        const cachedText = localStorage.getItem('ph_running_text');
-        const cachedSpeed = localStorage.getItem('ph_running_speed') || 'slow';
-        applyData(cachedText || '', cachedSpeed);
-      } catch (_) {}
-      console.warn('[RunningText] API error, using cache:', err);
-    }
-  },
-
-  async initRunningTextPanel() {
-    const txtArea = document.getElementById('rt-content');
-    const saveBtn = document.getElementById('rt-save-btn');
-    if (!txtArea || !saveBtn) return;
-
-    const speedCards = document.querySelectorAll('.rt-speed-card');
-    const previewWrap = document.getElementById('rt-preview-wrap');
-    const prevC1 = document.getElementById('rt-preview-content-1');
-    const prevC2 = document.getElementById('rt-preview-content-2');
-    const previewBadge = document.getElementById('rt-preview-speed-badge');
-
-    const getSelectedSpeed = () => {
-      const checked = document.querySelector('input[name="rt_speed"]:checked');
-      return checked ? checked.value : 'slow';
-    };
-
-    const updateSpeedUI = (speedVal) => {
-      speedCards.forEach(card => {
-        const input = card.querySelector('input');
-        if (input) {
-          const isMatch = input.value === speedVal;
-          input.checked = isMatch;
-          card.classList.toggle('active', isMatch);
-        }
-      });
-      if (previewBadge) {
-        const labels = {
-          slow: 'Pelan (~24 px/dtk)',
-          normal: 'Sedang (~36 px/dtk)',
-          fast: 'Cepat (~50 px/dtk)'
-        };
-        previewBadge.textContent = labels[speedVal] || labels.slow;
-      }
-      updatePreview();
-    };
-
-    const updatePreview = () => {
-      if (!prevC1 || !prevC2 || !previewWrap) return;
-      const val = (txtArea.value || '').trim() || 'Contoh Running Teks Hotel Pelangi Tanjungpinang...';
-      const html = this.formatRunningTextHTML(val);
-      prevC1.innerHTML = html;
-      prevC2.innerHTML = html;
-
-      const speed = getSelectedSpeed();
-      requestAnimationFrame(() => {
-        const singleWidth = prevC1.scrollWidth || prevC1.offsetWidth || (val.length * 9);
-        const speedPx = speed === 'fast' ? 50 : (speed === 'normal' ? 36 : 24);
-        const duration = Math.max(15, Math.round(singleWidth / speedPx)) + 's';
-        previewWrap.style.animationDuration = duration;
-      });
-    };
-
-    // Load current value from server
-    try {
-      const res = await api.get('/settings/running-text');
-      txtArea.value = res.runningText || '';
-      updateSpeedUI(res.runningTextSpeed || 'slow');
-    } catch (err) {
-      toast(err.message, 'error');
-    }
-
-    // Bind speed card click events
-    speedCards.forEach(card => {
-      card.addEventListener('click', () => {
-        const input = card.querySelector('input');
-        if (input) {
-          updateSpeedUI(input.value);
-        }
-      });
-    });
-
-    // Bind quick icon buttons
-    document.querySelectorAll('.rt-icon-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const insertText = btn.getAttribute('data-insert');
-        if (!insertText) return;
-
-        const start = txtArea.selectionStart;
-        const end = txtArea.selectionEnd;
-        const text = txtArea.value;
-
-        // Insert text at cursor
-        txtArea.value = text.substring(0, start) + insertText + text.substring(end);
-        txtArea.focus();
-        txtArea.selectionStart = txtArea.selectionEnd = start + insertText.length;
-
-        updatePreview();
-      });
-    });
-
-    // Real-time preview on input
-    txtArea.addEventListener('input', () => updatePreview());
-
-    // Set save handler
-    const newSaveBtn = saveBtn.cloneNode(true);
-    saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
-
-    newSaveBtn.addEventListener('click', async () => {
-      const val = txtArea.value.trim();
-      const speed = getSelectedSpeed();
-      try {
-        newSaveBtn.disabled = true;
-        newSaveBtn.textContent = '⏳ Menyimpan...';
-        await api.put('/settings/running-text', { runningText: val, speed });
-        toast('Running teks dan kecepatan berhasil diperbarui!', 'success');
-        this.loadRunningText(true); // Force reload banner
-      } catch (err) {
-        toast(err.message, 'error');
-      } finally {
-        newSaveBtn.disabled = false;
-        newSaveBtn.textContent = '💾 Simpan & Terapkan';
-      }
-    });
-
-    updatePreview();
   },
 
   startClock() {
