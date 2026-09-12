@@ -815,13 +815,13 @@
 .weather-widget-card {
   background: #ffffff;
   border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem 1.1rem;
-  margin-top: 0.65rem;
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.75rem;
+  margin-top: 0.25rem;
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 0.45rem;
   transition: border-color var(--transition), box-shadow var(--transition);
 }
 
@@ -834,28 +834,28 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .weather-location-wrap {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.35rem;
 }
 
 .weather-loc-icon {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
 }
 
 .weather-city-name {
-  font-size: 0.84rem;
+  font-size: 0.8rem;
   font-weight: 800;
   color: var(--text-primary);
   line-height: 1.2;
 }
 
 .weather-province-name {
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   font-weight: 500;
   color: var(--text-muted);
 }
@@ -863,33 +863,33 @@
 .weather-header-actions {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.3rem;
 }
 
 .weather-live-badge {
-  font-size: 0.65rem;
+  font-size: 0.58rem;
   font-weight: 800;
   color: var(--primary-dark);
   background: var(--primary-light);
   border: 1px solid var(--border-emerald);
-  padding: 0.12rem 0.45rem;
+  padding: 0.08rem 0.35rem;
   border-radius: var(--radius-full);
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.25rem;
   white-space: nowrap;
 }
 
 .weather-static-dot {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: #10b981;
 }
 
 .weather-refresh-btn {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   border: 1px solid var(--border);
   background: #f8fafc;
@@ -897,7 +897,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   cursor: pointer;
   transition: all 0.2s ease;
   line-height: 1;
@@ -919,14 +919,14 @@
 .weather-main-row {
   display: flex;
   align-items: center;
-  gap: 0.9rem;
-  padding: 0.2rem 0;
+  gap: 0.65rem;
+  padding: 0.05rem 0;
 }
 
 .weather-anim-box {
-  width: 62px;
-  height: 62px;
-  border-radius: var(--radius-sm);
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
   background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
   border: 1px solid var(--border-emerald);
   display: flex;
@@ -939,8 +939,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 34px;
+  height: 34px;
 }
 
 /* Temperature wrap */
@@ -949,7 +949,7 @@
 }
 
 .weather-temp-val {
-  font-size: 1.65rem;
+  font-size: 1.4rem;
   font-weight: 900;
   color: var(--text-primary);
   line-height: 1;
@@ -957,47 +957,47 @@
 }
 
 .weather-unit {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--primary);
   margin-left: 2px;
 }
 
 .weather-condition-label {
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   font-weight: 700;
   color: var(--primary-dark);
-  margin-top: 0.2rem;
+  margin-top: 0.1rem;
 }
 
 .weather-feels-like {
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   color: var(--text-muted);
   font-weight: 500;
-  margin-top: 0.15rem;
+  margin-top: 0.06rem;
 }
 
 /* ── 2x2 STATS GRID (HIGH, LOW, WIND SPEED, WIND DIRECTION) ── */
 .weather-stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.45rem;
+  gap: 0.35rem;
 }
 
 .weather-stat-item {
   background: #f8fafc;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.6rem;
+  border-radius: 6px;
+  padding: 0.3rem 0.45rem;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.1rem;
 }
 
 .stat-icon-tag {
-  font-size: 0.62rem;
+  font-size: 0.56rem;
   font-weight: 800;
-  padding: 0.08rem 0.35rem;
+  padding: 0.04rem 0.25rem;
   border-radius: 4px;
   width: fit-content;
   text-transform: uppercase;
@@ -1029,67 +1029,67 @@
 }
 
 .stat-data-value {
-  font-size: 0.82rem;
+  font-size: 0.75rem;
   font-weight: 800;
   color: var(--text-primary);
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.2rem;
   white-space: nowrap;
 }
 
 .wind-arrow-icon {
   display: inline-block;
-  font-size: 0.88rem;
+  font-size: 0.8rem;
   line-height: 1;
 }
 
 .stat-data-label {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   color: var(--text-muted);
   font-weight: 500;
 }
 
 /* ── AIR QUALITY STATUS (NORMAL - HIJAU, SEDANG - OREN, WASPADA - MERAH) ── */
 .weather-air-card {
-  border-radius: var(--radius-sm);
-  padding: 0.65rem 0.8rem;
+  border-radius: 6px;
+  padding: 0.45rem 0.6rem;
   border: 1.5px solid;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.2rem;
 }
 
 .air-card-row-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .air-card-label {
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 800;
   white-space: nowrap;
 }
 
 .air-status-pill {
-  padding: 0.12rem 0.5rem;
+  padding: 0.08rem 0.4rem;
   border-radius: var(--radius-full);
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   font-weight: 800;
   white-space: nowrap;
 }
 
 .air-card-metrics {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.01em;
 }
 
 .air-card-desc {
-  font-size: 0.68rem;
-  line-height: 1.35;
+  font-size: 0.64rem;
+  line-height: 1.25;
   font-weight: 500;
 }
 
@@ -1151,8 +1151,9 @@
 }
 
 .weather-footer-sync {
-  font-size: 0.64rem;
+  font-size: 0.6rem;
   color: var(--text-muted);
   text-align: center;
+  margin-top: -0.1rem;
 }
 
